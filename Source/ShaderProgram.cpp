@@ -24,7 +24,10 @@ bool ShaderProgram::loadShader(GLuint shader, const std::string &filename)
 	const char *c_str = tmp.c_str();
 
 	glShaderSource(shader, 1, &c_str, nullptr);
-	compileShader(shader, filename);
+	
+	if (!compileShader(shader, filename))
+		return false;
+
 	glAttachShader(program, shader);
 
 	return true;
@@ -45,7 +48,9 @@ bool ShaderProgram::compileShader(GLuint shader, const std::string &filename)
 		GLchar *log = new GLchar[len + 1];
 		glGetShaderInfoLog(shader, len, &len, log);
 
-		Error::report("Failed to compile shader \"" + filename + "\".", log);
+		std::stringstream s;
+		s << "Failed to compile shader \"" << filename << "\":" << std::endl << std::endl << log;
+		Error::report("Error", s.str());
 
 		delete[] log;
 
@@ -107,7 +112,9 @@ bool ShaderProgram::link()
 		GLchar *log = new GLchar[len + 1];
 		glGetProgramInfoLog(program, len, &len, log);
 
-		Error::report("Failed to link shader program.", log);
+		std::stringstream s;
+		s << "Failed to link shader program:" << std::endl << std::endl << log;
+		Error::report("Error", s.str());
 
 		delete[] log;
 

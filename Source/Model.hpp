@@ -1,38 +1,31 @@
 #pragma once
 
-#include "Texture.hpp"
+#include "Material.hpp"
+#include "Mesh.hpp"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <glm.hpp>
 #include <vector>
 
-struct Vertex
-{
-	float positionX, positionY, positionZ;
-	float u, v;
-	float normalX, normalY, normalZ;
-};
-
 class Model
 {
 private:
 	static Assimp::Importer importer;
-	static Texture *defaultTexture;
-	static const std::string &defaultTextureFilename;
-
+	
 	GLuint VBO, VAO;
-	std::vector<Texture*> textures;
-	std::vector<unsigned int> meshFirstVertex;
-	std::vector<unsigned int> meshVertexCount;
-	std::vector<unsigned int> meshMaterialIndex;
+	std::vector<Mesh*> meshes;
+	std::vector<Material*> materials;
 	glm::mat4 worldMatrix;
+
+	bool parseMaterials(const aiScene *model);
+	void parseVertices(const aiScene *model, std::vector<Vertex> *vertices);
 
 public:
 	~Model();
 
 	bool load(const std::string &filename);
-	void render();
+	void render(bool bindMaterials);
 
 	glm::mat4 getWorldMatrix();
 	void setWorldMatrix(glm::mat4 &worldMatrix);

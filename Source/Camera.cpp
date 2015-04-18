@@ -9,8 +9,12 @@ float Camera::mouseSensitivity = 0.4f;
 
 Camera::Camera()
 {
-	position = glm::vec4(0.f, 0.f, 0.f, 1.f);
+	position = glm::vec4(0.f, 100.f, 0.f, 1.f);
 	pitch = yaw = roll = 0.f;
+
+	forwardKeyPressed = backKeyPressed = leftKeyPressed = rightKeyPressed = crouchKeyPressed = false;
+
+	debugMode = false;
 }
 
 void Camera::rotatePitch(float amount)
@@ -88,4 +92,14 @@ void Camera::setRightKeyPressed(bool pressed)
 void Camera::setCrouchKeyPressed(bool pressed)
 {
 	crouchKeyPressed = pressed;
+}
+
+void Camera::toggleDebugMode()
+{
+	debugMode = !debugMode;
+}
+
+bool Camera::isDebugModeOn()
+{
+	return debugMode;
 }

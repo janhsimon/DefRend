@@ -1,8 +1,10 @@
 #include "Camera.hpp"
 #include "Error.hpp"
+#include "GBuffer.hpp"
 #include "Model.hpp"
 #include "Renderer.hpp"
 #include "ShaderProgram.hpp"
+#include "TextureManager.hpp"
 #include "Window.hpp"
 
 #include <glm.hpp>
@@ -11,14 +13,19 @@
 #include <SDL_opengl.h>
 
 Camera *camera;
-Model *sponzaModel, *bannerModel;
+GBuffer *gBuffer;
+Model *fullscreenQuadModel, *sponzaModel;
 Renderer *renderer;
-ShaderProgram *simpleDrawShaderProgram;
+ShaderProgram /**simpleDrawShaderProgram,*/ *geometryPassShaderProgram, *directionalLightingPassShaderProgram;
 Window *window;
 
 unsigned int lastTickTime = 0;
-GLint worldViewMatrixLocation;
 
+//GLint worldViewMatrixLocation;
+GLint gp_worldMatrixLocation, gp_viewProjectionMatrixLocation;
+GLint dlp_worldViewProjectionMatrixLocation;
+
+/*
 bool initSimpleDrawShaderProgram()
 {
 	simpleDrawShaderProgram = new ShaderProgram();
@@ -47,10 +54,133 @@ bool initSimpleDrawShaderProgram()
 	glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(projection_matrix));
 
 
+	// set up texture units
+
+	GLint texLoc;
+	if (!simpleDrawShaderProgram->getUniformLocation("diffuseMap", texLoc))
+		return false;
+
+	glUniform1i(texLoc, 0);
+
+	if (!simpleDrawShaderProgram->getUniformLocation("normalMap", texLoc))
+		return false;
+
+	glUniform1i(texLoc, 1);
+
+	if (!simpleDrawShaderProgram->getUniformLocation("opacityMap", texLoc))
+		return false;
+
+	glUniform1i(texLoc, 2);
+
 	GLenum error = glGetError();
 	if (error != GL_NO_ERROR)
 	{
 		Error::report("Error", "Failed to load tree draw shader: " + Error::getOpenGLErrorString(error));
+		return false;
+	}
+
+	return true;
+}
+*/
+
+bool initGeometryPassShaderProgram()
+{
+	geometryPassShaderProgram = new ShaderProgram();
+
+	assert(geometryPassShaderProgram);
+
+	if (!geometryPassShaderProgram->load("Shaders\\GeometryPass.vs.glsl", "", "Shaders\\GeometryPass.fs.glsl"))
+		return false;
+
+	if (!geometryPassShaderProgram->link())
+		return false;
+
+	glUseProgram(geometryPassShaderProgram->getProgram());
+
+	if (!geometryPassShaderProgram->getUniformLocation("worldMatrix", gp_worldMatrixLocation))
+		return false;
+
+	if (!geometryPassShaderProgram->getUniformLocation("viewProjectionMatrix", gp_viewProjectionMatrixLocation))
+		return false;
+
+
+	// set up texture units
+
+	GLint texLoc;
+	if (!geometryPassShaderProgram->getUniformLocation("diffuseMap", texLoc))
+		return false;
+
+	glUniform1i(texLoc, 0);
+
+	if (!geometryPassShaderProgram->getUniformLocation("normalMap", texLoc))
+		return false;
+
+	glUniform1i(texLoc, 1);
+
+	if (!geometryPassShaderProgram->getUniformLocation("opacityMap", texLoc))
+		return false;
+
+	glUniform1i(texLoc, 2);
+
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR)
+	{
+		Error::report("Error", "Failed to load deferred geometry pass shader: " + Error::getOpenGLErrorString(error));
+		return false;
+	}
+
+	return true;
+}
+
+bool initDirectionalLightingPassShaderProgram()
+{
+	directionalLightingPassShaderProgram = new ShaderProgram();
+
+	assert(directionalLightingPassShaderProgram);
+
+	if (!directionalLightingPassShaderProgram->load("Shaders\\DirectionalLightingPass.vs.glsl", "", "Shaders\\DirectionalLightingPass.fs.glsl"))
+		return false;
+
+	if (!directionalLightingPassShaderProgram->link())
+		return false;
+
+	glUseProgram(directionalLightingPassShaderProgram->getProgram());
+
+	if (!directionalLightingPassShaderProgram->getUniformLocation("worldViewProjectionMatrix", dlp_worldViewProjectionMatrixLocation))
+		return false;
+
+
+	// set up screen size
+
+	GLint screenSizeLocation;
+	if (!directionalLightingPassShaderProgram->getUniformLocation("screenSize", screenSizeLocation))
+		return false;
+
+	glUniform2f(screenSizeLocation, (float)window->getWidth(), (float)window->getHeight());
+
+
+	// set up texture units
+
+	GLint texLoc;
+	if (!directionalLightingPassShaderProgram->getUniformLocation("gbuffer_worldPosition", texLoc))
+		return false;
+
+	glUniform1i(texLoc, 0);
+
+	if (!directionalLightingPassShaderProgram->getUniformLocation("gbuffer_diffuse", texLoc))
+		return false;
+
+	glUniform1i(texLoc, 1);
+
+	if (!directionalLightingPassShaderProgram->getUniformLocation("gbuffer_normal", texLoc))
+		return false;
+
+	glUniform1i(texLoc, 2);
+
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR)
+	{
+		Error::report("Error", "Failed to load deferred direction lighting pass shader: " + Error::getOpenGLErrorString(error));
 		return false;
 	}
 
@@ -114,8 +244,16 @@ bool load()
 	// create camera
 	camera = new Camera();
 
-	// load shader
-	if (!initSimpleDrawShaderProgram())
+
+	// load shaders
+	
+	//if (!initSimpleDrawShaderProgram())
+		//return false;
+
+	if (!initGeometryPassShaderProgram())
+		return false;
+
+	if (!initDirectionalLightingPassShaderProgram())
 		return false;
 
 
@@ -123,45 +261,123 @@ bool load()
 
 	sponzaModel = new Model();
 
-	if (!sponzaModel->load("Models\\sponza\\sponza.obj"))
+	if (!sponzaModel->load("Models\\sponza2\\sponza.obj"))
 		return false;
 
 	glm::mat4 worldMatrix;
 	worldMatrix = glm::scale(worldMatrix, glm::vec3(1.f, 1.f, 1.f));
 	sponzaModel->setWorldMatrix(worldMatrix);
 
-	bannerModel = new Model();
 
-	if (!bannerModel->load("Models\\sponza\\banner.obj"))
+	fullscreenQuadModel = new Model();
+
+	if (!fullscreenQuadModel->load("Models\\fullscreen_quad\\fullscreen_quad.obj"))
 		return false;
 
-	worldMatrix = glm::rotate(worldMatrix, 90.f, glm::vec3(1.f, 0.f, 0.f));
-	bannerModel->setWorldMatrix(worldMatrix);
+	worldMatrix = glm::scale(worldMatrix, glm::vec3(1.f, 1.f, 1.f));
+	fullscreenQuadModel->setWorldMatrix(worldMatrix);
+
+
+	// create g-buffer
+	
+	gBuffer = new GBuffer();
+
+	if (!gBuffer->load(window->getWidth(), window->getHeight()))
+		return false;
 	
 
 	return true;
 }
 
+void renderGeometryPass(float delta)
+{
+	glUseProgram(geometryPassShaderProgram->getProgram());
+
+	gBuffer->bindForWriting();
+
+	// make sure we write to the depth buffer
+	glDepthMask(GL_TRUE);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glEnable(GL_DEPTH_TEST);
+
+	// set the world matrix
+	glUniformMatrix4fv(gp_worldMatrixLocation, 1, GL_FALSE, glm::value_ptr(sponzaModel->getWorldMatrix()));
+
+	// set the view-projection matrix
+	glm::mat4 projection_matrix(glm::perspective(glm::radians(74.f), (float)window->getWidth() / (float)window->getHeight(), 1.0f, 10000.0f));
+	glUniformMatrix4fv(gp_viewProjectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(projection_matrix * camera->getViewMatrix(delta)));
+
+	sponzaModel->render(true);
+}
+
+void renderGBufferDebug()
+{
+	// reset the frame buffer so we draw to the actual screen
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	assert(gBuffer);
+	gBuffer->bindForReading(true);
+
+	GLsizei halfWidth = (GLsizei)(window->getWidth() / 2.f);
+	GLsizei halfHeight = (GLsizei)(window->getHeight() / 2.f);
+
+	gBuffer->setReadBuffer(GBUFFER_TEXTURE_TYPE_POSITION);
+	glBlitFramebuffer(0, 0, window->getWidth(), window->getHeight(), 0, 0, halfWidth, halfHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+	gBuffer->setReadBuffer(GBUFFER_TEXTURE_TYPE_DIFFUSE);
+	glBlitFramebuffer(0, 0, window->getWidth(), window->getHeight(), 0, halfHeight, halfWidth, window->getHeight(), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+	gBuffer->setReadBuffer(GBUFFER_TEXTURE_TYPE_NORMAL);
+	glBlitFramebuffer(0, 0, window->getWidth(), window->getHeight(), halfWidth, halfHeight, window->getWidth(), window->getHeight(), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+}
+
+void beginLightPass()
+{
+	// light pass does not write to the depth buffer
+	glDepthMask(GL_FALSE);
+	glDisable(GL_DEPTH_TEST);
+
+	assert(gBuffer);
+	gBuffer->bindForReading(false);
+
+	glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void doDirectionalLightPass()
+{
+	glUseProgram(directionalLightingPassShaderProgram->getProgram());
+
+	// set the world matrix
+	glUniformMatrix4fv(dlp_worldViewProjectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
+
+	fullscreenQuadModel->render(false);
+}
+
 void render(float delta)
 {
-	renderer->beginDrawing();
+	renderGeometryPass(delta);
 
-	glUseProgram(simpleDrawShaderProgram->getProgram());
-	
-	glUniformMatrix4fv(worldViewMatrixLocation, 1, GL_FALSE, glm::value_ptr(camera->getViewMatrix(delta) * sponzaModel->getWorldMatrix()));
-	sponzaModel->render();
-	
-	glUniformMatrix4fv(worldViewMatrixLocation, 1, GL_FALSE, glm::value_ptr(camera->getViewMatrix(delta) * bannerModel->getWorldMatrix()));
-	bannerModel->render();
-	
-	renderer->endDrawing();
+	if (camera->isDebugModeOn())
+		renderGBufferDebug();
+	else
+	{
+		beginLightPass();
+		doDirectionalLightPass();
+	}
+
+	renderer->finalizeFrame();
 }
 
 void destroy()
 {
+	delete gBuffer;
+	delete fullscreenQuadModel;
 	delete sponzaModel;
-	delete bannerModel;
-	delete simpleDrawShaderProgram;
+	//delete simpleDrawShaderProgram;
 	delete camera;
 	delete renderer;
 	delete window;
@@ -199,6 +415,8 @@ int main(int argc, char **argv)
 			{
 				if (e.key.keysym.sym == SDLK_ESCAPE && e.type == SDL_KEYUP)
 					window->setAlive(false);
+				else if (e.key.keysym.sym == SDLK_TAB && e.type == SDL_KEYDOWN)
+					camera->toggleDebugMode();
 				else if (e.key.keysym.sym == SDLK_F10 && e.type == SDL_KEYUP)
 					window->changeResolution(window->getWidth(), window->getHeight(), !window->getFullscreen());
 				else if (e.key.keysym.sym == SDLK_w)

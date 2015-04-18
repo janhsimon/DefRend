@@ -42,6 +42,18 @@
     <ClCompile Include="Source\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\TextureManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Error.hpp">
@@ -65,12 +77,36 @@
     <ClInclude Include="Source\Texture.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Mesh.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Material.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\TextureManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Binaries\Shaders\SimpleDraw.vs.glsl">
       <Filter>Shader Files</Filter>
     </None>
     <None Include="Binaries\Shaders\SimpleDraw.fs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\DirectionalLightingPass.fs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\DirectionalLightingPass.vs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\GeometryPass.fs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\GeometryPass.vs.glsl">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>

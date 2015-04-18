@@ -11,7 +11,6 @@ public:
 	~Renderer();
 
 	bool create();
-	void beginDrawing();
-	void endDrawing();
+	void finalizeFrame();
 	SDL_GLContext getGLContext();
 };

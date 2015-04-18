@@ -12,11 +12,13 @@ private:
 	glm::vec4 position;
 	float pitch, yaw, roll;
 
-	bool forwardKeyPressed = false;
-	bool backKeyPressed = false;
-	bool leftKeyPressed = false;
-	bool rightKeyPressed = false;
-	bool crouchKeyPressed = false;
+	bool forwardKeyPressed;
+	bool backKeyPressed;
+	bool leftKeyPressed;
+	bool rightKeyPressed;
+	bool crouchKeyPressed;
+
+	bool debugMode;
 
 public:
 	Camera();
@@ -32,4 +34,7 @@ public:
 	void setLeftKeyPressed(bool pressed);
 	void setRightKeyPressed(bool pressed);
 	void setCrouchKeyPressed(bool pressed);
+
+	void toggleDebugMode();
+	bool isDebugModeOn();
 };

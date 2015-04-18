@@ -36,3 +36,27 @@ const std::string Error::getOpenGLErrorString(GLenum errorFlag)
 	else
 		return "Unrecognized error";
 }
+
+const std::string Error::getOpenGLFrameBufferErrorString(GLenum errorFlag)
+{
+	if (errorFlag == GL_FRAMEBUFFER_COMPLETE)
+		return "No error has been recorded";
+	else if (errorFlag == GL_FRAMEBUFFER_UNDEFINED)
+		return "Target is the default framebuffer, but the default framebuffer does not exist";
+	else if (errorFlag == GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT)
+		return "The framebuffer attachment points are framebuffer incomplete";
+	else if (errorFlag == GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT)
+		return "The framebuffer does not have at least one image attached to it";
+	else if (errorFlag == GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER)
+		return "The value of GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE is GL_NONE for a color attachment point named by GL_DRAW_BUFFERi";
+	else if (errorFlag == GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER)
+		return "GL_READ_BUFFER is not GL_NONE and the value of GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE is GL_NONE for the color attachment point named by GL_READ_BUFFER";
+	else if (errorFlag == GL_FRAMEBUFFER_UNSUPPORTED)
+		return "The combination of internal formats of the attached images violates an implementation-dependent set of restrictions";
+	else if (errorFlag == GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE)
+		return "The value of GL_RENDERBUFFER_SAMPLES is not the same for all attached renderbuffers";
+	else if (errorFlag == GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS)
+		return "A framebuffer attachment is layered and any populated attachment is not layered or all populated color attachments are not from textures of the same target";
+	else
+		return "Unrecognized error";
+}

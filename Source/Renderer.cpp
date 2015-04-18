@@ -53,15 +53,13 @@ bool Renderer::create()
 	// enable depth test
 	glEnable(GL_DEPTH_TEST);
 
+	// set up blend func for opacity maps
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	return true;
 }
 
-void Renderer::beginDrawing()
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-void Renderer::endDrawing()
+void Renderer::finalizeFrame()
 {
 	assert(window);
 	assert(window->getSDLWindow());

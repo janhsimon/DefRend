@@ -12,12 +12,12 @@ private:
 	Texture *diffuseMap, *normalMap, *opacityMap;
 
 	void parseName(aiMaterial *material);
-	bool parseTexture(aiMaterial *material, int slot);
+	bool parseTexture(aiMaterial *material, const std::string &modelFilename, int slot);
 
 public:
 	~Material();
 
-	bool load(aiMaterial *material);
+	bool load(aiMaterial *material, const std::string &modelFilename);
 	void bind();
 	std::string getName();
 };

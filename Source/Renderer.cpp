@@ -48,7 +48,7 @@ bool Renderer::create()
 	}
 
 	// set clear color
-	glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
+	glClearColor(0.f, 0.f, 0.f, 1.0f);
 
 	// enable depth test
 	glEnable(GL_DEPTH_TEST);

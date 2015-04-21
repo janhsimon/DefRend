@@ -6,14 +6,22 @@
 
 Assimp::Importer Model::importer = Assimp::Importer();
 
-bool Model::parseMaterials(const aiScene *model)
+std::string Model::isolateFilename(const std::string &filename)
+{
+	std::string isolatedFilename = filename;
+	isolatedFilename = isolatedFilename.substr(isolatedFilename.find_last_of("\\") + 1, isolatedFilename.length());
+	isolatedFilename = isolatedFilename.substr(0, isolatedFilename.find_last_of("."));
+	return isolatedFilename;
+}
+
+bool Model::parseMaterials(const aiScene *model, const std::string &filename)
 {
 	for (unsigned int materialIndex = 0; materialIndex < model->mNumMaterials; ++materialIndex)
 	// loop through each material in the model
 	{
 		Material *newMaterial = new Material();
 
-		if (!newMaterial->load(model->mMaterials[materialIndex]))
+		if (!newMaterial->load(model->mMaterials[materialIndex], filename))
 			return false;
 
 		materials.push_back(newMaterial);
@@ -58,7 +66,7 @@ bool Model::load(const std::string &filename)
 		return false;
 	}
 
-	if (!parseMaterials(model))
+	if (!parseMaterials(model, isolateFilename(filename)))
 		return false;
 
 	std::vector<Vertex> vertices;
@@ -116,6 +124,7 @@ void Model::render(bool bindMaterials)
 	}
 }
 
+/*
 glm::mat4 Model::getWorldMatrix()
 {
 	return worldMatrix;
@@ -125,3 +134,4 @@ void Model::setWorldMatrix(glm::mat4 &worldMatrix)
 {
 	this->worldMatrix = worldMatrix;
 }
+*/

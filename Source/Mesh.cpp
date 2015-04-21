@@ -19,10 +19,21 @@ std::vector<Vertex> Mesh::load(aiMesh *mesh)
 		for (int i = 0; i < 3; ++i)
 		// we expect triangulated faces
 		{
-			aiVector3D pos = mesh->mVertices[face->mIndices[i]];
-			aiVector3D uv = mesh->mTextureCoords[0][face->mIndices[i]];
-			aiVector3D normal = mesh->mNormals[face->mIndices[i]];
-			aiVector3D tangent = mesh->mTangents[face->mIndices[i]];
+			aiVector3D pos = aiVector3D(0.f, 0.f, 0.f);
+			if (mesh->HasPositions())
+				pos = mesh->mVertices[face->mIndices[i]];
+
+			aiVector3D uv = aiVector3D(0.f, 0.f, 0.f);
+			if (mesh->HasTextureCoords(0))
+				uv = mesh->mTextureCoords[0][face->mIndices[i]];
+
+			aiVector3D normal = aiVector3D(0.f, 0.f, 0.f);
+			if (mesh->HasNormals())
+				normal = mesh->mNormals[face->mIndices[i]];
+
+			aiVector3D tangent = aiVector3D(0.f, 0.f, 0.f);
+			if (mesh->HasTangentsAndBitangents())
+				tangent = mesh->mTangents[face->mIndices[i]];
 
 			// add this vertex to our list
 			Vertex newVertex = { pos.x, pos.y, pos.z, uv.x, uv.y, normal.x, normal.y, normal.z, tangent.x, tangent.y, tangent.z };

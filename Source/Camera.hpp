@@ -11,6 +11,7 @@ private:
 
 	glm::vec4 position;
 	float pitch, yaw, roll;
+	glm::vec4 forward, right, up;
 
 	bool forwardKeyPressed;
 	bool backKeyPressed;
@@ -27,7 +28,8 @@ public:
 	void rotateYaw(float amount);
 	void rotateRoll(float amount);
 	
-	glm::mat4 getViewMatrix(float delta);
+	void update(float delta);
+	glm::mat4 getViewMatrix();
 	
 	void setForwardKeyPressed(bool pressed);
 	void setBackKeyPressed(bool pressed);

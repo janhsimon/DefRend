@@ -2,6 +2,7 @@
 #include "Texture.hpp"
 
 #include <SDL_image.h>
+#include <sstream>
 
 Texture::~Texture()
 {
@@ -29,19 +30,32 @@ bool Texture::load(const std::string &filename)
 	glGenTextures(1, &textureHandle);
 	glBindTexture(GL_TEXTURE_2D, textureHandle);
 
-	int mode;
+	int sourceFormat, destinationFormat;
 
-	if (surface->format->BytesPerPixel == 3)
-		mode = GL_BGR;
+	if (surface->format->BytesPerPixel == 1)
+	{
+		sourceFormat = GL_RED;
+		destinationFormat = GL_R8;
+	}
+	else if (surface->format->BytesPerPixel == 3)
+	{
+		sourceFormat = GL_BGR;
+		destinationFormat = GL_RGB8;
+	}
 	else if (surface->format->BytesPerPixel == 4)
-		mode = GL_BGRA;
+	{
+		sourceFormat = GL_BGRA;
+		destinationFormat = GL_RGBA8;
+	}
 	else
 	{
-		Error::report("Error", "Invalid color depth on texture \"" + filename + "\".");
+		std::stringstream s;
+		s << "Invalid color depth (" << (int)surface->format->BytesPerPixel << " byte(s) per pixel) on texture \"" << filename + "\".";
+		Error::report("Error", s.str());
 		return false;
 	}
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, mode, GL_UNSIGNED_BYTE, surface->pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, destinationFormat, surface->w, surface->h, 0, sourceFormat, GL_UNSIGNED_BYTE, surface->pixels);
 	SDL_FreeSurface(surface);
 
 	GLenum error = glGetError();

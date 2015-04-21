@@ -2,8 +2,10 @@
 #include "Error.hpp"
 #include "GBuffer.hpp"
 #include "Model.hpp"
+#include "PointLight.hpp"
 #include "Renderer.hpp"
 #include "ShaderProgram.hpp"
+#include "SpotLight.hpp"
 #include "TextureManager.hpp"
 #include "Window.hpp"
 
@@ -12,18 +14,25 @@
 #include <gtc/type_ptr.hpp>
 #include <SDL_opengl.h>
 
-Camera *camera;
+Camera camera;
 GBuffer *gBuffer;
-Model *fullscreenQuadModel, *sponzaModel;
+Model fullscreenQuadModel, sponzaModel, manModel, unitSphereModel;
 Renderer *renderer;
-ShaderProgram /**simpleDrawShaderProgram,*/ *geometryPassShaderProgram, *directionalLightingPassShaderProgram;
+ShaderProgram /**simpleDrawShaderProgram,*/ *geometryPassShaderProgram, *directionalLightingPassShaderProgram, *pointLightingPassShaderProgram, *spotLightingPassShaderProgram;
 Window *window;
 
+std::vector<PointLight*> pointLights;
+std::vector<SpotLight*> spotLights;
+
 unsigned int lastTickTime = 0;
+
+glm::mat4 projection_matrix;
 
 //GLint worldViewMatrixLocation;
 GLint gp_worldMatrixLocation, gp_viewProjectionMatrixLocation;
 GLint dlp_worldViewProjectionMatrixLocation;
+GLint plp_worldViewProjectionMatrixLocation, plp_lightPosition, plp_lightColor, plp_lightIntensity, plp_lightAttenuation;
+GLint slp_worldViewProjectionMatrixLocation, slp_lightPosition, slp_lightColor, slp_lightIntensity, slp_lightAttenuation, slp_lightDirection, slp_lightCutoffCosine;
 
 /*
 bool initSimpleDrawShaderProgram()
@@ -138,7 +147,7 @@ bool initDirectionalLightingPassShaderProgram()
 
 	assert(directionalLightingPassShaderProgram);
 
-	if (!directionalLightingPassShaderProgram->load("Shaders\\DirectionalLightingPass.vs.glsl", "", "Shaders\\DirectionalLightingPass.fs.glsl"))
+	if (!directionalLightingPassShaderProgram->load("Shaders\\LightingPass.vs.glsl", "", "Shaders\\DirectionalLightingPass.fs.glsl"))
 		return false;
 
 	if (!directionalLightingPassShaderProgram->link())
@@ -187,6 +196,154 @@ bool initDirectionalLightingPassShaderProgram()
 	return true;
 }
 
+bool initPointLightingPassShaderProgram()
+{
+	pointLightingPassShaderProgram = new ShaderProgram();
+
+	assert(pointLightingPassShaderProgram);
+
+	if (!pointLightingPassShaderProgram->load("Shaders\\LightingPass.vs.glsl", "", "Shaders\\PointLightingPass.fs.glsl"))
+		return false;
+
+	if (!pointLightingPassShaderProgram->link())
+		return false;
+
+	
+	glUseProgram(pointLightingPassShaderProgram->getProgram());
+
+	if (!pointLightingPassShaderProgram->getUniformLocation("worldViewProjectionMatrix", plp_worldViewProjectionMatrixLocation))
+		return false;
+
+
+	// set up screen size
+
+	GLint screenSizeLocation;
+	if (!pointLightingPassShaderProgram->getUniformLocation("screenSize", screenSizeLocation))
+		return false;
+
+	glUniform2f(screenSizeLocation, (float)window->getWidth(), (float)window->getHeight());
+
+
+	// retrieve point light parameters
+
+	if (!pointLightingPassShaderProgram->getUniformLocation("lightPosition", plp_lightPosition))
+		return false;
+
+	if (!pointLightingPassShaderProgram->getUniformLocation("lightColor", plp_lightColor))
+		return false;
+
+	if (!pointLightingPassShaderProgram->getUniformLocation("lightIntensity", plp_lightIntensity))
+		return false;
+
+	if (!pointLightingPassShaderProgram->getUniformLocation("lightAttenuation", plp_lightAttenuation))
+		return false;
+
+
+	// set up texture units
+
+	GLint texLoc;
+	if (!pointLightingPassShaderProgram->getUniformLocation("gbuffer_worldPosition", texLoc))
+		return false;
+
+	glUniform1i(texLoc, 0);
+
+	if (!pointLightingPassShaderProgram->getUniformLocation("gbuffer_diffuse", texLoc))
+		return false;
+
+	glUniform1i(texLoc, 1);
+
+	if (!pointLightingPassShaderProgram->getUniformLocation("gbuffer_normal", texLoc))
+		return false;
+
+	glUniform1i(texLoc, 2);
+
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR)
+	{
+		Error::report("Error", "Failed to load deferred point lighting pass shader: " + Error::getOpenGLErrorString(error));
+		return false;
+	}
+	
+	return true;
+}
+
+bool initSpotLightingPassShaderProgram()
+{
+	spotLightingPassShaderProgram = new ShaderProgram();
+
+	assert(spotLightingPassShaderProgram);
+
+	if (!spotLightingPassShaderProgram->load("Shaders\\LightingPass.vs.glsl", "", "Shaders\\SpotLightingPass.fs.glsl"))
+		return false;
+
+	if (!spotLightingPassShaderProgram->link())
+		return false;
+
+
+	glUseProgram(spotLightingPassShaderProgram->getProgram());
+
+	if (!spotLightingPassShaderProgram->getUniformLocation("worldViewProjectionMatrix", slp_worldViewProjectionMatrixLocation))
+		return false;
+
+
+	// set up screen size
+
+	GLint screenSizeLocation;
+	if (!spotLightingPassShaderProgram->getUniformLocation("screenSize", screenSizeLocation))
+		return false;
+
+	glUniform2f(screenSizeLocation, (float)window->getWidth(), (float)window->getHeight());
+
+
+	// retrieve point light parameters
+
+	if (!spotLightingPassShaderProgram->getUniformLocation("lightPosition", slp_lightPosition))
+		return false;
+
+	if (!spotLightingPassShaderProgram->getUniformLocation("lightColor", slp_lightColor))
+		return false;
+
+	if (!spotLightingPassShaderProgram->getUniformLocation("lightIntensity", slp_lightIntensity))
+		return false;
+
+	if (!spotLightingPassShaderProgram->getUniformLocation("lightAttenuation", slp_lightAttenuation))
+		return false;
+
+	if (!spotLightingPassShaderProgram->getUniformLocation("lightDirection", slp_lightDirection))
+		return false;
+
+	if (!spotLightingPassShaderProgram->getUniformLocation("lightCutoffCosine", slp_lightCutoffCosine))
+		return false;
+
+
+	// set up texture units
+
+	GLint texLoc;
+	if (!spotLightingPassShaderProgram->getUniformLocation("gbuffer_worldPosition", texLoc))
+		return false;
+
+	glUniform1i(texLoc, 0);
+
+	if (!spotLightingPassShaderProgram->getUniformLocation("gbuffer_diffuse", texLoc))
+		return false;
+
+	glUniform1i(texLoc, 1);
+
+	if (!spotLightingPassShaderProgram->getUniformLocation("gbuffer_normal", texLoc))
+		return false;
+
+	glUniform1i(texLoc, 2);
+
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR)
+	{
+		Error::report("Error", "Failed to load deferred spot lighting pass shader: " + Error::getOpenGLErrorString(error));
+		return false;
+	}
+
+	return true;
+}
+
 bool load()
 {
 	// create a window
@@ -197,6 +354,9 @@ bool load()
 
 	if (!window->create(1600, 900))
 		return false;
+
+	// set up the projection matrix
+	projection_matrix = glm::perspective(glm::radians(74.f), (float)window->getWidth() / (float)window->getHeight(), 1.0f, 10000.0f);
 
 
 	// create a renderer
@@ -241,10 +401,6 @@ bool load()
 	}
 
 
-	// create camera
-	camera = new Camera();
-
-
 	// load shaders
 	
 	//if (!initSimpleDrawShaderProgram())
@@ -256,26 +412,26 @@ bool load()
 	if (!initDirectionalLightingPassShaderProgram())
 		return false;
 
+	if (!initPointLightingPassShaderProgram())
+		return false;
+
+	if (!initSpotLightingPassShaderProgram())
+		return false;
+
 
 	// load models
 
-	sponzaModel = new Model();
-
-	if (!sponzaModel->load("Models\\sponza2\\sponza.obj"))
+	if (!fullscreenQuadModel.load("Models\\FullscreenQuad\\FullscreenQuad.obj"))
 		return false;
 
-	glm::mat4 worldMatrix;
-	worldMatrix = glm::scale(worldMatrix, glm::vec3(1.f, 1.f, 1.f));
-	sponzaModel->setWorldMatrix(worldMatrix);
-
-
-	fullscreenQuadModel = new Model();
-
-	if (!fullscreenQuadModel->load("Models\\fullscreen_quad\\fullscreen_quad.obj"))
+	if (!sponzaModel.load("Models\\Sponza\\Sponza.obj"))
 		return false;
 
-	worldMatrix = glm::scale(worldMatrix, glm::vec3(1.f, 1.f, 1.f));
-	fullscreenQuadModel->setWorldMatrix(worldMatrix);
+	if (!manModel.load("Models\\OldMan\\OldMan.obj"))
+		return false;
+
+	if (!unitSphereModel.load("Models\\UnitSphere\\UnitSphere.obj"))
+		return false;
 
 
 	// create g-buffer
@@ -284,7 +440,59 @@ bool load()
 
 	if (!gBuffer->load(window->getWidth(), window->getHeight()))
 		return false;
+
+
+	// add a point light
 	
+	PointLight *l = new PointLight();
+	l->position[0] = 0.f;
+	l->position[1] = 0.f;
+	l->position[2] = 0.f;
+	l->color[0] = 1.f;
+	l->color[1] = 0.f;
+	l->color[2] = 0.f;
+	l->intensity = 100000.f;
+	l->attenuation[0] = 0.f;
+	l->attenuation[1] = 0.f;
+	l->attenuation[2] = 1.f;
+	pointLights.push_back(l);
+
+	for (int i = 0; i < 13; ++i)
+	{
+		SpotLight *s = new SpotLight();
+		s->position[0] = 1075.f - i * 189.f;
+		s->position[1] = 0.f;
+		s->position[2] = 560.f;
+		s->color[0] = .9f;
+		s->color[1] = .9f;
+		s->color[2] = .6f;
+		s->intensity = 100000.f;
+		s->attenuation[0] = 0.f;
+		s->attenuation[1] = 0.f;
+		s->attenuation[2] = 1.f;
+		s->direction[0] = 0.f;
+		s->direction[1] = 1.f;
+		s->direction[2] = 0.f;
+		s->cutoff = 25.f;
+		spotLights.push_back(s);
+
+		s = new SpotLight();
+		s->position[0] = 1075.f - i * 189.f;
+		s->position[1] = 0.f;
+		s->position[2] = -630.f;
+		s->color[0] = .9f;
+		s->color[1] = .9f;
+		s->color[2] = .6f;
+		s->intensity = 100000.f;
+		s->attenuation[0] = 0.f;
+		s->attenuation[1] = 0.f;
+		s->attenuation[2] = 1.f;
+		s->direction[0] = 0.f;
+		s->direction[1] = 1.f;
+		s->direction[2] = 0.f;
+		s->cutoff = 25.f;
+		spotLights.push_back(s);
+	}
 
 	return true;
 }
@@ -301,15 +509,31 @@ void renderGeometryPass(float delta)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glEnable(GL_DEPTH_TEST);
-
-	// set the world matrix
-	glUniformMatrix4fv(gp_worldMatrixLocation, 1, GL_FALSE, glm::value_ptr(sponzaModel->getWorldMatrix()));
+	glDisable(GL_BLEND);
 
 	// set the view-projection matrix
-	glm::mat4 projection_matrix(glm::perspective(glm::radians(74.f), (float)window->getWidth() / (float)window->getHeight(), 1.0f, 10000.0f));
-	glUniformMatrix4fv(gp_viewProjectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(projection_matrix * camera->getViewMatrix(delta)));
+	glUniformMatrix4fv(gp_viewProjectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(projection_matrix * camera.getViewMatrix()));
 
-	sponzaModel->render(true);
+
+	// set the world matrix
+	glUniformMatrix4fv(gp_worldMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.f)));
+
+	sponzaModel.render(true);
+
+
+	static float angle;
+	glm::mat4 worldMatrix(1.f);
+	worldMatrix = glm::translate(worldMatrix, glm::vec3(-500.f, 0.f, 0.f));
+	worldMatrix = glm::rotate(worldMatrix, angle, glm::vec3(0.f, 1.f, 0.f));
+	angle += delta * .003f;
+
+	// set the world matrix
+	glUniformMatrix4fv(gp_worldMatrixLocation, 1, GL_FALSE, glm::value_ptr(worldMatrix));
+
+	manModel.render(true);
+
+	glDepthMask(GL_FALSE);
+	glDisable(GL_DEPTH_TEST);
 }
 
 void renderGBufferDebug()
@@ -337,9 +561,13 @@ void renderGBufferDebug()
 
 void beginLightPass()
 {
+	glEnable(GL_BLEND);
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_ONE, GL_ONE);
+
 	// light pass does not write to the depth buffer
-	glDepthMask(GL_FALSE);
-	glDisable(GL_DEPTH_TEST);
+	//glDepthMask(GL_FALSE);
+	//glDisable(GL_DEPTH_TEST);
 
 	assert(gBuffer);
 	gBuffer->bindForReading(false);
@@ -354,19 +582,75 @@ void doDirectionalLightPass()
 	// set the world matrix
 	glUniformMatrix4fv(dlp_worldViewProjectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
 
-	fullscreenQuadModel->render(false);
+	fullscreenQuadModel.render(false);
+}
+
+float calcPointLightBSphere(const PointLight& l)
+{
+	float maxChannel = fmax(fmax(l.color[0], l.color[1]), l.color[2]);
+	return (-l.attenuation[1] + sqrtf(l.attenuation[1] * l.attenuation[1] - 4 * l.attenuation[2] * (/*TODO: check should this be constant?*/l.attenuation[0] - 256.f * maxChannel * l.intensity))) / 2 * l.attenuation[2];
+}
+
+void doPointLightPass(float delta)
+{
+	glUseProgram(pointLightingPassShaderProgram->getProgram());
+
+	for (PointLight *pointLight : pointLights)
+	{
+		// set the world matrix
+		glm::mat4 worldMatrix;
+		worldMatrix = glm::translate(worldMatrix, glm::vec3(pointLight->position[0], pointLight->position[1], pointLight->position[2]));
+		float s = calcPointLightBSphere(*pointLight);
+		worldMatrix = glm::scale(worldMatrix, glm::vec3(s, s, s));
+		glUniformMatrix4fv(plp_worldViewProjectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(projection_matrix * camera.getViewMatrix() * worldMatrix));
+
+		glUniform3f(plp_lightPosition, pointLight->position[0], pointLight->position[1], pointLight->position[2]);
+		glUniform3f(plp_lightColor, pointLight->color[0], pointLight->color[1], pointLight->color[2]);
+		glUniform1f(plp_lightIntensity, pointLight->intensity);
+		glUniform3f(plp_lightAttenuation, pointLight->attenuation[0], pointLight->attenuation[1], pointLight->attenuation[2]);
+
+		unitSphereModel.render(false);
+	}
+}
+
+void doSpotLightPass(float delta)
+{
+	glUseProgram(spotLightingPassShaderProgram->getProgram());
+
+	for (SpotLight *spotLight : spotLights)
+	{
+		// set the world matrix
+		glm::mat4 worldMatrix;
+		worldMatrix = glm::translate(worldMatrix, glm::vec3(spotLight->position[0], spotLight->position[1], spotLight->position[2]));
+		float s = calcPointLightBSphere(*spotLight);
+		worldMatrix = glm::scale(worldMatrix, glm::vec3(s, s, s));
+		glUniformMatrix4fv(slp_worldViewProjectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(projection_matrix * camera.getViewMatrix() * worldMatrix));
+
+		glUniform3f(slp_lightPosition, spotLight->position[0], spotLight->position[1], spotLight->position[2]);
+		glUniform3f(slp_lightColor, spotLight->color[0], spotLight->color[1], spotLight->color[2]);
+		glUniform1f(slp_lightIntensity, spotLight->intensity);
+		glUniform3f(slp_lightAttenuation, spotLight->attenuation[0], spotLight->attenuation[1], spotLight->attenuation[2]);
+		glUniform3f(slp_lightDirection, spotLight->direction[0], spotLight->direction[1], spotLight->direction[2]);
+		glUniform1f(slp_lightCutoffCosine, cosf(glm::radians(spotLight->cutoff)));
+
+		unitSphereModel.render(false);
+	}
 }
 
 void render(float delta)
 {
+	camera.update(delta);
+
 	renderGeometryPass(delta);
 
-	if (camera->isDebugModeOn())
+	if (camera.isDebugModeOn())
 		renderGBufferDebug();
 	else
 	{
 		beginLightPass();
 		doDirectionalLightPass();
+		doPointLightPass(delta);
+		doSpotLightPass(delta);
 	}
 
 	renderer->finalizeFrame();
@@ -375,10 +659,10 @@ void render(float delta)
 void destroy()
 {
 	delete gBuffer;
-	delete fullscreenQuadModel;
-	delete sponzaModel;
 	//delete simpleDrawShaderProgram;
-	delete camera;
+	delete geometryPassShaderProgram;
+	delete directionalLightingPassShaderProgram;
+	delete pointLightingPassShaderProgram;
 	delete renderer;
 	delete window;
 }
@@ -405,8 +689,8 @@ int main(int argc, char **argv)
 				int w2 = window->getWidth() / 2;
 				int h2 = window->getHeight() / 2;
 
-				camera->rotateYaw((e.motion.x - w2) / (float)w2);
-				camera->rotatePitch((e.motion.y - h2) / (float)h2);
+				camera.rotateYaw((e.motion.x - w2) / (float)w2);
+				camera.rotatePitch((e.motion.y - h2) / (float)h2);
 
 				SDL_WarpMouseInWindow(window->getSDLWindow(), w2, h2);
 			}
@@ -416,19 +700,29 @@ int main(int argc, char **argv)
 				if (e.key.keysym.sym == SDLK_ESCAPE && e.type == SDL_KEYUP)
 					window->setAlive(false);
 				else if (e.key.keysym.sym == SDLK_TAB && e.type == SDL_KEYDOWN)
-					camera->toggleDebugMode();
+					camera.toggleDebugMode();
 				else if (e.key.keysym.sym == SDLK_F10 && e.type == SDL_KEYUP)
 					window->changeResolution(window->getWidth(), window->getHeight(), !window->getFullscreen());
 				else if (e.key.keysym.sym == SDLK_w)
-					camera->setForwardKeyPressed(e.type == SDL_KEYDOWN);
+					camera.setForwardKeyPressed(e.type == SDL_KEYDOWN);
 				else if (e.key.keysym.sym == SDLK_s)
-					camera->setBackKeyPressed(e.type == SDL_KEYDOWN);
+					camera.setBackKeyPressed(e.type == SDL_KEYDOWN);
 				else if (e.key.keysym.sym == SDLK_a)
-					camera->setLeftKeyPressed(e.type == SDL_KEYDOWN);
+					camera.setLeftKeyPressed(e.type == SDL_KEYDOWN);
 				else if (e.key.keysym.sym == SDLK_d)
-					camera->setRightKeyPressed(e.type == SDL_KEYDOWN);
+					camera.setRightKeyPressed(e.type == SDL_KEYDOWN);
 				else if (e.key.keysym.sym == SDLK_LSHIFT)
-					camera->setCrouchKeyPressed(e.type == SDL_KEYDOWN);
+					camera.setCrouchKeyPressed(e.type == SDL_KEYDOWN);
+
+				else if (e.key.keysym.sym == SDLK_q && e.type == SDL_KEYUP)
+					pointLights[0]->intensity--;
+				else if (e.key.keysym.sym == SDLK_e && e.type == SDL_KEYUP)
+					pointLights[0]->intensity *= pointLights[0]->intensity;
+
+				else if (e.key.keysym.sym == SDLK_z && e.type == SDL_KEYUP)
+					pointLights[0]->attenuation[2]--;
+				else if (e.key.keysym.sym == SDLK_c && e.type == SDL_KEYUP)
+					pointLights[0]->attenuation[2]++;
 			}
 		}
 

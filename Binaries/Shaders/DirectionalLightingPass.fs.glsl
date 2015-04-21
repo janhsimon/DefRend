@@ -10,7 +10,7 @@ uniform vec2 screenSize;
 
 float calcDirectionalLight(vec3 normal)
 {
-	return dot(vec3(-1.0, 1.0, -1.0), normal);
+	return dot(vec3(-0.5, 1.0, -0.05), normal);
 }
 
 void main()
@@ -21,5 +21,5 @@ void main()
 	vec3 diffuse = texture(gbuffer_diffuse, uv).rgb;
 	vec3 normal = normalize(texture(gbuffer_normal, uv).rgb);
 
-	color = vec4(0.05, 0.05, 0.05, 1.0) + vec4(diffuse + worldPos * 0.00001, 1.0) * calcDirectionalLight(normal);
+	color = vec4(0.0, 0.0, 0.02, 1.0) + vec4(diffuse + worldPos * 0.00001, 1.0) * calcDirectionalLight(normal);
 }

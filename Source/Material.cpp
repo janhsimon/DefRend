@@ -22,7 +22,7 @@ void Material::parseName(aiMaterial *material)
 	}
 }
 
-bool Material::parseTexture(aiMaterial *material, int slot)
+bool Material::parseTexture(aiMaterial *material, const std::string &modelFilename, int slot)
 {
 	aiTextureType textureType = aiTextureType_DIFFUSE;
 	std::string typeDesc = "diffuse";
@@ -76,24 +76,26 @@ bool Material::parseTexture(aiMaterial *material, int slot)
 		Error::report("Error", "Failed to retrieve " + typeDesc + " map filename for material \"" + name + "\".");
 		return false;
 	}
+
+	std::string completeMaterialFilename = "Textures\\" + modelFilename + "\\" + materialFilename.C_Str();
 	
 	if (slot == 0)
 	{
-		diffuseMap = TextureManager::refTexture(materialFilename.C_Str());
+		diffuseMap = TextureManager::refTexture(completeMaterialFilename);
 
 		if (!diffuseMap)
 			return false;
 	}
 	else if (slot == 1)
 	{
-		normalMap = TextureManager::refTexture(materialFilename.C_Str());
+		normalMap = TextureManager::refTexture(completeMaterialFilename);
 
 		if (!normalMap)
 			return false;
 	}
 	else if (slot == 2)
 	{
-		opacityMap = TextureManager::refTexture(materialFilename.C_Str());
+		opacityMap = TextureManager::refTexture(completeMaterialFilename);
 
 		if (!opacityMap)
 			return false;
@@ -114,14 +116,14 @@ Material::~Material()
 		TextureManager::unrefTexture(opacityMap);
 }
 
-bool Material::load(aiMaterial *material)
+bool Material::load(aiMaterial *material, const std::string &modelFilename)
 {
 	parseName(material);
 
 	for (int i = 0; i < 3; ++i)
 	// load all maps
 	{
-		if (!parseTexture(material, i))
+		if (!parseTexture(material, modelFilename, i))
 			return false;
 	}
 

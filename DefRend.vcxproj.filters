@@ -89,6 +89,12 @@
     <ClInclude Include="Source\GBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\PointLight.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SpotLight.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Binaries\Shaders\SimpleDraw.vs.glsl">
@@ -100,13 +106,19 @@
     <None Include="Binaries\Shaders\DirectionalLightingPass.fs.glsl">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="Binaries\Shaders\DirectionalLightingPass.vs.glsl">
-      <Filter>Shader Files</Filter>
-    </None>
     <None Include="Binaries\Shaders\GeometryPass.fs.glsl">
       <Filter>Shader Files</Filter>
     </None>
     <None Include="Binaries\Shaders\GeometryPass.vs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\LightingPass.vs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\PointLightingPass.fs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\SpotLightingPass.fs.glsl">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>

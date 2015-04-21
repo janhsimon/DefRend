@@ -16,9 +16,10 @@ private:
 	GLuint VBO, VAO;
 	std::vector<Mesh*> meshes;
 	std::vector<Material*> materials;
-	glm::mat4 worldMatrix;
+	//glm::mat4 worldMatrix;
 
-	bool parseMaterials(const aiScene *model);
+	std::string isolateFilename(const std::string &filename);
+	bool parseMaterials(const aiScene *model, const std::string &filename);
 	void parseVertices(const aiScene *model, std::vector<Vertex> *vertices);
 
 public:
@@ -27,6 +28,6 @@ public:
 	bool load(const std::string &filename);
 	void render(bool bindMaterials);
 
-	glm::mat4 getWorldMatrix();
-	void setWorldMatrix(glm::mat4 &worldMatrix);
+	//glm::mat4 getWorldMatrix();
+	//void setWorldMatrix(glm::mat4 &worldMatrix);
 };

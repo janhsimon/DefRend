@@ -41,6 +41,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)Binaries\</OutDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)Binaries\</OutDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -98,19 +101,23 @@
     <ClInclude Include="Source\Material.hpp" />
     <ClInclude Include="Source\Mesh.hpp" />
     <ClInclude Include="Source\Model.hpp" />
+    <ClInclude Include="Source\PointLight.hpp" />
     <ClInclude Include="Source\Renderer.hpp" />
     <ClInclude Include="Source\ShaderProgram.hpp" />
+    <ClInclude Include="Source\SpotLight.hpp" />
     <ClInclude Include="Source\Texture.hpp" />
     <ClInclude Include="Source\TextureManager.hpp" />
     <ClInclude Include="Source\Window.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Binaries\Shaders\DirectionalLightingPass.fs.glsl" />
-    <None Include="Binaries\Shaders\DirectionalLightingPass.vs.glsl" />
+    <None Include="Binaries\Shaders\LightingPass.vs.glsl" />
     <None Include="Binaries\Shaders\GeometryPass.fs.glsl" />
     <None Include="Binaries\Shaders\GeometryPass.vs.glsl" />
+    <None Include="Binaries\Shaders\PointLightingPass.fs.glsl" />
     <None Include="Binaries\Shaders\SimpleDraw.fs.glsl" />
     <None Include="Binaries\Shaders\SimpleDraw.vs.glsl" />
+    <None Include="Binaries\Shaders\SpotLightingPass.fs.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

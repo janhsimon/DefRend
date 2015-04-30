@@ -6,7 +6,7 @@
 class Texture
 {
 private:
-	GLuint textureHandle;
+	GLuint handle;
 	std::string filename;
 	unsigned int refCount;
 

@@ -72,6 +72,26 @@ glm::mat4 Camera::getViewMatrix()
 	return glm::lookAt(p, p + f, u);
 }
 
+glm::vec3 Camera::getPosition()
+{
+	return glm::vec3(position);
+}
+
+glm::vec3 Camera::getForward()
+{
+	return glm::vec3(forward);
+}
+
+glm::vec3 Camera::getRight()
+{
+	return glm::vec3(right);
+}
+
+glm::vec3 Camera::getUp()
+{
+	return glm::vec3(up);
+}
+
 void Camera::setForwardKeyPressed(bool pressed)
 {
 	forwardKeyPressed = pressed;
@@ -105,4 +125,14 @@ void Camera::toggleDebugMode()
 bool Camera::isDebugModeOn()
 {
 	return debugMode;
+}
+
+void Camera::toggleFlashLight()
+{
+	flashLight = !flashLight;
+}
+
+bool Camera::isFlashLightOn()
+{
+	return flashLight;
 }

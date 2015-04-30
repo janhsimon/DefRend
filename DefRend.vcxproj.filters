@@ -54,6 +54,12 @@
     <ClCompile Include="Source\GBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Cubemap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PointLight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Error.hpp">
@@ -95,6 +101,9 @@
     <ClInclude Include="Source\SpotLight.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Cubemap.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Binaries\Shaders\SimpleDraw.vs.glsl">
@@ -119,6 +128,12 @@
       <Filter>Shader Files</Filter>
     </None>
     <None Include="Binaries\Shaders\SpotLightingPass.fs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\ShadowPass.fs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\ShadowPass.vs.glsl">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>

@@ -6,7 +6,7 @@
 
 Texture::~Texture()
 {
-	glDeleteTextures(1, &textureHandle);
+	glDeleteTextures(1, &handle);
 }
 
 bool Texture::operator==(const Texture &other)
@@ -27,8 +27,8 @@ bool Texture::load(const std::string &filename)
 		return false;
 	}
 
-	glGenTextures(1, &textureHandle);
-	glBindTexture(GL_TEXTURE_2D, textureHandle);
+	glGenTextures(1, &handle);
+	glBindTexture(GL_TEXTURE_2D, handle);
 
 	int sourceFormat, destinationFormat;
 
@@ -78,7 +78,7 @@ bool Texture::load(const std::string &filename)
 void Texture::bind(GLenum textureUnit)
 {
 	glActiveTexture(textureUnit);
-	glBindTexture(GL_TEXTURE_2D, textureHandle);
+	glBindTexture(GL_TEXTURE_2D, handle);
 }
 
 unsigned int Texture::getRefCount()

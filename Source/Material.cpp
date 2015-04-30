@@ -31,11 +31,17 @@ bool Material::parseTexture(aiMaterial *material, const std::string &modelFilena
 		diffuseMap = nullptr;
 	else if (slot == 1)
 	{
+		textureType = aiTextureType_SPECULAR;
+		specularMap = nullptr;
+		typeDesc = "specular";
+	}
+	else if (slot == 2)
+	{
 		textureType = aiTextureType_HEIGHT;
 		normalMap = nullptr;
 		typeDesc = "normal";
 	}
-	else if (slot == 2)
+	else if (slot == 3)
 	{
 		textureType = aiTextureType_OPACITY;
 		opacityMap = nullptr;
@@ -53,12 +59,19 @@ bool Material::parseTexture(aiMaterial *material, const std::string &modelFilena
 		}
 		else if (slot == 1)
 		{
+			specularMap = TextureManager::refTexture(TextureManager::getDefaultSpecularTextureFilename());
+
+			if (!specularMap)
+				return false;
+		}
+		else if (slot == 2)
+		{
 			normalMap = TextureManager::refTexture(TextureManager::getDefaultNormalTextureFilename());
 
 			if (!normalMap)
 				return false;
 		}
-		else if (slot == 2)
+		else if (slot == 3)
 		{
 			opacityMap = TextureManager::refTexture(TextureManager::getDefaultOpacityTextureFilename());
 
@@ -88,12 +101,19 @@ bool Material::parseTexture(aiMaterial *material, const std::string &modelFilena
 	}
 	else if (slot == 1)
 	{
+		specularMap = TextureManager::refTexture(completeMaterialFilename);
+
+		if (!specularMap)
+			return false;
+	}
+	else if (slot == 2)
+	{
 		normalMap = TextureManager::refTexture(completeMaterialFilename);
 
 		if (!normalMap)
 			return false;
 	}
-	else if (slot == 2)
+	else if (slot == 3)
 	{
 		opacityMap = TextureManager::refTexture(completeMaterialFilename);
 
@@ -108,6 +128,9 @@ Material::~Material()
 {
 	if (diffuseMap)
 		TextureManager::unrefTexture(diffuseMap);
+
+	if (specularMap)
+		TextureManager::unrefTexture(specularMap);
 	
 	if (normalMap)
 		TextureManager::unrefTexture(normalMap);
@@ -120,7 +143,7 @@ bool Material::load(aiMaterial *material, const std::string &modelFilename)
 {
 	parseName(material);
 
-	for (int i = 0; i < 3; ++i)
+	for (int i = 0; i < 4; ++i)
 	// load all maps
 	{
 		if (!parseTexture(material, modelFilename, i))
@@ -135,23 +158,12 @@ void Material::bind()
 	if (diffuseMap)
 		diffuseMap->bind(GL_TEXTURE0);
 	
+	if (specularMap)
+		specularMap->bind(GL_TEXTURE1);
+
 	if (normalMap)
-		normalMap->bind(GL_TEXTURE1);
+		normalMap->bind(GL_TEXTURE2);
 
 	if (opacityMap)
-	{
-		opacityMap->bind(GL_TEXTURE2);
-
-		// set up for transparency (used by opacity maps)
-		//glEnable(GL_BLEND);
-		//glDisable(GL_DEPTH_TEST);
-		//glDepthMask(false);
-	}
-	else
-	{
-		// set up for no transparency
-		//glDisable(GL_BLEND);
-		//glEnable(GL_DEPTH_TEST);
-		//glDepthMask(true);
-	}
+		opacityMap->bind(GL_TEXTURE3);
 }

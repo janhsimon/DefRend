@@ -82,12 +82,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\Camera.cpp" />
+    <ClCompile Include="Source\Cubemap.cpp" />
     <ClCompile Include="Source\Error.cpp" />
     <ClCompile Include="Source\GBuffer.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Material.cpp" />
     <ClCompile Include="Source\Mesh.cpp" />
     <ClCompile Include="Source\Model.cpp" />
+    <ClCompile Include="Source\PointLight.cpp" />
     <ClCompile Include="Source\Renderer.cpp" />
     <ClCompile Include="Source\ShaderProgram.cpp" />
     <ClCompile Include="Source\Texture.cpp" />
@@ -96,6 +98,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Camera.hpp" />
+    <ClInclude Include="Source\Cubemap.hpp" />
     <ClInclude Include="Source\Error.hpp" />
     <ClInclude Include="Source\GBuffer.hpp" />
     <ClInclude Include="Source\Material.hpp" />
@@ -115,6 +118,8 @@
     <None Include="Binaries\Shaders\GeometryPass.fs.glsl" />
     <None Include="Binaries\Shaders\GeometryPass.vs.glsl" />
     <None Include="Binaries\Shaders\PointLightingPass.fs.glsl" />
+    <None Include="Binaries\Shaders\ShadowPass.fs.glsl" />
+    <None Include="Binaries\Shaders\ShadowPass.vs.glsl" />
     <None Include="Binaries\Shaders\SimpleDraw.fs.glsl" />
     <None Include="Binaries\Shaders\SimpleDraw.vs.glsl" />
     <None Include="Binaries\Shaders\SpotLightingPass.fs.glsl" />

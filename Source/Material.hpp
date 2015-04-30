@@ -9,7 +9,7 @@ class Material
 {
 private:
 	std::string name;
-	Texture *diffuseMap, *normalMap, *opacityMap;
+	Texture *diffuseMap, *specularMap, *normalMap, *opacityMap;
 
 	void parseName(aiMaterial *material);
 	bool parseTexture(aiMaterial *material, const std::string &modelFilename, int slot);

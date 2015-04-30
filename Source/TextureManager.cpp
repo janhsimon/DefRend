@@ -6,6 +6,7 @@ std::vector<Texture*> TextureManager::textures;
 
 const std::string TextureManager::DEFAULT_DIFFUSE_TEXTURE_FILENAME = "Textures\\DefaultDiffuse.tga";
 const std::string TextureManager::DEFAULT_NORMAL_TEXTURE_FILENAME = "Textures\\DefaultNormal.tga";
+const std::string TextureManager::DEFAULT_SPECULAR_TEXTURE_FILENAME = "Textures\\DefaultSpecular.tga";
 const std::string TextureManager::DEFAULT_OPACITY_TEXTURE_FILENAME = "Textures\\DefaultOpacity.tga";
 
 Texture* TextureManager::refTexture(std::string filename)
@@ -33,6 +34,9 @@ void TextureManager::unrefTexture(Texture *texture)
 {
 	assert(texture);
 
+	if (textures.size() <= 0)
+		return;
+
 	for (std::vector<Texture*>::iterator i = textures.begin(); i != textures.end(); ++i)
 	{
 		if (*i == texture)
@@ -44,13 +48,10 @@ void TextureManager::unrefTexture(Texture *texture)
 				textures.erase(i);
 				delete texture;
 			}
-			
+
 			return;
 		}
 	}
-
-	// this should never happen
-	assert(true);
 }
 
 std::string TextureManager::getDefaultDiffuseTextureFilename()
@@ -61,6 +62,11 @@ std::string TextureManager::getDefaultDiffuseTextureFilename()
 std::string TextureManager::getDefaultNormalTextureFilename()
 {
 	return DEFAULT_NORMAL_TEXTURE_FILENAME;
+}
+
+std::string TextureManager::getDefaultSpecularTextureFilename()
+{
+	return DEFAULT_SPECULAR_TEXTURE_FILENAME;
 }
 
 std::string TextureManager::getDefaultOpacityTextureFilename()

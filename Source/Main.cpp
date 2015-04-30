@@ -18,79 +18,23 @@ Camera camera;
 GBuffer *gBuffer;
 Model fullscreenQuadModel, sponzaModel, manModel, unitSphereModel;
 Renderer *renderer;
-ShaderProgram /**simpleDrawShaderProgram,*/ *geometryPassShaderProgram, *directionalLightingPassShaderProgram, *pointLightingPassShaderProgram, *spotLightingPassShaderProgram;
+ShaderProgram /**simpleDrawShaderProgram,*/ *geometryPassShaderProgram, *directionalLightingPassShaderProgram, *pointLightingPassShaderProgram, *spotLightingPassShaderProgram, *shadowPassShaderProgram;
 Window *window;
 
 std::vector<PointLight*> pointLights;
 std::vector<SpotLight*> spotLights;
 
+SpotLight *flashLight;
+
 unsigned int lastTickTime = 0;
 
 glm::mat4 projection_matrix;
 
-//GLint worldViewMatrixLocation;
 GLint gp_worldMatrixLocation, gp_viewProjectionMatrixLocation;
 GLint dlp_worldViewProjectionMatrixLocation;
-GLint plp_worldViewProjectionMatrixLocation, plp_lightPosition, plp_lightColor, plp_lightIntensity, plp_lightAttenuation;
-GLint slp_worldViewProjectionMatrixLocation, slp_lightPosition, slp_lightColor, slp_lightIntensity, slp_lightAttenuation, slp_lightDirection, slp_lightCutoffCosine;
-
-/*
-bool initSimpleDrawShaderProgram()
-{
-	simpleDrawShaderProgram = new ShaderProgram();
-
-	assert(simpleDrawShaderProgram);
-
-	if (!simpleDrawShaderProgram->load("Shaders\\SimpleDraw.vs.glsl", "", "Shaders\\SimpleDraw.fs.glsl"))
-		return false;
-
-	if (!simpleDrawShaderProgram->link())
-		return false;
-
-	glUseProgram(simpleDrawShaderProgram->getProgram());
-
-	if (!simpleDrawShaderProgram->getUniformLocation("worldViewMatrix", worldViewMatrixLocation))
-		return false;
-
-
-	// set up the projection matrix
-
-	GLint projectionMatrixLocation;
-	if (!simpleDrawShaderProgram->getUniformLocation("projectionMatrix", projectionMatrixLocation))
-		return false;
-	
-	glm::mat4 projection_matrix(glm::perspective(glm::radians(74.f), (float)window->getWidth() / (float)window->getHeight(), 1.0f, 10000.0f));
-	glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(projection_matrix));
-
-
-	// set up texture units
-
-	GLint texLoc;
-	if (!simpleDrawShaderProgram->getUniformLocation("diffuseMap", texLoc))
-		return false;
-
-	glUniform1i(texLoc, 0);
-
-	if (!simpleDrawShaderProgram->getUniformLocation("normalMap", texLoc))
-		return false;
-
-	glUniform1i(texLoc, 1);
-
-	if (!simpleDrawShaderProgram->getUniformLocation("opacityMap", texLoc))
-		return false;
-
-	glUniform1i(texLoc, 2);
-
-	GLenum error = glGetError();
-	if (error != GL_NO_ERROR)
-	{
-		Error::report("Error", "Failed to load tree draw shader: " + Error::getOpenGLErrorString(error));
-		return false;
-	}
-
-	return true;
-}
-*/
+GLint plp_worldViewProjectionMatrixLocation, plp_lightPosition, plp_lightDiffuseColor, plp_lightDiffuseIntensity, plp_lightSpecularColor, plp_lightSpecularIntensity, plp_lightSpecularPower, plp_lightAttenuation, plp_eyeWorldPosition;
+GLint slp_worldViewProjectionMatrixLocation, slp_lightPosition, slp_lightDiffuseColor, slp_lightDiffuseIntensity, slp_lightSpecularColor, slp_lightSpecularIntensity, slp_lightSpecularPower, slp_lightAttenuation, slp_lightDirection, slp_lightCutoffCosine, slp_eyeWorldPosition;
+GLint sp_worldMatrixLocation, sp_viewProjectionMatrixLocation, sp_pointLightPositionLocation;
 
 bool initGeometryPassShaderProgram()
 {
@@ -121,10 +65,15 @@ bool initGeometryPassShaderProgram()
 
 	glUniform1i(texLoc, 0);
 
-	if (!geometryPassShaderProgram->getUniformLocation("normalMap", texLoc))
+	if (!geometryPassShaderProgram->getUniformLocation("specularMap", texLoc))
 		return false;
 
 	glUniform1i(texLoc, 1);
+
+	if (!geometryPassShaderProgram->getUniformLocation("normalMap", texLoc))
+		return false;
+
+	glUniform1i(texLoc, 2);
 
 	if (!geometryPassShaderProgram->getUniformLocation("opacityMap", texLoc))
 		return false;
@@ -181,10 +130,15 @@ bool initDirectionalLightingPassShaderProgram()
 
 	glUniform1i(texLoc, 1);
 
-	if (!directionalLightingPassShaderProgram->getUniformLocation("gbuffer_normal", texLoc))
+	if (!directionalLightingPassShaderProgram->getUniformLocation("gbuffer_specular", texLoc))
 		return false;
 
 	glUniform1i(texLoc, 2);
+
+	if (!directionalLightingPassShaderProgram->getUniformLocation("gbuffer_normal", texLoc))
+		return false;
+
+	glUniform1i(texLoc, 3);
 
 	GLenum error = glGetError();
 	if (error != GL_NO_ERROR)
@@ -229,14 +183,27 @@ bool initPointLightingPassShaderProgram()
 	if (!pointLightingPassShaderProgram->getUniformLocation("lightPosition", plp_lightPosition))
 		return false;
 
-	if (!pointLightingPassShaderProgram->getUniformLocation("lightColor", plp_lightColor))
+	if (!pointLightingPassShaderProgram->getUniformLocation("lightDiffuseColor", plp_lightDiffuseColor))
 		return false;
 
-	if (!pointLightingPassShaderProgram->getUniformLocation("lightIntensity", plp_lightIntensity))
+	if (!pointLightingPassShaderProgram->getUniformLocation("lightDiffuseIntensity", plp_lightDiffuseIntensity))
+		return false;
+
+	if (!pointLightingPassShaderProgram->getUniformLocation("lightSpecularColor", plp_lightSpecularColor))
+		return false;
+
+	if (!pointLightingPassShaderProgram->getUniformLocation("lightSpecularIntensity", plp_lightSpecularIntensity))
+		return false;
+
+	if (!pointLightingPassShaderProgram->getUniformLocation("lightSpecularPower", plp_lightSpecularPower))
 		return false;
 
 	if (!pointLightingPassShaderProgram->getUniformLocation("lightAttenuation", plp_lightAttenuation))
 		return false;
+
+	if (!pointLightingPassShaderProgram->getUniformLocation("eyeWorldPosition", plp_eyeWorldPosition))
+		return false;
+
 
 
 	// set up texture units
@@ -252,10 +219,15 @@ bool initPointLightingPassShaderProgram()
 
 	glUniform1i(texLoc, 1);
 
-	if (!pointLightingPassShaderProgram->getUniformLocation("gbuffer_normal", texLoc))
+	if (!pointLightingPassShaderProgram->getUniformLocation("gbuffer_specular", texLoc))
 		return false;
 
 	glUniform1i(texLoc, 2);
+
+	if (!pointLightingPassShaderProgram->getUniformLocation("gbuffer_normal", texLoc))
+		return false;
+
+	glUniform1i(texLoc, 3);
 
 	GLenum error = glGetError();
 	if (error != GL_NO_ERROR)
@@ -295,15 +267,24 @@ bool initSpotLightingPassShaderProgram()
 	glUniform2f(screenSizeLocation, (float)window->getWidth(), (float)window->getHeight());
 
 
-	// retrieve point light parameters
+	// retrieve spot light parameters
 
 	if (!spotLightingPassShaderProgram->getUniformLocation("lightPosition", slp_lightPosition))
 		return false;
 
-	if (!spotLightingPassShaderProgram->getUniformLocation("lightColor", slp_lightColor))
+	if (!spotLightingPassShaderProgram->getUniformLocation("lightDiffuseColor", slp_lightDiffuseColor))
 		return false;
 
-	if (!spotLightingPassShaderProgram->getUniformLocation("lightIntensity", slp_lightIntensity))
+	if (!spotLightingPassShaderProgram->getUniformLocation("lightDiffuseIntensity", slp_lightDiffuseIntensity))
+		return false;
+
+	if (!spotLightingPassShaderProgram->getUniformLocation("lightSpecularColor", slp_lightSpecularColor))
+		return false;
+
+	if (!spotLightingPassShaderProgram->getUniformLocation("lightSpecularIntensity", slp_lightSpecularIntensity))
+		return false;
+
+	if (!spotLightingPassShaderProgram->getUniformLocation("lightSpecularPower", slp_lightSpecularPower))
 		return false;
 
 	if (!spotLightingPassShaderProgram->getUniformLocation("lightAttenuation", slp_lightAttenuation))
@@ -313,6 +294,9 @@ bool initSpotLightingPassShaderProgram()
 		return false;
 
 	if (!spotLightingPassShaderProgram->getUniformLocation("lightCutoffCosine", slp_lightCutoffCosine))
+		return false;
+
+	if (!spotLightingPassShaderProgram->getUniformLocation("eyeWorldPosition", slp_eyeWorldPosition))
 		return false;
 
 
@@ -329,15 +313,53 @@ bool initSpotLightingPassShaderProgram()
 
 	glUniform1i(texLoc, 1);
 
-	if (!spotLightingPassShaderProgram->getUniformLocation("gbuffer_normal", texLoc))
+	if (!spotLightingPassShaderProgram->getUniformLocation("gbuffer_specular", texLoc))
 		return false;
 
 	glUniform1i(texLoc, 2);
+
+	if (!spotLightingPassShaderProgram->getUniformLocation("gbuffer_normal", texLoc))
+		return false;
+
+	glUniform1i(texLoc, 3);
 
 	GLenum error = glGetError();
 	if (error != GL_NO_ERROR)
 	{
 		Error::report("Error", "Failed to load deferred spot lighting pass shader: " + Error::getOpenGLErrorString(error));
+		return false;
+	}
+
+	return true;
+}
+
+bool initShadowPassShaderProgram()
+{
+	shadowPassShaderProgram = new ShaderProgram();
+
+	assert(shadowPassShaderProgram);
+
+	if (!shadowPassShaderProgram->load("Shaders\\ShadowPass.vs.glsl", "", "Shaders\\ShadowPass.fs.glsl"))
+		return false;
+
+	if (!shadowPassShaderProgram->link())
+		return false;
+
+	glUseProgram(shadowPassShaderProgram->getProgram());
+
+	if (!shadowPassShaderProgram->getUniformLocation("worldMatrix", sp_worldMatrixLocation))
+		return false;
+
+	if (!shadowPassShaderProgram->getUniformLocation("viewProjectionMatrix", sp_viewProjectionMatrixLocation))
+		return false;
+
+	if (!shadowPassShaderProgram->getUniformLocation("pointLightPosition", sp_pointLightPositionLocation))
+		return false;
+
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR)
+	{
+		Error::report("Error", "Failed to load shadow shader: " + Error::getOpenGLErrorString(error));
 		return false;
 	}
 
@@ -403,8 +425,8 @@ bool load()
 
 	// load shaders
 	
-	//if (!initSimpleDrawShaderProgram())
-		//return false;
+	if (!initShadowPassShaderProgram())
+		return false;
 
 	if (!initGeometryPassShaderProgram())
 		return false;
@@ -446,16 +468,25 @@ bool load()
 	
 	PointLight *l = new PointLight();
 	l->position[0] = 0.f;
-	l->position[1] = 0.f;
+	l->position[1] = 100.f;
 	l->position[2] = 0.f;
-	l->color[0] = 1.f;
-	l->color[1] = 0.f;
-	l->color[2] = 0.f;
-	l->intensity = 100000.f;
+	l->diffuseColor[0] = 1.f;
+	l->diffuseColor[1] = 1.f;
+	l->diffuseColor[2] = .9f;
+	l->diffuseIntensity = 10000.f;
+	l->specularColor[0] = 1.f;
+	l->specularColor[1] = 0.f;
+	l->specularColor[2] = .0f;
+	l->specularIntensity = 100000.f;
+	l->specularPower = 10.f;
 	l->attenuation[0] = 0.f;
 	l->attenuation[1] = 0.f;
 	l->attenuation[2] = 1.f;
+	
 	pointLights.push_back(l);
+
+	/*
+	// and some spot lights
 
 	for (int i = 0; i < 13; ++i)
 	{
@@ -463,10 +494,15 @@ bool load()
 		s->position[0] = 1075.f - i * 189.f;
 		s->position[1] = 0.f;
 		s->position[2] = 560.f;
-		s->color[0] = .9f;
-		s->color[1] = .9f;
-		s->color[2] = .6f;
-		s->intensity = 100000.f;
+		s->diffuseColor[0] = 1.f;
+		s->diffuseColor[1] = 1.f;
+		s->diffuseColor[2] = .9f;
+		s->diffuseIntensity = 100000.f;
+		s->specularColor[0] = 1.f;
+		s->specularColor[1] = 0.f;
+		s->specularColor[2] = .0f;
+		s->specularIntensity = 100000.f;
+		s->specularPower = 10.f;
 		s->attenuation[0] = 0.f;
 		s->attenuation[1] = 0.f;
 		s->attenuation[2] = 1.f;
@@ -480,10 +516,15 @@ bool load()
 		s->position[0] = 1075.f - i * 189.f;
 		s->position[1] = 0.f;
 		s->position[2] = -630.f;
-		s->color[0] = .9f;
-		s->color[1] = .9f;
-		s->color[2] = .6f;
-		s->intensity = 100000.f;
+		s->diffuseColor[0] = 1.f;
+		s->diffuseColor[1] = 1.f;
+		s->diffuseColor[2] = .9f;
+		s->diffuseIntensity = 100000.f;
+		s->specularColor[0] = 1.f;
+		s->specularColor[1] = 0.f;
+		s->specularColor[2] = .0f;
+		s->specularIntensity = 100000.f;
+		s->specularPower = 10.f;
 		s->attenuation[0] = 0.f;
 		s->attenuation[1] = 0.f;
 		s->attenuation[2] = 1.f;
@@ -494,7 +535,33 @@ bool load()
 		spotLights.push_back(s);
 	}
 
+	flashLight = new SpotLight();
+	flashLight->diffuseColor[0] = .9f;
+	flashLight->diffuseColor[1] = .9f;
+	flashLight->diffuseColor[2] = 1.f;
+	flashLight->diffuseIntensity = 30000.f;
+	flashLight->specularColor[0] = 1.f;
+	flashLight->specularColor[1] = 0.f;
+	flashLight->specularColor[2] = .0f;
+	flashLight->specularIntensity = 100000.f;
+	flashLight->specularPower = 10.f;
+	flashLight->attenuation[0] = 0.f;
+	flashLight->attenuation[1] = 0.f;
+	flashLight->attenuation[2] = 0.2f;
+	flashLight->cutoff = 30.f;
+	*/
+
 	return true;
+}
+
+float calcPointLightBSphere(const PointLight &l)
+{
+	float maxDiffuseChannel = fmax(fmax(l.diffuseColor[0], l.diffuseColor[1]), l.diffuseColor[2]);
+	float maxSpecularChannel = fmax(fmax(l.specularColor[0], l.specularColor[1]), l.specularColor[2]);
+	float maxChannel = fmax(maxDiffuseChannel, maxSpecularChannel);
+	float maxIntensity = fmax(l.diffuseIntensity, l.specularIntensity);
+	float s = (-l.attenuation[1] + sqrtf(l.attenuation[1] * l.attenuation[1] - 4 * l.attenuation[2] * (l.attenuation[0] - 256.f * maxChannel * maxIntensity))) / 2 * l.attenuation[2];
+	return s;
 }
 
 void renderGeometryPass(float delta)
@@ -549,14 +616,75 @@ void renderGBufferDebug()
 	GLsizei halfWidth = (GLsizei)(window->getWidth() / 2.f);
 	GLsizei halfHeight = (GLsizei)(window->getHeight() / 2.f);
 
-	gBuffer->setReadBuffer(GBUFFER_TEXTURE_TYPE_POSITION);
-	glBlitFramebuffer(0, 0, window->getWidth(), window->getHeight(), 0, 0, halfWidth, halfHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-
 	gBuffer->setReadBuffer(GBUFFER_TEXTURE_TYPE_DIFFUSE);
 	glBlitFramebuffer(0, 0, window->getWidth(), window->getHeight(), 0, halfHeight, halfWidth, window->getHeight(), GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
-	gBuffer->setReadBuffer(GBUFFER_TEXTURE_TYPE_NORMAL);
+	gBuffer->setReadBuffer(GBUFFER_TEXTURE_TYPE_SPECULAR);
 	glBlitFramebuffer(0, 0, window->getWidth(), window->getHeight(), halfWidth, halfHeight, window->getWidth(), window->getHeight(), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+	gBuffer->setReadBuffer(GBUFFER_TEXTURE_TYPE_NORMAL);
+	glBlitFramebuffer(0, 0, window->getWidth(), window->getHeight(), 0, 0, halfWidth, halfHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+	gBuffer->setReadBuffer(GBUFFER_TEXTURE_TYPE_POSITION);
+	glBlitFramebuffer(0, 0, window->getWidth(), window->getHeight(), halfWidth, 0, window->getWidth(), halfHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+}
+
+void doShadowPass(float delta)
+{
+	glUseProgram(shadowPassShaderProgram->getProgram());
+
+	for (PointLight *pointLight : pointLights)
+	{
+		glm::mat4 pointLightProjectionMatrix = glm::perspective(glm::radians(90.f), 1.f, 1.0f, calcPointLightBSphere(*pointLight));
+
+		//pointLight->beginDrawingToShadowMap();
+
+		for (int i = 0; i < 6; ++i)
+		{
+			glm::vec3 sideDirection;
+
+			if (i == 0)
+				sideDirection = glm::vec3(1.f, 0.f, 0.f);
+			else if (i == 1)
+				sideDirection = glm::vec3(-1.f, 0.f, 0.f);
+			else if (i == 2)
+				sideDirection = glm::vec3(0.f, 1.f, 0.f);
+			else if (i == 3)
+				sideDirection = glm::vec3(0.f, -1.f, 0.f);
+			else if (i == 4)
+				sideDirection = glm::vec3(0.f, 0.f, 1.f);
+			else
+				sideDirection = glm::vec3(0.f, 0.f, -1.f);
+
+			glm::vec3 upDirection = glm::vec3(0.f, 1.f, 0.f);
+
+			if (i == 2)
+				upDirection = glm::vec3(0.f, 0.f, -1.f);
+			else if (i == 3)
+				upDirection = glm::vec3(0.f, 0.f, 1.f);
+
+			glm::mat4 pointLightViewMatrix = glm::lookAt(glm::vec3(pointLight->position[0], pointLight->position[1], pointLight->position[2]), sideDirection, upDirection);
+
+			glUniformMatrix4fv(sp_viewProjectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(pointLightProjectionMatrix * pointLightViewMatrix));
+			glUniform3f(sp_pointLightPositionLocation, pointLight->position[0], pointLight->position[1], pointLight->position[2]);
+
+
+			glUniformMatrix4fv(sp_worldMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.f)));
+			
+			sponzaModel.render(true);
+
+
+			static float _angle;
+			glm::mat4 worldMatrix(1.f);
+			worldMatrix = glm::translate(worldMatrix, glm::vec3(-500.f, 0.f, 0.f));
+			worldMatrix = glm::rotate(worldMatrix, _angle, glm::vec3(0.f, 1.f, 0.f));
+			_angle += delta * .003f;
+
+			glUniformMatrix4fv(sp_worldMatrixLocation, 1, GL_FALSE, glm::value_ptr(worldMatrix));
+
+			manModel.render(true);
+		}
+	}
 }
 
 void beginLightPass()
@@ -585,12 +713,6 @@ void doDirectionalLightPass()
 	fullscreenQuadModel.render(false);
 }
 
-float calcPointLightBSphere(const PointLight& l)
-{
-	float maxChannel = fmax(fmax(l.color[0], l.color[1]), l.color[2]);
-	return (-l.attenuation[1] + sqrtf(l.attenuation[1] * l.attenuation[1] - 4 * l.attenuation[2] * (/*TODO: check should this be constant?*/l.attenuation[0] - 256.f * maxChannel * l.intensity))) / 2 * l.attenuation[2];
-}
-
 void doPointLightPass(float delta)
 {
 	glUseProgram(pointLightingPassShaderProgram->getProgram());
@@ -605,9 +727,14 @@ void doPointLightPass(float delta)
 		glUniformMatrix4fv(plp_worldViewProjectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(projection_matrix * camera.getViewMatrix() * worldMatrix));
 
 		glUniform3f(plp_lightPosition, pointLight->position[0], pointLight->position[1], pointLight->position[2]);
-		glUniform3f(plp_lightColor, pointLight->color[0], pointLight->color[1], pointLight->color[2]);
-		glUniform1f(plp_lightIntensity, pointLight->intensity);
+		glUniform3f(plp_lightDiffuseColor, pointLight->diffuseColor[0], pointLight->diffuseColor[1], pointLight->diffuseColor[2]);
+		glUniform1f(plp_lightDiffuseIntensity, pointLight->diffuseIntensity);
+		glUniform3f(plp_lightSpecularColor, pointLight->specularColor[0], pointLight->specularColor[1], pointLight->specularColor[2]);
+		glUniform1f(plp_lightSpecularIntensity, pointLight->specularIntensity);
+		glUniform1f(plp_lightSpecularPower, pointLight->specularPower);
 		glUniform3f(plp_lightAttenuation, pointLight->attenuation[0], pointLight->attenuation[1], pointLight->attenuation[2]);
+		
+		glUniform3f(plp_eyeWorldPosition, camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
 
 		unitSphereModel.render(false);
 	}
@@ -627,11 +754,43 @@ void doSpotLightPass(float delta)
 		glUniformMatrix4fv(slp_worldViewProjectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(projection_matrix * camera.getViewMatrix() * worldMatrix));
 
 		glUniform3f(slp_lightPosition, spotLight->position[0], spotLight->position[1], spotLight->position[2]);
-		glUniform3f(slp_lightColor, spotLight->color[0], spotLight->color[1], spotLight->color[2]);
-		glUniform1f(slp_lightIntensity, spotLight->intensity);
+		glUniform3f(slp_lightDiffuseColor, spotLight->diffuseColor[0], spotLight->diffuseColor[1], spotLight->diffuseColor[2]);
+		glUniform1f(slp_lightDiffuseIntensity, spotLight->diffuseIntensity);
+		glUniform3f(slp_lightSpecularColor, spotLight->specularColor[0], spotLight->specularColor[1], spotLight->specularColor[2]);
+		glUniform1f(slp_lightSpecularIntensity, spotLight->specularIntensity);
+		glUniform1f(slp_lightSpecularPower, spotLight->specularPower);
 		glUniform3f(slp_lightAttenuation, spotLight->attenuation[0], spotLight->attenuation[1], spotLight->attenuation[2]);
 		glUniform3f(slp_lightDirection, spotLight->direction[0], spotLight->direction[1], spotLight->direction[2]);
 		glUniform1f(slp_lightCutoffCosine, cosf(glm::radians(spotLight->cutoff)));
+
+		glUniform3f(plp_eyeWorldPosition, camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
+
+		unitSphereModel.render(false);
+	}
+
+	if (camera.isFlashLightOn())
+	{
+		flashLight->position[0] = camera.getPosition().x;
+		flashLight->position[1] = camera.getPosition().y;
+		flashLight->position[2] = camera.getPosition().z;
+
+		flashLight->direction[0] = camera.getForward().x;
+		flashLight->direction[1] = camera.getForward().y;
+		flashLight->direction[2] = camera.getForward().z;
+
+		// set the world matrix
+		glm::mat4 worldMatrix;
+		worldMatrix = glm::translate(worldMatrix, glm::vec3(flashLight->position[0], flashLight->position[1], flashLight->position[2]));
+		float s = calcPointLightBSphere(*flashLight);
+		worldMatrix = glm::scale(worldMatrix, glm::vec3(s, s, s));
+		glUniformMatrix4fv(slp_worldViewProjectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(projection_matrix * camera.getViewMatrix() * worldMatrix));
+
+		glUniform3f(slp_lightPosition, flashLight->position[0], flashLight->position[1], flashLight->position[2]);
+		glUniform3f(slp_lightDiffuseColor, flashLight->diffuseColor[0], flashLight->diffuseColor[1], flashLight->diffuseColor[2]);
+		glUniform1f(slp_lightDiffuseIntensity, flashLight->diffuseIntensity);
+		glUniform3f(slp_lightAttenuation, flashLight->attenuation[0], flashLight->attenuation[1], flashLight->attenuation[2]);
+		glUniform3f(slp_lightDirection, flashLight->direction[0], flashLight->direction[1], flashLight->direction[2]);
+		glUniform1f(slp_lightCutoffCosine, cosf(glm::radians(flashLight->cutoff)));
 
 		unitSphereModel.render(false);
 	}
@@ -647,6 +806,8 @@ void render(float delta)
 		renderGBufferDebug();
 	else
 	{
+		doShadowPass(delta);
+
 		beginLightPass();
 		doDirectionalLightPass();
 		doPointLightPass(delta);
@@ -659,11 +820,16 @@ void render(float delta)
 void destroy()
 {
 	delete gBuffer;
+
 	//delete simpleDrawShaderProgram;
 	delete geometryPassShaderProgram;
 	delete directionalLightingPassShaderProgram;
 	delete pointLightingPassShaderProgram;
+	delete spotLightingPassShaderProgram;
+	delete shadowPassShaderProgram;
+
 	delete renderer;
+
 	delete window;
 }
 
@@ -699,8 +865,10 @@ int main(int argc, char **argv)
 			{
 				if (e.key.keysym.sym == SDLK_ESCAPE && e.type == SDL_KEYUP)
 					window->setAlive(false);
-				else if (e.key.keysym.sym == SDLK_TAB && e.type == SDL_KEYDOWN)
+				else if (e.key.keysym.sym == SDLK_TAB && e.type == SDL_KEYUP)
 					camera.toggleDebugMode();
+				else if (e.key.keysym.sym == SDLK_f && e.type == SDL_KEYUP)
+					camera.toggleFlashLight();
 				else if (e.key.keysym.sym == SDLK_F10 && e.type == SDL_KEYUP)
 					window->changeResolution(window->getWidth(), window->getHeight(), !window->getFullscreen());
 				else if (e.key.keysym.sym == SDLK_w)
@@ -714,15 +882,9 @@ int main(int argc, char **argv)
 				else if (e.key.keysym.sym == SDLK_LSHIFT)
 					camera.setCrouchKeyPressed(e.type == SDL_KEYDOWN);
 
-				else if (e.key.keysym.sym == SDLK_q && e.type == SDL_KEYUP)
-					pointLights[0]->intensity--;
-				else if (e.key.keysym.sym == SDLK_e && e.type == SDL_KEYUP)
-					pointLights[0]->intensity *= pointLights[0]->intensity;
 
-				else if (e.key.keysym.sym == SDLK_z && e.type == SDL_KEYUP)
-					pointLights[0]->attenuation[2]--;
-				else if (e.key.keysym.sym == SDLK_c && e.type == SDL_KEYUP)
-					pointLights[0]->attenuation[2]++;
+				else if (e.key.keysym.sym == SDLK_q && e.type == SDL_KEYUP)
+					pointLights[0]->position[1] += 0.5f;
 			}
 		}
 

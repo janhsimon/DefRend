@@ -1,7 +1,8 @@
 #include "Camera.hpp"
+#include "Util.hpp"
 
-#include <gtx/transform.hpp>
-#include <gtx/quaternion.hpp>
+#include <gtc/matrix_transform.hpp>
+#include <gtc/quaternion.hpp>
 
 const float Camera::MOVEMENT_SPEED = 5.f;
 
@@ -12,9 +13,15 @@ Camera::Camera()
 	position = glm::vec4(0.f, 100.f, 0.f, 1.f);
 	pitch = yaw = roll = 0.f;
 
-	forwardKeyPressed = backKeyPressed = leftKeyPressed = rightKeyPressed = crouchKeyPressed = false;
+	forward = glm::vec4(0.f, 0.f, 1.f, 0.f);
+	right = glm::vec4(1.f, 0.f, 0.f, 0.f);
+	up = glm::vec4(1.f, 0.f, 0.f, 0.f);
 
-	debugMode = false;
+	nearClipPlane = 1.f;
+	farClipPlane = 10000.f;
+	fov = 90.f;
+
+	viewMatrix = projectionMatrix = glm::mat4(1.f);
 }
 
 void Camera::rotatePitch(float amount)
@@ -39,37 +46,29 @@ void Camera::rotateRoll(float amount)
 	roll += amount * mouseSensitivity;
 }
 
-void Camera::update(float delta)
+void Camera::update(Input &input, float delta, unsigned int screenWidth, unsigned int screenHeight)
 {
 	glm::mat4 orientationMatrix = glm::mat4_cast(glm::fquat(glm::vec3(pitch, yaw, roll)));
 
-	glm::vec4 f(0.f, 0.f, 1.f, 0.f);
-	forward = glm::normalize(orientationMatrix * f);
+	forward = glm::normalize(orientationMatrix * glm::vec4(0.f, 0.f, 1.f, 0.f));
+	right = glm::normalize(orientationMatrix * glm::vec4(1.f, 0.f, 0.f, 0.f));
+	up = glm::normalize(orientationMatrix * glm::vec4(0.f, 1.f, 0.f, 0.f));
 
-	glm::vec4 r(1.f, 0.f, 0.f, 0.f);
-	right = glm::normalize(orientationMatrix * r);
+	if (input.isForwardKeyPressed() && !input.isBackKeyPressed())
+		position += forward * MOVEMENT_SPEED * delta * (input.isCrouchKeyPressed() ? .25f : 1.f);
+	else if (input.isBackKeyPressed() && !input.isForwardKeyPressed())
+		position -= forward * MOVEMENT_SPEED * delta * (input.isCrouchKeyPressed() ? .25f : 1.f);
 
-	glm::vec4 u(0.f, 1.f, 0.f, 0.f);
-	up = glm::normalize(orientationMatrix * u);
+	if (input.isLeftKeyPressed() && !input.isRightKeyPressed())
+		position += right * MOVEMENT_SPEED * delta * (input.isCrouchKeyPressed() ? .25f : 1.f);
+	else if (input.isRightKeyPressed() && !input.isLeftKeyPressed())
+		position -= right * MOVEMENT_SPEED * delta * (input.isCrouchKeyPressed() ? .25f : 1.f);
 
-	if (forwardKeyPressed && !backKeyPressed)
-		position += forward * MOVEMENT_SPEED * delta * (crouchKeyPressed ? .25f : 1.f);
-	else if (backKeyPressed && !forwardKeyPressed)
-		position -= forward * MOVEMENT_SPEED * delta * (crouchKeyPressed ? .25f : 1.f);
+	viewMatrix = glm::lookAt(glm::vec3(position), glm::vec3(position + forward), glm::vec3(up));
 
-	if (leftKeyPressed && !rightKeyPressed)
-		position += right * MOVEMENT_SPEED * delta * (crouchKeyPressed ? .25f : 1.f);
-	else if (rightKeyPressed && !leftKeyPressed)
-		position -= right * MOVEMENT_SPEED * delta * (crouchKeyPressed ? .25f : 1.f);
-}
-
-glm::mat4 Camera::getViewMatrix()
-{
-	glm::vec3 p(position.x, position.y, position.z);
-	glm::vec3 f(forward.x, forward.y, forward.z);
-	glm::vec3 u(up.x, up.y, up.z);
-
-	return glm::lookAt(p, p + f, u);
+	float verticalFOV = Util::convertHorizontalToVerticalFOV(fov, (float)screenWidth, (float)screenHeight);
+	float aspectRatio = (float)screenWidth / (float)screenHeight;
+	projectionMatrix = glm::perspective(glm::radians(verticalFOV / 2.f), aspectRatio, 1.0f, 10000.0f);
 }
 
 glm::vec3 Camera::getPosition()
@@ -92,47 +91,12 @@ glm::vec3 Camera::getUp()
 	return glm::vec3(up);
 }
 
-void Camera::setForwardKeyPressed(bool pressed)
+glm::mat4 Camera::getViewMatrix()
 {
-	forwardKeyPressed = pressed;
+	return viewMatrix;
 }
 
-void Camera::setBackKeyPressed(bool pressed)
+glm::mat4 Camera::getProjectionMatrix()
 {
-	backKeyPressed = pressed;
-}
-
-void Camera::setLeftKeyPressed(bool pressed)
-{
-	leftKeyPressed = pressed;
-}
-
-void Camera::setRightKeyPressed(bool pressed)
-{
-	rightKeyPressed = pressed;
-}
-
-void Camera::setCrouchKeyPressed(bool pressed)
-{
-	crouchKeyPressed = pressed;
-}
-
-void Camera::toggleDebugMode()
-{
-	debugMode = !debugMode;
-}
-
-bool Camera::isDebugModeOn()
-{
-	return debugMode;
-}
-
-void Camera::toggleFlashLight()
-{
-	flashLight = !flashLight;
-}
-
-bool Camera::isFlashLightOn()
-{
-	return flashLight;
+	return projectionMatrix;
 }

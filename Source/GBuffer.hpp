@@ -25,7 +25,7 @@ private:
 public:
 	~GBuffer();
 
-	bool load(unsigned int windowWidth, unsigned int windowHeight);
+	bool load(unsigned int screenWidth, unsigned int screenHeight);
 	void bindForWriting();
 	void bindForReading(bool debug);
 	void setReadBuffer(GBUFFER_TEXTURE_TYPE textureType);

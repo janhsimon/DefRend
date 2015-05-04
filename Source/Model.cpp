@@ -1,5 +1,6 @@
 #include "Error.hpp"
 #include "Model.hpp"
+#include "Util.hpp"
 
 #include <assert.h>
 #include <assimp/postprocess.h>
@@ -30,12 +31,15 @@ bool Model::parseMaterials(const aiScene *model, const std::string &filename)
 	return true;
 }
 
-void Model::parseVertices(const aiScene *model, std::vector<Vertex> *vertices)
+bool Model::parseVertices(const aiScene *model, std::vector<Vertex> *vertices)
 {
 	for (unsigned int meshIndex = 0; meshIndex < model->mNumMeshes; ++meshIndex)
 	// loop through each mesh in the model
 	{
-		Mesh *newMesh = new Mesh();
+		Mesh *newMesh;
+		
+		if (!Util::checkMemory(newMesh = new Mesh()))
+			return false;
 
 		std::vector<Vertex> meshVertices = newMesh->load(model->mMeshes[meshIndex]);
 
@@ -70,7 +74,9 @@ bool Model::load(const std::string &filename)
 		return false;
 
 	std::vector<Vertex> vertices;
-	parseVertices(model, &vertices);
+	
+	if (!parseVertices(model, &vertices))
+		return false;
 
 	// generate and bind a VAO
 	glGenVertexArrays(1, &VAO);

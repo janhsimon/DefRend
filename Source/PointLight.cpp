@@ -1,8 +1,12 @@
 #include "PointLight.hpp"
+#include "Util.hpp"
 
-PointLight::PointLight()
+bool PointLight::create()
 {
-	shadowMap = new Cubemap();
+	if (!Util::checkMemory(shadowMap = new Cubemap()))
+		return false;
+
+	return true;
 }
 
 PointLight::~PointLight()

@@ -1,4 +1,5 @@
 #include "TextureManager.hpp"
+#include "Util.hpp"
 
 #include <assert.h>
 
@@ -20,7 +21,10 @@ Texture* TextureManager::refTexture(std::string filename)
 		}
 	}
 
-	Texture *newTexture = new Texture();
+	Texture *newTexture;
+	
+	if (!Util::checkMemory(newTexture = new Texture()))
+		return nullptr;
 	
 	if (!newTexture->load(filename))
 		return nullptr;

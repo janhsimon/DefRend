@@ -16,8 +16,9 @@ public:
 	float specularPower;
 	float attenuation[3]; // constant, linear, exponent
 
-	PointLight();
 	~PointLight();
+
+	bool create();
 
 	void beginDrawingToShadowMap();
 };

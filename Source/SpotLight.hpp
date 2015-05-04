@@ -5,5 +5,5 @@
 struct SpotLight : public PointLight
 {
 	float direction[3];
-	float cutoff;
+	float cutoffCosine;
 };

@@ -20,7 +20,7 @@ private:
 
 	std::string isolateFilename(const std::string &filename);
 	bool parseMaterials(const aiScene *model, const std::string &filename);
-	void parseVertices(const aiScene *model, std::vector<Vertex> *vertices);
+	bool parseVertices(const aiScene *model, std::vector<Vertex> *vertices);
 
 public:
 	~Model();

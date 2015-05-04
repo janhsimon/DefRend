@@ -83,46 +83,58 @@
   <ItemGroup>
     <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\Cubemap.cpp" />
+    <ClCompile Include="Source\DirectionalLightingShader.cpp" />
     <ClCompile Include="Source\Error.cpp" />
     <ClCompile Include="Source\GBuffer.cpp" />
+    <ClCompile Include="Source\GeometryShader.cpp" />
+    <ClCompile Include="Source\Input.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Material.cpp" />
     <ClCompile Include="Source\Mesh.cpp" />
     <ClCompile Include="Source\Model.cpp" />
     <ClCompile Include="Source\PointLight.cpp" />
+    <ClCompile Include="Source\PointLightingShader.cpp" />
     <ClCompile Include="Source\Renderer.cpp" />
     <ClCompile Include="Source\ShaderProgram.cpp" />
+    <ClCompile Include="Source\SpotLightingShader.cpp" />
     <ClCompile Include="Source\Texture.cpp" />
     <ClCompile Include="Source\TextureManager.cpp" />
+    <ClCompile Include="Source\Util.cpp" />
     <ClCompile Include="Source\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Camera.hpp" />
     <ClInclude Include="Source\Cubemap.hpp" />
+    <ClInclude Include="Source\DirectionalLightingShader.hpp" />
     <ClInclude Include="Source\Error.hpp" />
     <ClInclude Include="Source\GBuffer.hpp" />
+    <ClInclude Include="Source\GeometryShader.hpp" />
+    <ClInclude Include="Source\Input.hpp" />
     <ClInclude Include="Source\Material.hpp" />
     <ClInclude Include="Source\Mesh.hpp" />
     <ClInclude Include="Source\Model.hpp" />
     <ClInclude Include="Source\PointLight.hpp" />
+    <ClInclude Include="Source\PointLightingShader.hpp" />
     <ClInclude Include="Source\Renderer.hpp" />
     <ClInclude Include="Source\ShaderProgram.hpp" />
     <ClInclude Include="Source\SpotLight.hpp" />
+    <ClInclude Include="Source\SpotLightingShader.hpp" />
     <ClInclude Include="Source\Texture.hpp" />
     <ClInclude Include="Source\TextureManager.hpp" />
+    <ClInclude Include="Source\Util.hpp" />
     <ClInclude Include="Source\Window.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Binaries\Shaders\DirectionalLightingPass.fs.glsl" />
-    <None Include="Binaries\Shaders\LightingPass.vs.glsl" />
-    <None Include="Binaries\Shaders\GeometryPass.fs.glsl" />
-    <None Include="Binaries\Shaders\GeometryPass.vs.glsl" />
-    <None Include="Binaries\Shaders\PointLightingPass.fs.glsl" />
+    <None Include="Binaries\Shaders\DirectionalLighting.fs.glsl" />
+    <None Include="Binaries\Shaders\Lighting.vs.glsl" />
+    <None Include="Binaries\Shaders\Geometry.fs.glsl" />
+    <None Include="Binaries\Shaders\Geometry.vs.glsl" />
+    <None Include="Binaries\Shaders\PointLighting.fs.glsl" />
     <None Include="Binaries\Shaders\ShadowPass.fs.glsl" />
     <None Include="Binaries\Shaders\ShadowPass.vs.glsl" />
     <None Include="Binaries\Shaders\SimpleDraw.fs.glsl" />
     <None Include="Binaries\Shaders\SimpleDraw.vs.glsl" />
-    <None Include="Binaries\Shaders\SpotLightingPass.fs.glsl" />
+    <None Include="Binaries\Shaders\SpotLighting.fs.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

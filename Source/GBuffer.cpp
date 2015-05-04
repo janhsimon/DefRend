@@ -10,7 +10,7 @@ GBuffer::~GBuffer()
 	glDeleteTextures(1, &depthTexture);
 }
 
-bool GBuffer::load(unsigned int windowWidth, unsigned int windowHeight)
+bool GBuffer::load(unsigned int screenWidth, unsigned int screenHeight)
 {
 	// create the FBO
 	glGenFramebuffers(1, &FBO);
@@ -25,10 +25,10 @@ bool GBuffer::load(unsigned int windowWidth, unsigned int windowHeight)
 		glBindTexture(GL_TEXTURE_2D, textures[i]);
 
 		//if (i == 1)
-			//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, windowWidth, windowHeight, 0, GL_RGBA, GL_FLOAT, NULL);
+			//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, screenWidth, screenHeight, 0, GL_RGBA, GL_FLOAT, NULL);
 		//else
 		
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, screenWidth, screenHeight, 0, GL_RGB, GL_FLOAT, NULL);
 
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -38,7 +38,7 @@ bool GBuffer::load(unsigned int windowWidth, unsigned int windowHeight)
 
 	// depth
 	glBindTexture(GL_TEXTURE_2D, depthTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, windowWidth, windowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, screenWidth, screenHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
 
 	// set up our multiple rendertargets

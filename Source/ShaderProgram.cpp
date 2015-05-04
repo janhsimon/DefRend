@@ -1,5 +1,6 @@
 #include "Error.hpp"
 #include "ShaderProgram.hpp"
+#include "Util.hpp"
 
 #include <assert.h>
 #include <fstream>
@@ -45,7 +46,11 @@ bool ShaderProgram::compileShader(GLuint shader, const std::string &filename)
 		GLsizei len;
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &len);
 
-		GLchar *log = new GLchar[len + 1];
+		GLchar *log;
+
+		if (!Util::checkMemory(log = new GLchar[len + 1]))
+			return false;
+		
 		glGetShaderInfoLog(shader, len, &len, log);
 
 		std::stringstream s;
@@ -109,7 +114,11 @@ bool ShaderProgram::link()
 		GLsizei len;
 		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &len);
 
-		GLchar *log = new GLchar[len + 1];
+		GLchar *log;
+		
+		if (!Util::checkMemory(log = new GLchar[len + 1]))
+			return false;
+
 		glGetProgramInfoLog(program, len, &len, log);
 
 		std::stringstream s;

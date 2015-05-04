@@ -60,6 +60,24 @@
     <ClCompile Include="Source\PointLight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\DirectionalLightingShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PointLightingShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SpotLightingShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GeometryShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Error.hpp">
@@ -104,6 +122,24 @@
     <ClInclude Include="Source\Cubemap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\DirectionalLightingShader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PointLightingShader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SpotLightingShader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GeometryShader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Input.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Util.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Binaries\Shaders\SimpleDraw.vs.glsl">
@@ -112,28 +148,28 @@
     <None Include="Binaries\Shaders\SimpleDraw.fs.glsl">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="Binaries\Shaders\DirectionalLightingPass.fs.glsl">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="Binaries\Shaders\GeometryPass.fs.glsl">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="Binaries\Shaders\GeometryPass.vs.glsl">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="Binaries\Shaders\LightingPass.vs.glsl">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="Binaries\Shaders\PointLightingPass.fs.glsl">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="Binaries\Shaders\SpotLightingPass.fs.glsl">
-      <Filter>Shader Files</Filter>
-    </None>
     <None Include="Binaries\Shaders\ShadowPass.fs.glsl">
       <Filter>Shader Files</Filter>
     </None>
     <None Include="Binaries\Shaders\ShadowPass.vs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\Lighting.vs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\PointLighting.fs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\SpotLighting.fs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\Geometry.vs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\Geometry.fs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\DirectionalLighting.fs.glsl">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>

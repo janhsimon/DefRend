@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Input.hpp"
+
 #include <glm.hpp>
 
 class Camera
@@ -13,14 +15,10 @@ private:
 	float pitch, yaw, roll;
 	glm::vec4 forward, right, up;
 
-	bool forwardKeyPressed;
-	bool backKeyPressed;
-	bool leftKeyPressed;
-	bool rightKeyPressed;
-	bool crouchKeyPressed;
+	float nearClipPlane, farClipPlane;
+	float fov;
 
-	bool debugMode;
-	bool flashLight;
+	glm::mat4 viewMatrix, projectionMatrix;
 
 public:
 	Camera();
@@ -29,23 +27,12 @@ public:
 	void rotateYaw(float amount);
 	void rotateRoll(float amount);
 	
-	void update(float delta);
+	void update(Input &input, float delta, unsigned int screenWidth, unsigned int screenHeight);
 
-	glm::mat4 getViewMatrix();
 	glm::vec3 getPosition();
 	glm::vec3 getForward();
 	glm::vec3 getRight();
 	glm::vec3 getUp();
-	
-	void setForwardKeyPressed(bool pressed);
-	void setBackKeyPressed(bool pressed);
-	void setLeftKeyPressed(bool pressed);
-	void setRightKeyPressed(bool pressed);
-	void setCrouchKeyPressed(bool pressed);
-
-	void toggleDebugMode();
-	bool isDebugModeOn();
-
-	void toggleFlashLight();
-	bool isFlashLightOn();
+	glm::mat4 getViewMatrix();
+	glm::mat4 getProjectionMatrix();
 };

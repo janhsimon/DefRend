@@ -8,7 +8,6 @@ const std::string SpotLightingShader::SCREEN_SIZE_UNIFORM_NAME = "screenSize";
 const std::string SpotLightingShader::LIGHT_POSITION_UNIFORM_NAME = "lightPosition";
 const std::string SpotLightingShader::LIGHT_DIFFUSE_COLOR_UNIFORM_NAME = "lightDiffuseColor";
 const std::string SpotLightingShader::LIGHT_DIFFUSE_INTENSITY_UNIFORM_NAME = "lightDiffuseIntensity";
-const std::string SpotLightingShader::LIGHT_SPECULAR_COLOR_UNIFORM_NAME = "lightSpecularColor";
 const std::string SpotLightingShader::LIGHT_SPECULAR_INTENSITY_UNIFORM_NAME = "lightSpecularIntensity";
 const std::string SpotLightingShader::LIGHT_SPECULAR_POWER_UNIFORM_NAME = "lightSpecularPower";
 const std::string SpotLightingShader::LIGHT_DIRECTION_UNIFORM_NAME = "lightDirection";
@@ -40,9 +39,6 @@ bool SpotLightingShader::create()
 		return false;
 
 	if (!getUniformLocation(LIGHT_DIFFUSE_INTENSITY_UNIFORM_NAME, lightDiffuseIntensityUniformLocation))
-		return false;
-
-	if (!getUniformLocation(LIGHT_SPECULAR_COLOR_UNIFORM_NAME, lightSpecularColorUniformLocation))
 		return false;
 
 	if (!getUniformLocation(LIGHT_SPECULAR_INTENSITY_UNIFORM_NAME, lightSpecularIntensityUniformLocation))
@@ -88,12 +84,12 @@ void SpotLightingShader::setWorldViewProjectionUniforms(const glm::mat4 &worldMa
 	glUniformMatrix4fv(worldViewProjectionMatrixUniformLocation, 1, GL_FALSE, glm::value_ptr((projectionMatrix * viewMatrix) * worldMatrix));
 }
 
-void SpotLightingShader::setScreenSizeUniforms(unsigned int screenWidth, unsigned int screenHeight)
+void SpotLightingShader::setScreenSizeUniform(unsigned int screenWidth, unsigned int screenHeight)
 {
 	glUniform2f(screenSizeUniformLocation, (float)screenWidth, (float)screenHeight);
 }
 
-void SpotLightingShader::setLightPositionUniforms(float x, float y, float z)
+void SpotLightingShader::setLightPositionUniform(float x, float y, float z)
 {
 	glUniform3f(lightPositionUniformLocation, x, y, z);
 }
@@ -104,14 +100,13 @@ void SpotLightingShader::setLightDiffuseUniforms(float r, float g, float b, floa
 	glUniform1f(lightDiffuseIntensityUniformLocation, intensity);
 }
 
-void SpotLightingShader::setLightSpecularUniforms(float r, float g, float b, float intensity, float power)
+void SpotLightingShader::setLightSpecularUniforms(float intensity, float power)
 {
-	glUniform3f(lightSpecularColorUniformLocation, r, g, b);
 	glUniform1f(lightSpecularIntensityUniformLocation, intensity);
 	glUniform1f(lightSpecularPowerUniformLocation, power);
 }
 
-void SpotLightingShader::setLightDirectionUniforms(float x, float y, float z)
+void SpotLightingShader::setLightDirectionUniform(float x, float y, float z)
 {
 	glUniform3f(lightDirectionUniformLocation, x, y, z);
 }
@@ -121,12 +116,12 @@ void SpotLightingShader::setLightCutoffCosineUniform(float cutoffCosine)
 	glUniform1f(lightCutoffCosineUniformLocation, cutoffCosine);
 }
 
-void SpotLightingShader::setLightAttenuationUniforms(float exponential, float linear, float constant)
+void SpotLightingShader::setLightAttenuationUniform(float constant, float linear, float exponent)
 {
-	glUniform3f(lightAttenuationUniformLocation, exponential, linear, constant);
+	glUniform3f(lightAttenuationUniformLocation, constant, linear, exponent);
 }
 
-void SpotLightingShader::setEyePositionUniforms(float x, float y, float z)
+void SpotLightingShader::setEyePositionUniform(float x, float y, float z)
 {
 	glUniform3f(eyePositionUniformLocation, x, y, z);
 }

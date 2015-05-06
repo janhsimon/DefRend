@@ -99,6 +99,8 @@ bool ShaderProgram::load(const std::string &vertexShaderFilename, const std::str
 			return false;
 	}
 
+	this->filename = fragmentShaderFilename;
+
 	return true;
 }
 
@@ -139,7 +141,7 @@ bool ShaderProgram::getUniformLocation(const std::string &uniformName, GLint &lo
 
 	if (locationOut < 0)
 	{
-		Error::report("Error", "Failed to get location of uniform \"" + uniformName + "\".");
+		Error::report("Error", "Failed to get location of uniform \"" + uniformName + "\" in shader \"" + filename + "\".");
 		return false;
 	}
 

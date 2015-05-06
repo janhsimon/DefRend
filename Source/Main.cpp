@@ -199,15 +199,15 @@ bool load()
 	l->diffuseColor[0] = 1.f;
 	l->diffuseColor[1] = 1.f;
 	l->diffuseColor[2] = .9f;
-	l->diffuseIntensity = 10000.f;
+	l->diffuseIntensity = 5000.f;
 	l->specularColor[0] = 1.f;
 	l->specularColor[1] = 0.f;
 	l->specularColor[2] = .0f;
-	l->specularIntensity = 100000.f;
+	l->specularIntensity = 1000.f;
 	l->specularPower = 500.f;
-	l->attenuation[0] = 0.f;
-	l->attenuation[1] = 0.f;
-	l->attenuation[2] = 0.5f;
+	l->attenuation[0] = 1.f;	// constant
+	l->attenuation[1] = .1f;	// linear
+	l->attenuation[2] = .1f;	// exponent
 	
 	pointLights.push_back(l);
 
@@ -227,15 +227,12 @@ bool load()
 		s->diffuseColor[0] = 1.f;
 		s->diffuseColor[1] = 1.f;
 		s->diffuseColor[2] = .9f;
-		s->diffuseIntensity = 100000.f;
-		s->specularColor[0] = 1.f;
-		s->specularColor[1] = 0.f;
-		s->specularColor[2] = .0f;
-		s->specularIntensity = 100000.f;
-		s->specularPower = 10.f;
-		s->attenuation[0] = 0.f;
-		s->attenuation[1] = 0.f;
-		s->attenuation[2] = 1.f;
+		s->diffuseIntensity = 5000.f;
+		s->specularIntensity = 1000.f;
+		s->specularPower = 500.f;
+		s->attenuation[0] = 1.f;	// constant
+		s->attenuation[1] = .01f;	// linear
+		s->attenuation[2] = .01f;	// exponent
 		s->direction[0] = 0.f;
 		s->direction[1] = 1.f;
 		s->direction[2] = 0.f;
@@ -251,15 +248,12 @@ bool load()
 		s->diffuseColor[0] = 1.f;
 		s->diffuseColor[1] = 1.f;
 		s->diffuseColor[2] = .9f;
-		s->diffuseIntensity = 100000.f;
-		s->specularColor[0] = 1.f;
-		s->specularColor[1] = 0.f;
-		s->specularColor[2] = .0f;
-		s->specularIntensity = 100000.f;
-		s->specularPower = 10.f;
-		s->attenuation[0] = 0.f;
-		s->attenuation[1] = 0.f;
-		s->attenuation[2] = 1.f;
+		s->diffuseIntensity = 5000.f;
+		s->specularIntensity = 1000.f;
+		s->specularPower = 500.f;
+		s->attenuation[0] = 1.f;	// constant
+		s->attenuation[1] = .01f;	// linear
+		s->attenuation[2] = .01f;	// exponent
 		s->direction[0] = 0.f;
 		s->direction[1] = 1.f;
 		s->direction[2] = 0.f;
@@ -273,15 +267,15 @@ bool load()
 	flashLight->diffuseColor[0] = .9f;
 	flashLight->diffuseColor[1] = .9f;
 	flashLight->diffuseColor[2] = 1.f;
-	flashLight->diffuseIntensity = 30000.f;
+	flashLight->diffuseIntensity = 5000.f;
 	flashLight->specularColor[0] = 1.f;
 	flashLight->specularColor[1] = 0.f;
 	flashLight->specularColor[2] = .0f;
-	flashLight->specularIntensity = 100000.f;
-	flashLight->specularPower = 10.f;
-	flashLight->attenuation[0] = 0.f;
-	flashLight->attenuation[1] = 0.f;
-	flashLight->attenuation[2] = 0.2f;
+	flashLight->specularIntensity = 1000.f;
+	flashLight->specularPower = 500.f;
+	flashLight->attenuation[0] = 1.f;	// constant
+	flashLight->attenuation[1] = .01f;	// linear
+	flashLight->attenuation[2] = .01f;	// exponent
 	flashLight->cutoffCosine = 30.f;
 	
 	return true;
@@ -289,11 +283,11 @@ bool load()
 
 float calcPointLightBSphere(const PointLight &l)
 {
-	float maxDiffuseChannel = fmax(fmax(l.diffuseColor[0], l.diffuseColor[1]), l.diffuseColor[2]);
-	float maxSpecularChannel = fmax(fmax(l.specularColor[0], l.specularColor[1]), l.specularColor[2]);
-	float maxChannel = fmax(maxDiffuseChannel, maxSpecularChannel);
-	float maxIntensity = fmax(l.diffuseIntensity, l.specularIntensity);
-	float s = (-l.attenuation[1] + sqrtf(l.attenuation[1] * l.attenuation[1] - 4 * l.attenuation[2] * (l.attenuation[0] - 256.f * maxChannel * maxIntensity))) / 2 * l.attenuation[2];
+	float maxChannel = fmax(fmax(l.diffuseColor[0], l.diffuseColor[1]), l.diffuseColor[2]);
+
+	// [0] = constant, [1] = linear, [2] = exponent
+	float s = (-l.attenuation[1] + sqrtf(l.attenuation[1] * l.attenuation[1] - 4.f * l.attenuation[2] * (l.attenuation[0] - 256.f * maxChannel * l.diffuseIntensity))) / (2.f * l.attenuation[2]);
+
 	return s;
 }
 
@@ -314,7 +308,6 @@ void renderGeometryPass(float delta)
 	geometryShader->setWorldViewProjectionUniforms(glm::mat4(1.f), camera.getViewMatrix(), camera.getProjectionMatrix());
 
 	sponzaModel.render(true);
-
 
 	static float angle;
 	glm::mat4 worldMatrix(1.f);
@@ -436,6 +429,9 @@ void doDirectionalLightPass()
 {
 	glUseProgram(directionalLightingShader->getProgram());
 	directionalLightingShader->setWorldViewProjectionUniforms(glm::mat4(1.f), glm::mat4(1.f), glm::mat4(1.f));
+	directionalLightingShader->setLightDirectionUniform(.5f, 1.f, .5f);
+	directionalLightingShader->setLightAmbientUniforms(0.f, 0.f, 0.f, 0.f);
+	directionalLightingShader->setLightDiffuseUniform(1.f);
 	directionalLightingShader->setScreenSizeUniforms(window->getWidth(), window->getHeight());
 	fullscreenQuadModel.render(false);
 }
@@ -452,12 +448,12 @@ void doPointLightPass(float delta)
 		worldMatrix = glm::scale(worldMatrix, glm::vec3(s, s, s));
 		
 		pointLightingShader->setWorldViewProjectionUniforms(worldMatrix, camera.getViewMatrix(), camera.getProjectionMatrix());
-		pointLightingShader->setScreenSizeUniforms(window->getWidth(), window->getHeight());
-		pointLightingShader->setLightPositionUniforms(pointLight->position[0], pointLight->position[1], pointLight->position[2]);
+		pointLightingShader->setScreenSizeUniform(window->getWidth(), window->getHeight());
+		pointLightingShader->setLightPositionUniform(pointLight->position[0], pointLight->position[1], pointLight->position[2]);
 		pointLightingShader->setLightDiffuseUniforms(pointLight->diffuseColor[0], pointLight->diffuseColor[1], pointLight->diffuseColor[2], pointLight->diffuseIntensity);
-		pointLightingShader->setLightSpecularUniforms(pointLight->specularColor[0], pointLight->specularColor[1], pointLight->specularColor[2], pointLight->specularIntensity, pointLight->specularPower);
-		pointLightingShader->setLightAttenuationUniforms(pointLight->attenuation[0], pointLight->attenuation[1], pointLight->attenuation[2]);
-		pointLightingShader->setEyePositionUniforms(camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
+		pointLightingShader->setLightSpecularUniforms(pointLight->specularIntensity, pointLight->specularPower);
+		pointLightingShader->setLightAttenuationUniform(pointLight->attenuation[0], pointLight->attenuation[1], pointLight->attenuation[2]);
+		pointLightingShader->setEyePositionUniform(camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
 		
 		unitSphereModel.render(false);
 	}
@@ -475,14 +471,14 @@ void doSpotLightPass(float delta)
 		worldMatrix = glm::scale(worldMatrix, glm::vec3(s, s, s));
 
 		spotLightingShader->setWorldViewProjectionUniforms(worldMatrix, camera.getViewMatrix(), camera.getProjectionMatrix());
-		spotLightingShader->setScreenSizeUniforms(window->getWidth(), window->getHeight());
-		spotLightingShader->setLightPositionUniforms(spotLight->position[0], spotLight->position[1], spotLight->position[2]);
+		spotLightingShader->setScreenSizeUniform(window->getWidth(), window->getHeight());
+		spotLightingShader->setLightPositionUniform(spotLight->position[0], spotLight->position[1], spotLight->position[2]);
 		spotLightingShader->setLightDiffuseUniforms(spotLight->diffuseColor[0], spotLight->diffuseColor[1], spotLight->diffuseColor[2], spotLight->diffuseIntensity);
-		spotLightingShader->setLightSpecularUniforms(spotLight->specularColor[0], spotLight->specularColor[1], spotLight->specularColor[2], spotLight->specularIntensity, spotLight->specularPower);
-		spotLightingShader->setLightDirectionUniforms(spotLight->direction[0], spotLight->direction[1], spotLight->direction[2]);
+		spotLightingShader->setLightSpecularUniforms(spotLight->specularIntensity, spotLight->specularPower);
+		spotLightingShader->setLightDirectionUniform(spotLight->direction[0], spotLight->direction[1], spotLight->direction[2]);
 		spotLightingShader->setLightCutoffCosineUniform(spotLight->cutoffCosine);
-		spotLightingShader->setLightAttenuationUniforms(spotLight->attenuation[0], spotLight->attenuation[1], spotLight->attenuation[2]);
-		spotLightingShader->setEyePositionUniforms(camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
+		spotLightingShader->setLightAttenuationUniform(spotLight->attenuation[0], spotLight->attenuation[1], spotLight->attenuation[2]);
+		spotLightingShader->setEyePositionUniform(camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
 
 		unitSphereModel.render(false);
 	}
@@ -504,14 +500,14 @@ void doSpotLightPass(float delta)
 		worldMatrix = glm::scale(worldMatrix, glm::vec3(s, s, s));
 		
 		spotLightingShader->setWorldViewProjectionUniforms(worldMatrix, camera.getViewMatrix(), camera.getProjectionMatrix());
-		spotLightingShader->setScreenSizeUniforms(window->getWidth(), window->getHeight());
-		spotLightingShader->setLightPositionUniforms(flashLight->position[0], flashLight->position[1], flashLight->position[2]);
+		spotLightingShader->setScreenSizeUniform(window->getWidth(), window->getHeight());
+		spotLightingShader->setLightPositionUniform(flashLight->position[0], flashLight->position[1], flashLight->position[2]);
 		spotLightingShader->setLightDiffuseUniforms(flashLight->diffuseColor[0], flashLight->diffuseColor[1], flashLight->diffuseColor[2], flashLight->diffuseIntensity);
-		spotLightingShader->setLightSpecularUniforms(flashLight->specularColor[0], flashLight->specularColor[1], flashLight->specularColor[2], flashLight->specularIntensity, flashLight->specularPower);
-		spotLightingShader->setLightDirectionUniforms(flashLight->direction[0], flashLight->direction[1], flashLight->direction[2]);
+		spotLightingShader->setLightSpecularUniforms(flashLight->specularIntensity, flashLight->specularPower);
+		spotLightingShader->setLightDirectionUniform(flashLight->direction[0], flashLight->direction[1], flashLight->direction[2]);
 		spotLightingShader->setLightCutoffCosineUniform(flashLight->cutoffCosine);
-		spotLightingShader->setLightAttenuationUniforms(flashLight->attenuation[0], flashLight->attenuation[1], flashLight->attenuation[2]);
-		spotLightingShader->setEyePositionUniforms(camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
+		spotLightingShader->setLightAttenuationUniform(flashLight->attenuation[0], flashLight->attenuation[1], flashLight->attenuation[2]);
+		spotLightingShader->setEyePositionUniform(camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
 
 		unitSphereModel.render(false);
 	}

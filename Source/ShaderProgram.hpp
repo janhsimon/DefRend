@@ -7,6 +7,7 @@
 class ShaderProgram
 {
 private:
+	std::string filename;
 	GLuint program;
 	GLuint vertexShader, geometryShader, fragmentShader;
 

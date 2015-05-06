@@ -10,7 +10,6 @@ private:
 	static const std::string LIGHT_POSITION_UNIFORM_NAME;
 	static const std::string LIGHT_DIFFUSE_COLOR_UNIFORM_NAME;
 	static const std::string LIGHT_DIFFUSE_INTENSITY_UNIFORM_NAME;
-	static const std::string LIGHT_SPECULAR_COLOR_UNIFORM_NAME;
 	static const std::string LIGHT_SPECULAR_INTENSITY_UNIFORM_NAME;
 	static const std::string LIGHT_SPECULAR_POWER_UNIFORM_NAME;
 	static const std::string LIGHT_DIRECTION_UNIFORM_NAME;
@@ -23,7 +22,7 @@ private:
 	GLint screenSizeUniformLocation;
 	GLint lightPositionUniformLocation;
 	GLint lightDiffuseColorUniformLocation, lightDiffuseIntensityUniformLocation;
-	GLint lightSpecularColorUniformLocation, lightSpecularIntensityUniformLocation, lightSpecularPowerUniformLocation;
+	GLint lightSpecularIntensityUniformLocation, lightSpecularPowerUniformLocation;
 	GLint lightDirectionUniformLocation;
 	GLint lightCutoffCosineUniformLocation;
 	GLint lightAttenuationUniformLocation;
@@ -33,12 +32,12 @@ public:
 	bool create();
 
 	void setWorldViewProjectionUniforms(const glm::mat4 &worldMatrix, const glm::mat4 &viewMatrix, const glm::mat4 &projectionMatrix);
-	void setScreenSizeUniforms(unsigned int screenWidth, unsigned int screenHeight);
-	void setLightPositionUniforms(float x, float y, float z);
+	void setScreenSizeUniform(unsigned int screenWidth, unsigned int screenHeight);
+	void setLightPositionUniform(float x, float y, float z);
 	void setLightDiffuseUniforms(float r, float g, float b, float intensity);
-	void setLightSpecularUniforms(float r, float g, float b, float intensity, float power);
-	void setLightDirectionUniforms(float x, float y, float z);
+	void setLightSpecularUniforms(float intensity, float power);
+	void setLightDirectionUniform(float x, float y, float z);
 	void setLightCutoffCosineUniform(float cutoffCosine);
-	void setLightAttenuationUniforms(float exponential, float linear, float constant);
-	void setEyePositionUniforms(float x, float y, float z);
+	void setLightAttenuationUniform(float constant, float linear, float exponent);
+	void setEyePositionUniform(float x, float y, float z);
 };

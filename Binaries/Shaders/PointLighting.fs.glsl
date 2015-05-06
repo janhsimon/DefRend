@@ -10,7 +10,6 @@ uniform sampler2D gbuffer_normal;
 uniform vec3 lightPosition;
 uniform vec3 lightDiffuseColor;
 uniform float lightDiffuseIntensity;
-uniform vec3 lightSpecularColor;
 uniform float lightSpecularIntensity;
 uniform float lightSpecularPower;
 uniform vec3 lightAttenuation;
@@ -22,9 +21,9 @@ uniform vec2 screenSize;
 vec4 calcLightInternal(vec3 LightDirection, vec3 WorldPos, vec3 Normal, vec2 uv)
 {
 	float diffuseFactor = dot(Normal, -LightDirection);
+	float SpecularFactor = 0.0;
 
 	vec4 DiffuseColor = vec4(0, 0, 0, 0);
-	vec4 SpecularColor = vec4(0, 0, 0, 0);
 
 	if (diffuseFactor > 0.0)
 	{
@@ -32,16 +31,15 @@ vec4 calcLightInternal(vec3 LightDirection, vec3 WorldPos, vec3 Normal, vec2 uv)
 
 		vec3 VertexToEye = normalize(eyePosition - WorldPos);
 		vec3 LightReflect = normalize(reflect(LightDirection, Normal));
-		float SpecularFactor = dot(VertexToEye, LightReflect);
-		SpecularFactor = pow(SpecularFactor, lightSpecularPower);
-		
+		SpecularFactor = pow(dot(VertexToEye, LightReflect), lightSpecularPower);
+
 		if (SpecularFactor > 0.0)
 		{
-			SpecularColor = vec4(lightSpecularColor, 1.0) * lightSpecularIntensity * texture(gbuffer_specular, uv).r * SpecularFactor;
+			SpecularFactor = lightSpecularIntensity * texture(gbuffer_specular, uv).r * SpecularFactor;
 		}
 	}
 
-	return DiffuseColor + SpecularColor;
+	return DiffuseColor + vec4(1.0, 1.0, 1.0, 1.0) * SpecularFactor;
 }
 
 vec4 calcPointLight(vec3 WorldPos, vec3 Normal, vec2 uv)
@@ -52,6 +50,7 @@ vec4 calcPointLight(vec3 WorldPos, vec3 Normal, vec2 uv)
 
 	vec4 Color = calcLightInternal(LightDirection, WorldPos, Normal, uv);
 
+	// x = constant, y = linear, z = exponent
 	float Attenuation = lightAttenuation.x + lightAttenuation.y * Distance + lightAttenuation.z * Distance * Distance;
 
 	Attenuation = max(1.0, Attenuation);

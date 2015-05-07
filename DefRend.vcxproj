@@ -83,6 +83,7 @@
   <ItemGroup>
     <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\Cubemap.cpp" />
+    <ClCompile Include="Source\DeferredRenderer.cpp" />
     <ClCompile Include="Source\DirectionalLightingShader.cpp" />
     <ClCompile Include="Source\Error.cpp" />
     <ClCompile Include="Source\GBuffer.cpp" />
@@ -105,11 +106,13 @@
   <ItemGroup>
     <ClInclude Include="Source\Camera.hpp" />
     <ClInclude Include="Source\Cubemap.hpp" />
+    <ClInclude Include="Source\DeferredRenderer.hpp" />
     <ClInclude Include="Source\DirectionalLightingShader.hpp" />
     <ClInclude Include="Source\Error.hpp" />
     <ClInclude Include="Source\GBuffer.hpp" />
     <ClInclude Include="Source\GeometryShader.hpp" />
     <ClInclude Include="Source\Input.hpp" />
+    <ClInclude Include="Source\IRenderer.hpp" />
     <ClInclude Include="Source\Material.hpp" />
     <ClInclude Include="Source\Mesh.hpp" />
     <ClInclude Include="Source\Model.hpp" />

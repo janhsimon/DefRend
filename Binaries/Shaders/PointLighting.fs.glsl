@@ -23,7 +23,8 @@ vec4 calcLightInternal(vec3 LightDirection, vec3 WorldPos, vec3 Normal, vec2 uv)
 	float diffuseFactor = dot(Normal, -LightDirection);
 	float SpecularFactor = 0.0;
 
-	vec4 DiffuseColor = vec4(0, 0, 0, 0);
+	vec4 DiffuseColor = vec4(0.0, 0.0, 0.0, 1.0);
+	vec4 SpecularColor = vec4(0.0, 0.0, 0.0, 1.0);
 
 	if (diffuseFactor > 0.0)
 	{
@@ -35,11 +36,11 @@ vec4 calcLightInternal(vec3 LightDirection, vec3 WorldPos, vec3 Normal, vec2 uv)
 
 		if (SpecularFactor > 0.0)
 		{
-			SpecularFactor = lightSpecularIntensity * texture(gbuffer_specular, uv).r * SpecularFactor;
+			SpecularColor = vec4(1.0, 1.0, 1.0, 1.0) * SpecularFactor * lightSpecularIntensity * texture(gbuffer_specular, uv).r;
 		}
 	}
 
-	return DiffuseColor + vec4(1.0, 1.0, 1.0, 1.0) * SpecularFactor;
+	return DiffuseColor + SpecularColor;
 }
 
 vec4 calcPointLight(vec3 WorldPos, vec3 Normal, vec2 uv)

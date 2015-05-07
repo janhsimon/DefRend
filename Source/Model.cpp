@@ -48,6 +48,8 @@ bool Model::parseVertices(const aiScene *model, std::vector<Vertex> *vertices)
 
 		meshes.push_back(newMesh);
 	}
+
+	return true;
 }
 
 Model::~Model()

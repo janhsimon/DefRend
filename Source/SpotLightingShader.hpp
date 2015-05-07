@@ -37,7 +37,7 @@ public:
 	void setLightDiffuseUniforms(float r, float g, float b, float intensity);
 	void setLightSpecularUniforms(float intensity, float power);
 	void setLightDirectionUniform(float x, float y, float z);
-	void setLightCutoffCosineUniform(float cutoffCosine);
+	void setLightCutoffAngleUniform(float cutoffCosine);
 	void setLightAttenuationUniform(float constant, float linear, float exponent);
 	void setEyePositionUniform(float x, float y, float z);
 };

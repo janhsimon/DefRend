@@ -111,9 +111,9 @@ void SpotLightingShader::setLightDirectionUniform(float x, float y, float z)
 	glUniform3f(lightDirectionUniformLocation, x, y, z);
 }
 
-void SpotLightingShader::setLightCutoffCosineUniform(float cutoffCosine)
+void SpotLightingShader::setLightCutoffAngleUniform(float cutoffCosine)
 {
-	glUniform1f(lightCutoffCosineUniformLocation, cutoffCosine);
+	glUniform1f(lightCutoffCosineUniformLocation, glm::cos(glm::radians(cutoffCosine)));
 }
 
 void SpotLightingShader::setLightAttenuationUniform(float constant, float linear, float exponent)

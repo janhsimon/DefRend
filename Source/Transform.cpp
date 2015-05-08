@@ -1,9 +1,9 @@
-#include "ITransform.hpp"
+#include "Transform.hpp"
 
 #include <gtc/matrix_transform.hpp>
 #include <gtc/quaternion.hpp>
 
-ITransform::ITransform(glm::vec3 position)
+Transform::Transform(glm::vec3 position)
 {
 	this->position = position;
 	pitch = yaw = roll = 0.f;
@@ -13,7 +13,7 @@ ITransform::ITransform(glm::vec3 position)
 	up = glm::vec3(1.f, 0.f, 0.f);
 }
 
-void ITransform::updateTransform()
+void Transform::updateTransform()
 {
 	glm::mat4 orientationMatrix = glm::mat4_cast(glm::fquat(glm::vec3(pitch, yaw, roll)));
 
@@ -22,7 +22,7 @@ void ITransform::updateTransform()
 	up = glm::normalize(glm::vec3(orientationMatrix * glm::vec4(0.f, 1.f, 0.f, 0.f)));
 }
 
-glm::mat4 ITransform::getWorldMatrix()
+glm::mat4 Transform::getWorldMatrix()
 {
 	glm::mat4 worldMatrix(1.f);
 
@@ -35,52 +35,52 @@ glm::mat4 ITransform::getWorldMatrix()
 	return worldMatrix;
 }
 
-glm::vec3 ITransform::getPosition()
+glm::vec3 Transform::getPosition()
 {
 	return position;
 }
 
-glm::vec3 ITransform::getForward()
+glm::vec3 Transform::getForward()
 {
 	return forward;
 }
 
-glm::vec3 ITransform::getRight()
+glm::vec3 Transform::getRight()
 {
 	return right;
 }
 
-glm::vec3 ITransform::getUp()
+glm::vec3 Transform::getUp()
 {
 	return up;
 }
 
-float ITransform::getPitch()
+float Transform::getPitch()
 {
 	return pitch;
 }
 
-void ITransform::setPitch(float pitch)
+void Transform::setPitch(float pitch)
 {
 	this->pitch = pitch;
 }
 
-float ITransform::getYaw()
+float Transform::getYaw()
 {
 	return yaw;
 }
 
-void ITransform::setYaw(float yaw)
+void Transform::setYaw(float yaw)
 {
 	this->yaw = yaw;
 }
 
-float ITransform::getRoll()
+float Transform::getRoll()
 {
 	return roll;
 }
 
-void ITransform::setRoll(float roll)
+void Transform::setRoll(float roll)
 {
 	this->roll = roll;
 }

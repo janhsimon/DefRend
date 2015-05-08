@@ -7,7 +7,7 @@ const float Camera::MOVEMENT_SPEED = 5.f;
 
 float Camera::mouseSensitivity = .4f;
 
-Camera::Camera(glm::vec3 position, unsigned int screenWidth, unsigned int screenHeight) : ITransform(position)
+Camera::Camera(glm::vec3 position, unsigned int screenWidth, unsigned int screenHeight) : Transform(position)
 {
 	nearClipPlane = 1.f;
 	farClipPlane = 10000.f;
@@ -15,6 +15,16 @@ Camera::Camera(glm::vec3 position, unsigned int screenWidth, unsigned int screen
 	setFOV(90.f, screenWidth, screenHeight);
 
 	viewMatrix = glm::mat4(1.f);
+}
+
+void *Camera::operator new(size_t size)
+{
+	return _aligned_malloc(size, 16);
+}
+
+void Camera::operator delete(void *p)
+{
+	_aligned_free(p);
 }
 
 void Camera::rotatePitch(float amount)

@@ -2,7 +2,7 @@
 
 #include <glm.hpp>
 
-class ITransform
+class Transform
 {
 protected:
 	glm::vec3 position;
@@ -10,7 +10,7 @@ protected:
 	glm::vec3 forward, right, up;
 
 public:
-	ITransform(glm::vec3 position);
+	Transform(glm::vec3 position);
 
 	void updateTransform();
 

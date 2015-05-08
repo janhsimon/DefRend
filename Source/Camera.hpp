@@ -1,9 +1,11 @@
 #pragma once
 
 #include "Input.hpp"
-#include "ITransform.hpp"
+#include "Transform.hpp"
 
-class Camera : public ITransform
+#include <allocators>
+
+class Camera : public Transform
 {
 private:
 	static const float MOVEMENT_SPEED;
@@ -17,6 +19,10 @@ private:
 
 public:
 	Camera(glm::vec3 position, unsigned int screenWidth, unsigned int screenHeight);
+
+	// 16-byte alignment for fast SSE math instructions
+	void *operator new(size_t size);
+	void operator delete(void *p);
 
 	void rotatePitch(float amount);
 	void rotateYaw(float amount);

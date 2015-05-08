@@ -1,15 +1,15 @@
 #pragma once
 
-#include "ITransform.hpp"
 #include "Material.hpp"
 #include "Mesh.hpp"
+#include "Transform.hpp"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <glm.hpp>
 #include <vector>
 
-class Model : public ITransform
+class Model : public Transform
 {
 private:
 	static Assimp::Importer importer;

@@ -89,7 +89,7 @@
     <ClCompile Include="Source\GBuffer.cpp" />
     <ClCompile Include="Source\GeometryShader.cpp" />
     <ClCompile Include="Source\Input.cpp" />
-    <ClCompile Include="Source\ITransform.cpp" />
+    <ClCompile Include="Source\Transform.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Material.cpp" />
     <ClCompile Include="Source\Mesh.cpp" />
@@ -114,7 +114,7 @@
     <ClInclude Include="Source\GeometryShader.hpp" />
     <ClInclude Include="Source\Input.hpp" />
     <ClInclude Include="Source\IRenderer.hpp" />
-    <ClInclude Include="Source\ITransform.hpp" />
+    <ClInclude Include="Source\Transform.hpp" />
     <ClInclude Include="Source\Material.hpp" />
     <ClInclude Include="Source\Mesh.hpp" />
     <ClInclude Include="Source\Model.hpp" />

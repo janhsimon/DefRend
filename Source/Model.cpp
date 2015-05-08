@@ -52,7 +52,7 @@ bool Model::parseVertices(const aiScene *model, std::vector<Vertex> *vertices)
 	return true;
 }
 
-Model::Model(glm::vec3 position) : ITransform(position)
+Model::Model(glm::vec3 position) : Transform(position)
 {
 	
 }

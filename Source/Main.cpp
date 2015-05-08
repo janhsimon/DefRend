@@ -3,8 +3,8 @@
 #include "Error.hpp"
 #include "Input.hpp"
 #include "IRenderer.hpp"
-#include "Model.hpp"
 #include "PointLight.hpp"
+#include "SceneManager.hpp"
 #include "SpotLight.hpp"
 #include "Util.hpp"
 #include "Window.hpp"
@@ -12,7 +12,7 @@
 Camera *camera;
 IRenderer *renderer;
 Input input;
-Model *sponzaModel, *manModel;
+SceneManager *sceneManager;
 Window *window;
 
 std::vector<PointLight*> pointLights;
@@ -83,18 +83,18 @@ bool load()
 		return false;
 
 
+	// create scene manager
+
+	if (!Util::checkMemory(sceneManager = new SceneManager()))
+		return false;
+
+
 	// load models	
 
-	if (!Util::checkMemory(sponzaModel = new Model(glm::vec3(0.f))))
-		return false;
-	
-	if (!sponzaModel->load("Models\\Sponza\\Sponza.obj"))
+	if (!sceneManager->addModel("Models\\Sponza\\Sponza.obj", glm::vec3(0.f)))
 		return false;
 
-	if (!Util::checkMemory(manModel = new Model(glm::vec3(-500.f, -3.f, 0.f))))
-		return false;
-
-	if (!manModel->load("Models\\OldMan\\OldMan.obj"))
+	if (!sceneManager->addModel("Models\\OldMan\\OldMan.obj", glm::vec3(-500.f, -3.f, 0.f)))
 		return false;
 
 
@@ -198,7 +198,7 @@ void update(float delta)
 	pointLights[0]->position[0] = sinf(z) * 1200.f;
 	z += .005f * delta;
 
-	manModel->setYaw(manModel->getYaw() + delta * .003f);
+	//manModel->setYaw(manModel->getYaw() + delta * .003f);
 }
 
 void render()
@@ -209,8 +209,7 @@ void render()
 
 void destroy()
 {
-	delete manModel;
-	delete sponzaModel;
+	delete sceneManager;
 	delete camera;
 	delete renderer;
 	delete window;

@@ -1,6 +1,6 @@
 #include "DeferredRenderer.hpp"
-#include "Model.hpp"
 #include "PointLight.hpp"
+#include "SceneManager.hpp"
 #include "SpotLight.hpp"
 #include "Util.hpp"
 
@@ -11,15 +11,13 @@
 extern std::vector<PointLight*> pointLights;
 extern std::vector<SpotLight*> spotLights;
 
-extern Model *sponzaModel, *manModel;
+extern SceneManager *sceneManager;
 
 DeferredRenderer::~DeferredRenderer()
 {
 	delete gBuffer;
-
 	delete fullscreenQuadModel;
 	delete unitSphereModel;
-
 	delete geometryShader;
 	delete directionalLightingShader;
 	delete pointLightingShader;
@@ -109,11 +107,11 @@ void DeferredRenderer::renderGeometryPass(Camera *camera)
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 
-	geometryShader->setWorldViewProjectionUniforms(sponzaModel->getWorldMatrix(), camera->getViewMatrix(), camera->getProjectionMatrix());
-	sponzaModel->render(true);
-
-	geometryShader->setWorldViewProjectionUniforms(manModel->getWorldMatrix(), camera->getViewMatrix(), camera->getProjectionMatrix());
-	manModel->render(true);
+	for (Model *model : *sceneManager->getModels())
+	{
+		geometryShader->setWorldViewProjectionUniforms(model->getWorldMatrix(), camera->getViewMatrix(), camera->getProjectionMatrix());
+		model->render(true);
+	}
 }
 
 void DeferredRenderer::renderGBufferDebug()

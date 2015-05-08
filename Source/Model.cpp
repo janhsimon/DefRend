@@ -52,6 +52,11 @@ bool Model::parseVertices(const aiScene *model, std::vector<Vertex> *vertices)
 	return true;
 }
 
+Model::Model(glm::vec3 position) : ITransform(position)
+{
+	
+}
+
 Model::~Model()
 {
 	for (Material *m : materials)
@@ -131,15 +136,3 @@ void Model::render(bool bindMaterials)
 		vertex += m->getVertexCount();
 	}
 }
-
-/*
-glm::mat4 Model::getWorldMatrix()
-{
-	return worldMatrix;
-}
-
-void Model::setWorldMatrix(glm::mat4 &worldMatrix)
-{
-	this->worldMatrix = worldMatrix;
-}
-*/

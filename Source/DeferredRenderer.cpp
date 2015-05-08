@@ -11,11 +11,14 @@
 extern std::vector<PointLight*> pointLights;
 extern std::vector<SpotLight*> spotLights;
 
-extern Model sponzaModel;
+extern Model *sponzaModel, *manModel;
 
 DeferredRenderer::~DeferredRenderer()
 {
 	delete gBuffer;
+
+	delete fullscreenQuadModel;
+	delete unitSphereModel;
 
 	delete geometryShader;
 	delete directionalLightingShader;
@@ -54,10 +57,16 @@ bool DeferredRenderer::loadShaders()
 
 bool DeferredRenderer::loadModels()
 {
-	if (!fullscreenQuadModel.load("Models\\FullscreenQuad\\FullscreenQuad.obj"))
+	if (!Util::checkMemory(fullscreenQuadModel = new Model(glm::vec3(0.f))))
 		return false;
 
-	if (!unitSphereModel.load("Models\\UnitSphere\\UnitSphere.obj"))
+	if (!fullscreenQuadModel->load("Models\\FullscreenQuad\\FullscreenQuad.obj"))
+		return false;
+
+	if (!Util::checkMemory(unitSphereModel = new Model(glm::vec3(0.f))))
+		return false;
+
+	if (!unitSphereModel->load("Models\\UnitSphere\\UnitSphere.obj"))
 		return false;
 
 	return true;
@@ -100,21 +109,11 @@ void DeferredRenderer::renderGeometryPass(Camera *camera)
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 
-	geometryShader->setWorldViewProjectionUniforms(glm::mat4(1.f), camera->getViewMatrix(), camera->getProjectionMatrix());
+	geometryShader->setWorldViewProjectionUniforms(sponzaModel->getWorldMatrix(), camera->getViewMatrix(), camera->getProjectionMatrix());
+	sponzaModel->render(true);
 
-	sponzaModel.render(true);
-
-	/*
-	static float angle;
-	glm::mat4 worldMatrix(1.f);
-	worldMatrix = glm::translate(worldMatrix, glm::vec3(-500.f, 0.f, 0.f));
-	worldMatrix = glm::rotate(worldMatrix, angle, glm::vec3(0.f, 1.f, 0.f));
-	angle += delta * .003f;
-
-	geometryShader->setWorldViewProjectionUniforms(worldMatrix, camera.getViewMatrix(), camera.getProjectionMatrix());
-
-	manModel.render(true);
-	*/
+	geometryShader->setWorldViewProjectionUniforms(manModel->getWorldMatrix(), camera->getViewMatrix(), camera->getProjectionMatrix());
+	manModel->render(true);
 }
 
 void DeferredRenderer::renderGBufferDebug()
@@ -229,7 +228,7 @@ void DeferredRenderer::doDirectionalLightPass(Camera *camera)
 	directionalLightingShader->setLightAmbientUniforms(0.f, 0.f, 0.f, 0.f);
 	directionalLightingShader->setLightDiffuseUniform(1.f);
 	directionalLightingShader->setScreenSizeUniforms(window->getWidth(), window->getHeight());
-	fullscreenQuadModel.render(false);
+	fullscreenQuadModel->render(false);
 }
 
 float calcPointLightBSphere(const PointLight &l)
@@ -263,7 +262,7 @@ void DeferredRenderer::doPointLightPass(Camera *camera)
 		pointLightingShader->setLightAttenuationUniform(pointLight->attenuation[0], pointLight->attenuation[1], pointLight->attenuation[2]);
 		pointLightingShader->setEyePositionUniform(camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
 		
-		unitSphereModel.render(false);
+		unitSphereModel->render(false);
 	}
 }
 
@@ -290,7 +289,7 @@ void DeferredRenderer::doSpotLightPass(Camera *camera)
 		spotLightingShader->setLightAttenuationUniform(spotLight->attenuation[0], spotLight->attenuation[1], spotLight->attenuation[2]);
 		spotLightingShader->setEyePositionUniform(camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
 
-		unitSphereModel.render(false);
+		unitSphereModel->render(false);
 	}
 
 	/*

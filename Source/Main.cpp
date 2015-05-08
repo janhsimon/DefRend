@@ -9,10 +9,10 @@
 #include "Util.hpp"
 #include "Window.hpp"
 
-Camera camera;
+Camera *camera;
 IRenderer *renderer;
 Input input;
-Model sponzaModel, manModel;
+Model *sponzaModel, *manModel;
 Window *window;
 
 std::vector<PointLight*> pointLights;
@@ -77,13 +77,25 @@ bool load()
 	renderer->init(window);
 
 
-	// load models	
+	// create camera
 
-	if (!sponzaModel.load("Models\\Sponza\\Sponza.obj"))
+	if (!Util::checkMemory(camera = new Camera(glm::vec3(0.f, 100.f, 0.f), window->getWidth(), window->getHeight())))
 		return false;
 
-	//if (!manModel.load("Models\\OldMan\\OldMan.obj"))
-		//return false;
+
+	// load models	
+
+	if (!Util::checkMemory(sponzaModel = new Model(glm::vec3(0.f))))
+		return false;
+	
+	if (!sponzaModel->load("Models\\Sponza\\Sponza.obj"))
+		return false;
+
+	if (!Util::checkMemory(manModel = new Model(glm::vec3(-500.f, -3.f, 0.f))))
+		return false;
+
+	if (!manModel->load("Models\\OldMan\\OldMan.obj"))
+		return false;
 
 
 	// add a point light
@@ -180,21 +192,26 @@ bool load()
 
 void update(float delta)
 {
-	camera.update(input, delta, window->getWidth(), window->getHeight());
+	camera->update(input, delta);
 
 	static float z = 0.f;
 	pointLights[0]->position[0] = sinf(z) * 1200.f;
 	z += .005f * delta;
+
+	manModel->setYaw(manModel->getYaw() + delta * .003f);
 }
 
 void render()
 {
 	assert(renderer);
-	renderer->render(&camera);
+	renderer->render(camera);
 }
 
 void destroy()
 {
+	delete manModel;
+	delete sponzaModel;
+	delete camera;
 	delete renderer;
 	delete window;
 }
@@ -221,8 +238,8 @@ int main(int argc, char **argv)
 				int w2 = window->getWidth() / 2;
 				int h2 = window->getHeight() / 2;
 
-				camera.rotateYaw((event.motion.x - w2) / (float)w2);
-				camera.rotatePitch((event.motion.y - h2) / (float)h2);
+				camera->rotateYaw((event.motion.x - w2) / (float)w2);
+				camera->rotatePitch((event.motion.y - h2) / (float)h2);
 
 				SDL_WarpMouseInWindow(window->getSDLWindow(), w2, h2);
 			}

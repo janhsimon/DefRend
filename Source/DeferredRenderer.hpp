@@ -16,7 +16,7 @@ private:
 	PointLightingShader *pointLightingShader;
 	SpotLightingShader *spotLightingShader;
 
-	Model fullscreenQuadModel, unitSphereModel;
+	Model *fullscreenQuadModel, *unitSphereModel;
 
 	bool loadShaders();
 	bool loadModels();

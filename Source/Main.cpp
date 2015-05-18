@@ -1,13 +1,13 @@
-#include "Camera.hpp"
-#include "DeferredRenderer.hpp"
-#include "Error.hpp"
-#include "Input.hpp"
-#include "IRenderer.hpp"
-#include "PointLight.hpp"
-#include "SceneManager.hpp"
-#include "SpotLight.hpp"
-#include "Util.hpp"
-#include "Window.hpp"
+#include "Camera\Camera.hpp"
+#include "Input\Input.hpp"
+#include "Light\PointLight.hpp"
+#include "Light\SpotLight.hpp"
+#include "Renderer\DeferredRenderer.hpp"
+#include "Renderer\IRenderer.hpp"
+#include "Scene\SceneManager.hpp"
+#include "Util\Error.hpp"
+#include "Util\Util.hpp"
+#include "Window\Window.hpp"
 
 Camera *camera;
 IRenderer *renderer;
@@ -117,7 +117,6 @@ bool load()
 	l->attenuation[0] = .0001f;		// constant
 	l->attenuation[1] = .00001f;	// linear
 	l->attenuation[2] = .00001f;	// exponent
-	
 	pointLights.push_back(l);
 
 
@@ -136,7 +135,7 @@ bool load()
 		s->diffuseColor[0] = 1.f;
 		s->diffuseColor[1] = 1.f;
 		s->diffuseColor[2] = .9f;
-		s->diffuseIntensity = 1.f;
+		s->diffuseIntensity = 2.f;
 		s->specularIntensity = 1.f;
 		s->specularPower = 32.f;
 		s->attenuation[0] = .0001f;		// constant
@@ -157,7 +156,7 @@ bool load()
 		s->diffuseColor[0] = 1.f;
 		s->diffuseColor[1] = 1.f;
 		s->diffuseColor[2] = .9f;
-		s->diffuseIntensity = 1.f;
+		s->diffuseIntensity = 2.f;
 		s->specularIntensity = 1.f;
 		s->specularPower = 32.f;
 		s->attenuation[0] = .0001f;		// constant

@@ -58,6 +58,17 @@ bool GBuffer::load(unsigned int screenWidth, unsigned int screenHeight)
 	return true;
 }
 
+GLuint GBuffer::getFBO()
+{
+	return FBO;
+}
+
+GLuint GBuffer::getTexture(int i)
+{
+	return textures[i];
+}
+
+/*
 void GBuffer::bindForWriting()
 {
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, FBO);
@@ -83,3 +94,4 @@ void GBuffer::setReadBuffer(GBUFFER_TEXTURE_TYPE textureType)
 {
 	glReadBuffer(GL_COLOR_ATTACHMENT0 + textureType);
 }
+*/

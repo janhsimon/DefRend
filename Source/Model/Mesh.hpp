@@ -1,6 +1,6 @@
 #pragma once
 
-#include <assimp/mesh.h>
+#include <assimp\mesh.h>
 #include <vector>
 
 struct Vertex

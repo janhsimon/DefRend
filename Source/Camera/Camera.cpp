@@ -52,17 +52,17 @@ void Camera::rotateRoll(float amount)
 
 void Camera::update(Input &input, float delta)
 {
-	acceleration = glm::vec3(0.f, 0.f, 0.f);
+	//acceleration = glm::vec3(0.f, 0.f, 0.f);
 
 	if (input.isForwardKeyPressed() && !input.isBackKeyPressed())
-		acceleration += forward * MOVEMENT_SPEED * delta * (input.isCrouchKeyPressed() ? CROUCH_SPEED_FACTOR : 1.f) * 1.001f;
+		position += forward * MOVEMENT_SPEED * delta * (input.isCrouchKeyPressed() ? CROUCH_SPEED_FACTOR : 1.f) * 1.001f;
 	else if (input.isBackKeyPressed() && !input.isForwardKeyPressed())
-		acceleration -= forward * MOVEMENT_SPEED * delta * (input.isCrouchKeyPressed() ? CROUCH_SPEED_FACTOR : 1.f) * 1.001f;
+		position -= forward * MOVEMENT_SPEED * delta * (input.isCrouchKeyPressed() ? CROUCH_SPEED_FACTOR : 1.f) * 1.001f;
 
 	if (input.isLeftKeyPressed() && !input.isRightKeyPressed())
-		acceleration += right * MOVEMENT_SPEED * delta * (input.isCrouchKeyPressed() ? CROUCH_SPEED_FACTOR : 1.f) * 1.001f;
+		position += right * MOVEMENT_SPEED * delta * (input.isCrouchKeyPressed() ? CROUCH_SPEED_FACTOR : 1.f) * 1.001f;
 	else if (input.isRightKeyPressed() && !input.isLeftKeyPressed())
-		acceleration -= right * MOVEMENT_SPEED * delta * (input.isCrouchKeyPressed() ? CROUCH_SPEED_FACTOR : 1.f) * 1.001f;
+		position -= right * MOVEMENT_SPEED * delta * (input.isCrouchKeyPressed() ? CROUCH_SPEED_FACTOR : 1.f) * 1.001f;
 
 	updateTransform(delta);
 

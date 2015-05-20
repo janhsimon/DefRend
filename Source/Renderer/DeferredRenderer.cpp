@@ -1,5 +1,5 @@
 #include <assert.h>
-#include <gtc/matrix_transform.hpp>
+#include <gtc\matrix_transform.hpp>
 #include <vector>
 
 #include "DeferredRenderer.hpp"
@@ -91,21 +91,22 @@ bool DeferredRenderer::init(Window *window)
 	return true;
 }
 
+/*
 void DeferredRenderer::renderGeometryPass(Camera *camera)
 {
 	assert(camera);
 
-	glUseProgram(geometryShader->getProgram());
+	//glUseProgram(geometryShader->getProgram());
 
-	gBuffer->bindForWriting();
+	//gBuffer->bindForWriting();
 
 	// make sure we write to the depth buffer
-	glDepthMask(GL_TRUE);
+	//glDepthMask(GL_TRUE);
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);
+	//glEnable(GL_DEPTH_TEST);
+	//glDisable(GL_BLEND);
 
 	for (Model *model : *sceneManager->getModels())
 	{
@@ -113,7 +114,9 @@ void DeferredRenderer::renderGeometryPass(Camera *camera)
 		model->render(true);
 	}
 }
+*/
 
+/*
 void DeferredRenderer::renderGBufferDebug()
 {
 	// reset the frame buffer so we draw to the actual screen
@@ -139,6 +142,7 @@ void DeferredRenderer::renderGBufferDebug()
 	gBuffer->setReadBuffer(GBUFFER_TEXTURE_TYPE_POSITION);
 	glBlitFramebuffer(0, 0, window->getWidth(), window->getHeight(), halfWidth, 0, window->getWidth(), halfHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 }
+*/
 
 /*
 void DeferredRenderer::doShadowPass(float delta)
@@ -199,22 +203,6 @@ void DeferredRenderer::doShadowPass(float delta)
 	}
 }
 */
-
-void DeferredRenderer::beginLightPass()
-{
-	glEnable(GL_BLEND);
-	glBlendEquation(GL_FUNC_ADD);
-	glBlendFunc(GL_ONE, GL_ONE);
-
-	// light pass does not write to the depth buffer
-	glDepthMask(GL_FALSE);
-	glDisable(GL_DEPTH_TEST);
-
-	assert(gBuffer);
-	gBuffer->bindForReading(false);
-
-	glClear(GL_COLOR_BUFFER_BIT);
-}
 
 void DeferredRenderer::doDirectionalLightPass(Camera *camera)
 {
@@ -324,20 +312,39 @@ void DeferredRenderer::doSpotLightPass(Camera *camera)
 
 void DeferredRenderer::render(Camera *camera)
 {
-	assert(camera);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, gBuffer->getFBO());
+	glUseProgram(geometryShader->getProgram());
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	renderGeometryPass(camera);
-
-	//if (input.isDebugModeOn())
-	if (false)
-		renderGBufferDebug();
-	else
+	for (Model *model : *sceneManager->getModels())
 	{
-		beginLightPass();
-		doDirectionalLightPass(camera);
-		doPointLightPass(camera);
-		doSpotLightPass(camera);
+		geometryShader->setWorldViewProjectionUniforms(model->getWorldMatrix(), camera->getViewMatrix(), camera->getProjectionMatrix());
+		model->render(true);
+	}
+		
+	glEnable(GL_BLEND);
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_ONE, GL_ONE);
+
+	glDepthMask(GL_FALSE);
+	glDisable(GL_DEPTH_TEST);
+
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+	for (unsigned int i = 0; i < 4; ++i)
+	{
+		glActiveTexture(GL_TEXTURE0 + i);
+		glBindTexture(GL_TEXTURE_2D, gBuffer->getTexture(i));
 	}
 
-	window->finalizeFrame();
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	doDirectionalLightPass(camera);
+	doPointLightPass(camera);
+	doSpotLightPass(camera);
+
+	glDepthMask(GL_TRUE);
+
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
 }

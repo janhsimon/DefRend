@@ -1,5 +1,5 @@
-#include <gtc/matrix_transform.hpp>
-#include <gtc/quaternion.hpp>
+#include <gtc\matrix_transform.hpp>
+#include <gtc\quaternion.hpp>
 
 #include "Transform.hpp"
 

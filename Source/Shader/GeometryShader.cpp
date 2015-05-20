@@ -1,4 +1,4 @@
-#include <gtc/type_ptr.hpp>
+#include <gtc\type_ptr.hpp>
 
 #include "GeometryShader.hpp"
 #include "..\Util\Error.hpp"

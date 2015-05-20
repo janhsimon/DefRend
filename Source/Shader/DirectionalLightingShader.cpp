@@ -1,4 +1,4 @@
-#include <gtc/type_ptr.hpp>
+#include <gtc\type_ptr.hpp>
 
 #include "DirectionalLightingShader.hpp"
 #include "..\Util\Error.hpp"

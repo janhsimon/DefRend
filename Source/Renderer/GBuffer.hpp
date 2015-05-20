@@ -28,7 +28,10 @@ public:
 	~GBuffer();
 
 	bool load(unsigned int screenWidth, unsigned int screenHeight);
-	void bindForWriting();
-	void bindForReading(bool debug);
-	void setReadBuffer(GBUFFER_TEXTURE_TYPE textureType);
+	GLuint getFBO();
+	GLuint getTexture(int i);
+
+	//void bindForWriting();
+	//void bindForReading(bool debug);
+	//void setReadBuffer(GBUFFER_TEXTURE_TYPE textureType);
 };

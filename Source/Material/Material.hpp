@@ -1,6 +1,6 @@
 #pragma once
 
-#include <assimp/material.h>
+#include <assimp\material.h>
 
 #include "Texture.hpp"
 #include "TextureManager.hpp"

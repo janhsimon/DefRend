@@ -1,8 +1,11 @@
+#include <sstream>
+
 #include "Camera\Camera.hpp"
 #include "Input\Input.hpp"
 #include "Light\PointLight.hpp"
 #include "Light\SpotLight.hpp"
 #include "Renderer\DeferredRenderer.hpp"
+#include "Renderer\FontRenderer.hpp"
 #include "Renderer\IRenderer.hpp"
 #include "Scene\SceneManager.hpp"
 #include "Util\Error.hpp"
@@ -10,6 +13,7 @@
 #include "Window\Window.hpp"
 
 Camera *camera;
+FontRenderer *fontRenderer;
 IRenderer *renderer;
 Input input;
 SceneManager *sceneManager;
@@ -19,7 +23,7 @@ std::vector<PointLight*> pointLights;
 std::vector<SpotLight*> spotLights;
 SpotLight *flashLight;
 
-unsigned int lastTickTime = 0;
+unsigned int thisTickTime, lastTickTime = 0;
 
 glm::mat4 projectionMatrix;
 
@@ -74,7 +78,17 @@ bool load()
 	if (!Util::checkMemory(renderer = new DeferredRenderer()))
 		return false;
 
-	renderer->init(window);
+	if (!renderer->init(window))
+		return false;
+
+
+	// create font renderer
+
+	if (!Util::checkMemory(fontRenderer = new FontRenderer()))
+		return false;
+
+	if (!fontRenderer->create())
+		return false;
 
 
 	// create camera
@@ -204,6 +218,20 @@ void render()
 {
 	assert(renderer);
 	renderer->render(camera);
+
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	std::stringstream s;
+	unsigned int ms = (thisTickTime - lastTickTime);
+	s << "frame time: " << ms << " ms     fps: " << 1000.f / ms;
+	fontRenderer->drawText(s.str(), 0.f, 0.f, { 255, 255, 255 });
+
+	glDisable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
+
+	window->finalizeFrame();
 }
 
 void destroy()
@@ -221,7 +249,7 @@ int main(int argc, char **argv)
 
 	while (window->getAlive())
 	{
-		unsigned int thisTickTime = SDL_GetTicks();
+		thisTickTime = SDL_GetTicks();
 		float delta = (thisTickTime - lastTickTime) * .1f;
 
 		SDL_Event event;

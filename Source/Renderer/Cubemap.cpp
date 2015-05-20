@@ -1,6 +1,6 @@
 /*
 #include "Cubemap.hpp"
-#include "..\Util\\Error.hpp"
+#include "..\Util\Error.hpp"
 
 Cubemap::Cubemap()
 {

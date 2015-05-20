@@ -1,5 +1,5 @@
 #include <assert.h>
-#include <assimp/postprocess.h>
+#include <assimp\postprocess.h>
 
 #include "Model.hpp"
 #include "..\Util\Error.hpp"

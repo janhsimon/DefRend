@@ -79,6 +79,12 @@
     <None Include="Binaries\Shaders\FontDraw.vs.glsl">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="Binaries\Shaders\BillboardDraw.fs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\BillboardDraw.vs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Camera\Camera.hpp">
@@ -156,6 +162,12 @@
     <ClInclude Include="Source\Shader\FontDrawShader.hpp">
       <Filter>Source Files\Shader</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Shader\BillboardDrawShader.hpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\BillboardRenderer.hpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Camera\Camera.cpp">
@@ -229,6 +241,12 @@
     </ClCompile>
     <ClCompile Include="Source\Shader\FontDrawShader.cpp">
       <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Shader\BillboardDrawShader.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer\BillboardRenderer.cpp">
+      <Filter>Source Files\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

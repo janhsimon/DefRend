@@ -81,6 +81,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="Binaries\Shaders\BillboardDraw.fs.glsl" />
+    <None Include="Binaries\Shaders\BillboardDraw.vs.glsl" />
     <None Include="Binaries\Shaders\DirectionalLighting.fs.glsl" />
     <None Include="Binaries\Shaders\FontDraw.fs.glsl" />
     <None Include="Binaries\Shaders\FontDraw.vs.glsl" />
@@ -104,12 +106,14 @@
     <ClInclude Include="Source\Material\TextureManager.hpp" />
     <ClInclude Include="Source\Model\Mesh.hpp" />
     <ClInclude Include="Source\Model\Model.hpp" />
+    <ClInclude Include="Source\Renderer\BillboardRenderer.hpp" />
     <ClInclude Include="Source\Renderer\Cubemap.hpp" />
     <ClInclude Include="Source\Renderer\DeferredRenderer.hpp" />
     <ClInclude Include="Source\Renderer\FontRenderer.hpp" />
     <ClInclude Include="Source\Renderer\GBuffer.hpp" />
     <ClInclude Include="Source\Renderer\IRenderer.hpp" />
     <ClInclude Include="Source\Scene\SceneManager.hpp" />
+    <ClInclude Include="Source\Shader\BillboardDrawShader.hpp" />
     <ClInclude Include="Source\Shader\DirectionalLightingShader.hpp" />
     <ClInclude Include="Source\Shader\FontDrawShader.hpp" />
     <ClInclude Include="Source\Shader\GeometryShader.hpp" />
@@ -131,11 +135,13 @@
     <ClCompile Include="Source\Material\TextureManager.cpp" />
     <ClCompile Include="Source\Model\Mesh.cpp" />
     <ClCompile Include="Source\Model\Model.cpp" />
+    <ClCompile Include="Source\Renderer\BillboardRenderer.cpp" />
     <ClCompile Include="Source\Renderer\Cubemap.cpp" />
     <ClCompile Include="Source\Renderer\DeferredRenderer.cpp" />
     <ClCompile Include="Source\Renderer\FontRenderer.cpp" />
     <ClCompile Include="Source\Renderer\GBuffer.cpp" />
     <ClCompile Include="Source\Scene\SceneManager.cpp" />
+    <ClCompile Include="Source\Shader\BillboardDrawShader.cpp" />
     <ClCompile Include="Source\Shader\DirectionalLightingShader.cpp" />
     <ClCompile Include="Source\Shader\FontDrawShader.cpp" />
     <ClCompile Include="Source\Shader\GeometryShader.cpp" />

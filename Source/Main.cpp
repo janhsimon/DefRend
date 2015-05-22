@@ -4,6 +4,7 @@
 #include "Input\Input.hpp"
 #include "Light\PointLight.hpp"
 #include "Light\SpotLight.hpp"
+#include "Renderer\BillboardRenderer.hpp"
 #include "Renderer\DeferredRenderer.hpp"
 #include "Renderer\FontRenderer.hpp"
 #include "Renderer\IRenderer.hpp"
@@ -12,6 +13,7 @@
 #include "Util\Util.hpp"
 #include "Window\Window.hpp"
 
+BillboardRenderer *billboardRenderer;
 Camera *camera;
 FontRenderer *fontRenderer;
 IRenderer *renderer;
@@ -73,7 +75,16 @@ bool load()
 	}
 
 
-	// create renderer
+	// create font renderer
+
+	if (!Util::checkMemory(billboardRenderer = new BillboardRenderer()))
+		return false;
+
+	if (!billboardRenderer->create())
+		return false;
+
+
+	// create deferred renderer
 
 	if (!Util::checkMemory(renderer = new DeferredRenderer()))
 		return false;
@@ -125,6 +136,23 @@ bool load()
 	l->diffuseColor[0] = 1.f;
 	l->diffuseColor[1] = 1.f;
 	l->diffuseColor[2] = .9f;
+	l->diffuseIntensity = 1.f;
+	l->specularIntensity = 1.f;
+	l->specularPower = 32.f;
+	l->attenuation[0] = .0001f;		// constant
+	l->attenuation[1] = .00001f;	// linear
+	l->attenuation[2] = .00001f;	// exponent
+	pointLights.push_back(l);
+
+	if (!Util::checkMemory(l = new PointLight()))
+		return false;
+
+	l->position[0] = 300.f;
+	l->position[1] = 1000.f;
+	l->position[2] = 0.f;
+	l->diffuseColor[0] = .1f;
+	l->diffuseColor[1] = .1f;
+	l->diffuseColor[2] = 1.f;
 	l->diffuseIntensity = 1.f;
 	l->specularIntensity = 1.f;
 	l->specularPower = 32.f;
@@ -211,6 +239,8 @@ void update(float delta)
 	pointLights[0]->position[0] = sinf(z) * 1200.f;
 	z += .005f * delta;
 
+	pointLights[1]->position[1] = sinf(z) * 500.f;
+
 	//manModel->setYaw(manModel->getYaw() + delta * .003f);
 }
 
@@ -226,7 +256,10 @@ void render()
 	std::stringstream s;
 	unsigned int ms = (thisTickTime - lastTickTime);
 	s << "frame time: " << ms << " ms     fps: " << 1000.f / ms;
-	fontRenderer->drawText(s.str(), 0.f, 0.f, { 255, 255, 255 });
+	SDL_Color color = { 255, 255, 255 };
+	fontRenderer->drawText(s.str(), 0.f, 0.f, color);
+
+	billboardRenderer->render(camera);
 
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
@@ -239,6 +272,8 @@ void destroy()
 	delete sceneManager;
 	delete camera;
 	delete renderer;
+	delete fontRenderer;
+	delete billboardRenderer;
 	delete window;
 }
 

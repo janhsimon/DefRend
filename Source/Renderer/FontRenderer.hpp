@@ -23,5 +23,5 @@ public:
 	void render(SDL_Renderer *renderer, std::string text, SDL_Color color);
 	void drawText(std::string text, float x, float y, SDL_Color color);
 	
-	//Vector2 getTextDimensions(std::string text);
+	//const Vector2 getTextDimensions(std::string text);
 };

@@ -7,12 +7,12 @@ class Cubemap
 {
 private:
 	GLuint handle;
-	GLuint FBO;
+	
 
 public:
+	GLuint FBO;
+
 	Cubemap();
 	~Cubemap();
-
-	GLuint getFBO();
 };
 */

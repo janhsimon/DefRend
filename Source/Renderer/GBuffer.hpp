@@ -19,17 +19,14 @@ enum GBUFFER_TEXTURE_TYPE
 
 class GBuffer
 {
-private:
+public:
 	GLuint FBO;
 	GLuint textures[4];
 	GLuint depthTexture;
 
-public:
 	~GBuffer();
 
 	bool load(unsigned int screenWidth, unsigned int screenHeight);
-	GLuint getFBO();
-	GLuint getTexture(int i);
 
 	//void bindForWriting();
 	//void bindForReading(bool debug);

@@ -14,9 +14,9 @@ Texture* TextureManager::refTexture(std::string filename)
 {
 	for (Texture *t : textures)
 	{
-		if (filename.compare(t->getFilename()) == 0)
+		if (filename.compare(t->filename) == 0)
 		{
-			t->setRefCount(t->getRefCount() + 1);
+			t->refCount++;
 			return t;
 		}
 	}
@@ -45,9 +45,9 @@ void TextureManager::unrefTexture(Texture *texture)
 	{
 		if (*i == texture)
 		{
-			texture->setRefCount(texture->getRefCount() + 1);
+			texture->refCount--;
 
-			if (texture->getRefCount() <= 0)
+			if (texture->refCount <= 0)
 			{
 				textures.erase(i);
 				delete texture;
@@ -58,22 +58,22 @@ void TextureManager::unrefTexture(Texture *texture)
 	}
 }
 
-std::string TextureManager::getDefaultDiffuseTextureFilename()
+const std::string &TextureManager::getDefaultDiffuseTextureFilename()
 {
 	return DEFAULT_DIFFUSE_TEXTURE_FILENAME;
 }
 
-std::string TextureManager::getDefaultNormalTextureFilename()
+const std::string &TextureManager::getDefaultNormalTextureFilename()
 {
 	return DEFAULT_NORMAL_TEXTURE_FILENAME;
 }
 
-std::string TextureManager::getDefaultSpecularTextureFilename()
+const std::string &TextureManager::getDefaultSpecularTextureFilename()
 {
 	return DEFAULT_SPECULAR_TEXTURE_FILENAME;
 }
 
-std::string TextureManager::getDefaultOpacityTextureFilename()
+const std::string &TextureManager::getDefaultOpacityTextureFilename()
 {
 	return DEFAULT_OPACITY_TEXTURE_FILENAME;
 }

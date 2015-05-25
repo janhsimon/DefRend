@@ -3,11 +3,13 @@
 #include <vector>
 
 #include "DeferredRenderer.hpp"
+#include "..\Light\DirectionalLight.hpp"
 #include "..\Light\PointLight.hpp"
 #include "..\Light\SpotLight.hpp"
 #include "..\Scene\SceneManager.hpp"
 #include "..\Util\Util.hpp"
 
+extern std::vector<DirectionalLight*> directionalLights;
 extern std::vector<PointLight*> pointLights;
 extern std::vector<SpotLight*> spotLights;
 
@@ -16,7 +18,7 @@ extern SceneManager *sceneManager;
 DeferredRenderer::~DeferredRenderer()
 {
 	delete gBuffer;
-	delete fullscreenQuadModel;
+	delete unitQuad;
 	delete unitSphereModel;
 	delete geometryShader;
 	delete directionalLightingShader;
@@ -55,12 +57,6 @@ bool DeferredRenderer::loadShaders()
 
 bool DeferredRenderer::loadModels()
 {
-	if (!Util::checkMemory(fullscreenQuadModel = new Model(glm::vec3(0.f))))
-		return false;
-
-	if (!fullscreenQuadModel->load("Models\\FullscreenQuad\\FullscreenQuad.obj"))
-		return false;
-
 	if (!Util::checkMemory(unitSphereModel = new Model(glm::vec3(0.f))))
 		return false;
 
@@ -77,13 +73,19 @@ bool DeferredRenderer::init(Window *window)
 	if (!Util::checkMemory(gBuffer = new GBuffer()))
 		return false;
 
-	if (!gBuffer->load(window->getWidth(), window->getHeight()))
+	if (!gBuffer->load(window->width, window->height))
 		return false;
 
 	if (!loadShaders())
 		return false;
 
 	if (!loadModels())
+		return false;
+
+	if (!Util::checkMemory(unitQuad = new UnitQuad()))
+		return false;
+
+	if (!unitQuad->create())
 		return false;
 
 	this->window = window;
@@ -208,13 +210,15 @@ void DeferredRenderer::doDirectionalLightPass(Camera *camera)
 {
 	assert(camera);
 
-	glUseProgram(directionalLightingShader->getProgram());
-	directionalLightingShader->setWorldViewProjectionUniforms(glm::mat4(1.f), glm::mat4(1.f), glm::mat4(1.f));
-	directionalLightingShader->setLightDirectionUniform(.5f, 1.f, .5f);
-	directionalLightingShader->setLightAmbientUniforms(0.f, 0.f, 0.f, 0.f);
-	directionalLightingShader->setLightDiffuseUniform(1.f);
-	directionalLightingShader->setScreenSizeUniforms(window->getWidth(), window->getHeight());
-	fullscreenQuadModel->render(false);
+	glUseProgram(directionalLightingShader->program);
+
+	for (DirectionalLight *directionalLight : directionalLights)
+	{
+		directionalLightingShader->setWorldViewProjectionUniforms(glm::mat4(1.f), glm::mat4(1.f), glm::mat4(1.f));
+		directionalLightingShader->setLightParameters(directionalLight);
+		directionalLightingShader->setScreenSizeUniforms(window->width, window->height);
+		unitQuad->render();
+	}
 }
 
 float calcPointLightBSphere(const PointLight &l)
@@ -231,7 +235,7 @@ void DeferredRenderer::doPointLightPass(Camera *camera)
 {
 	assert(camera);
 
-	glUseProgram(pointLightingShader->getProgram());
+	glUseProgram(pointLightingShader->program);
 
 	for (PointLight *pointLight : pointLights)
 	{
@@ -240,13 +244,10 @@ void DeferredRenderer::doPointLightPass(Camera *camera)
 		float s = calcPointLightBSphere(*pointLight);
 		worldMatrix = glm::scale(worldMatrix, glm::vec3(s, s, s));
 		
-		pointLightingShader->setWorldViewProjectionUniforms(worldMatrix, camera->getViewMatrix(), camera->getProjectionMatrix());
-		pointLightingShader->setScreenSizeUniform(window->getWidth(), window->getHeight());
-		pointLightingShader->setLightPositionUniform(pointLight->position[0], pointLight->position[1], pointLight->position[2]);
-		pointLightingShader->setLightDiffuseUniforms(pointLight->diffuseColor[0], pointLight->diffuseColor[1], pointLight->diffuseColor[2], pointLight->diffuseIntensity);
-		pointLightingShader->setLightSpecularUniforms(pointLight->specularIntensity, pointLight->specularPower);
-		pointLightingShader->setLightAttenuationUniform(pointLight->attenuation[0], pointLight->attenuation[1], pointLight->attenuation[2]);
-		pointLightingShader->setEyePositionUniform(camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
+		pointLightingShader->setWorldViewProjectionUniforms(worldMatrix, camera->viewMatrix, camera->projectionMatrix);
+		pointLightingShader->setScreenSizeUniform(window->width, window->height);
+		pointLightingShader->setLightParameters(pointLight);
+		pointLightingShader->setEyePositionUniform(camera->position.x, camera->position.y, camera->position.z);
 		
 		unitSphereModel->render(false);
 	}
@@ -256,7 +257,7 @@ void DeferredRenderer::doSpotLightPass(Camera *camera)
 {
 	assert(camera);
 
-	glUseProgram(spotLightingShader->getProgram());
+	glUseProgram(spotLightingShader->program);
 
 	for (SpotLight *spotLight : spotLights)
 	{
@@ -265,15 +266,10 @@ void DeferredRenderer::doSpotLightPass(Camera *camera)
 		float s = calcPointLightBSphere(*spotLight);
 		worldMatrix = glm::scale(worldMatrix, glm::vec3(s, s, s));
 
-		spotLightingShader->setWorldViewProjectionUniforms(worldMatrix, camera->getViewMatrix(), camera->getProjectionMatrix());
-		spotLightingShader->setScreenSizeUniform(window->getWidth(), window->getHeight());
-		spotLightingShader->setLightPositionUniform(spotLight->position[0], spotLight->position[1], spotLight->position[2]);
-		spotLightingShader->setLightDiffuseUniforms(spotLight->diffuseColor[0], spotLight->diffuseColor[1], spotLight->diffuseColor[2], spotLight->diffuseIntensity);
-		spotLightingShader->setLightSpecularUniforms(spotLight->specularIntensity, spotLight->specularPower);
-		spotLightingShader->setLightDirectionUniform(spotLight->direction[0], spotLight->direction[1], spotLight->direction[2]);
-		spotLightingShader->setLightCutoffAngleUniform(spotLight->cutoffAngle);
-		spotLightingShader->setLightAttenuationUniform(spotLight->attenuation[0], spotLight->attenuation[1], spotLight->attenuation[2]);
-		spotLightingShader->setEyePositionUniform(camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
+		spotLightingShader->setWorldViewProjectionUniforms(worldMatrix, camera->viewMatrix, camera->projectionMatrix);
+		spotLightingShader->setScreenSizeUniform(window->width, window->height);
+		spotLightingShader->setLightParameters(spotLight);
+		spotLightingShader->setEyePositionUniform(glm::vec3(camera->position.x, camera->position.y, camera->position.z));
 
 		unitSphereModel->render(false);
 	}
@@ -312,13 +308,13 @@ void DeferredRenderer::doSpotLightPass(Camera *camera)
 
 void DeferredRenderer::render(Camera *camera)
 {
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, gBuffer->getFBO());
-	glUseProgram(geometryShader->getProgram());
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, gBuffer->FBO);
+	glUseProgram(geometryShader->program);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	for (Model *model : *sceneManager->getModels())
+	for (Model *model : sceneManager->models)
 	{
-		geometryShader->setWorldViewProjectionUniforms(model->getWorldMatrix(), camera->getViewMatrix(), camera->getProjectionMatrix());
+		geometryShader->setWorldViewProjectionUniforms(model->getWorldMatrix(), camera->viewMatrix, camera->projectionMatrix);
 		model->render(true);
 	}
 		
@@ -334,7 +330,7 @@ void DeferredRenderer::render(Camera *camera)
 	for (unsigned int i = 0; i < 4; ++i)
 	{
 		glActiveTexture(GL_TEXTURE0 + i);
-		glBindTexture(GL_TEXTURE_2D, gBuffer->getTexture(i));
+		glBindTexture(GL_TEXTURE_2D, gBuffer->textures[i]);
 	}
 
 	glClear(GL_COLOR_BUFFER_BIT);

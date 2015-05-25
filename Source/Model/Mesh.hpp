@@ -13,14 +13,10 @@ struct Vertex
 
 class Mesh
 {
-private:
+public:
 	unsigned int vertexCount;
 	unsigned int materialIndex;
 
-public:
 	std::vector<Vertex> load(aiMesh *mesh);
 	void render(unsigned int firstVertex);
-
-	unsigned int getVertexCount();
-	unsigned int getMaterialIndex();
 };

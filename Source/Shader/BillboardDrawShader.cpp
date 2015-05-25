@@ -15,7 +15,7 @@ bool BillboardDrawShader::create()
 	if (!link())
 		return false;
 
-	glUseProgram(getProgram());
+	glUseProgram(program);
 
 	if (!getUniformLocation(WORLD_VIEW_PROJECTION_MATRIX_UNIFORM_NAME, worldViewProjectionMatrixUniformLocation))
 		return false;
@@ -43,7 +43,7 @@ void BillboardDrawShader::setWorldViewProjectionMatrixUniforms(const glm::mat4 &
 	glUniformMatrix4fv(worldViewProjectionMatrixUniformLocation, 1, GL_FALSE, glm::value_ptr((projectionMatrix * viewMatrix) * worldMatrix));
 }
 
-void BillboardDrawShader::setTintColorUniform(float r, float g, float b)
+void BillboardDrawShader::setTintColorUniform(const glm::vec3 &tintColor)
 {
-	glUniform3f(tintColorUniformLocation, r, g, b);
+	glUniform3f(tintColorUniformLocation, tintColor.r, tintColor.g, tintColor.b);
 }

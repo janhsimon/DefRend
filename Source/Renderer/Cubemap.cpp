@@ -55,9 +55,4 @@ Cubemap::~Cubemap()
 {
 	glDeleteTextures(1, &handle);
 }
-
-GLuint Cubemap::getFBO()
-{
-	return FBO;
-}
 */

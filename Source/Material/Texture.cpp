@@ -80,18 +80,3 @@ void Texture::bind(GLenum textureUnit)
 	glActiveTexture(textureUnit);
 	glBindTexture(GL_TEXTURE_2D, handle);
 }
-
-unsigned int Texture::getRefCount()
-{
-	return refCount;
-}
-
-void Texture::setRefCount(unsigned int refCount)
-{
-	this->refCount = refCount;
-}
-
-std::string Texture::getFilename()
-{
-	return filename;
-}

@@ -9,14 +9,13 @@ private:
 	static const float MOVEMENT_SPEED;
 	static const float CROUCH_SPEED_FACTOR;
 
-	static float mouseSensitivity;
-
-	float nearClipPlane, farClipPlane;
 	float fov;
 
-	glm::mat4 viewMatrix, projectionMatrix;
-
 public:
+	glm::mat4 viewMatrix, projectionMatrix;
+	float nearClipPlane, farClipPlane;
+	static float mouseSensitivity;
+
 	Camera(glm::vec3 position, unsigned int screenWidth, unsigned int screenHeight);
 
 	// 16-byte alignment for fast SSE math instructions
@@ -29,9 +28,6 @@ public:
 	
 	void update(Input &input, float delta);
 
-	glm::mat4 getViewMatrix();
-	glm::mat4 getProjectionMatrix();
-
-	float getFOV();
+	inline float getFOV() const { return fov; }
 	void setFOV(float fov, unsigned int screenWidth, unsigned int screenHeight);
 };

@@ -10,12 +10,12 @@ void Error::report(const std::string &title, const std::string &description)
 	SDL_Window *parent = nullptr;
 
 	if (window)
-		parent = window->getSDLWindow();
+		parent = window->sdlWindow;
 
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title.c_str(), description.c_str(), parent);
 }
 
-const std::string Error::getOpenGLErrorString(GLenum errorFlag)
+std::string Error::getOpenGLErrorString(GLenum errorFlag)
 {
 	if (errorFlag == GL_NO_ERROR)
 		return "No error has been recorded";
@@ -37,7 +37,7 @@ const std::string Error::getOpenGLErrorString(GLenum errorFlag)
 		return "Unrecognized error";
 }
 
-const std::string Error::getOpenGLFrameBufferErrorString(GLenum errorFlag)
+std::string Error::getOpenGLFrameBufferErrorString(GLenum errorFlag)
 {
 	if (errorFlag == GL_FRAMEBUFFER_COMPLETE)
 		return "No error has been recorded";

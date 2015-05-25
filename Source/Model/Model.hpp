@@ -9,8 +9,6 @@
 #include "..\Material\Material.hpp"
 #include "..\Transform\Transform.hpp"
 
-
-
 class Model : public Transform
 {
 private:

@@ -1,5 +1,6 @@
 #include "GBuffer.hpp"
 #include "IRenderer.hpp"
+#include "UnitQuad.hpp"
 #include "..\Model\Model.hpp"
 #include "..\Shader\DirectionalLightingShader.hpp"
 #include "..\Shader\GeometryShader.hpp"
@@ -16,7 +17,9 @@ private:
 	PointLightingShader *pointLightingShader;
 	SpotLightingShader *spotLightingShader;
 
-	Model *fullscreenQuadModel, *unitSphereModel;
+	Model *unitSphereModel;
+
+	UnitQuad *unitQuad;
 
 	bool loadShaders();
 	bool loadModels();

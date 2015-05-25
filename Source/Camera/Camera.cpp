@@ -1,4 +1,4 @@
-#include <gtc/matrix_transform.hpp>
+#include <gtc\matrix_transform.hpp>
 
 #include "Camera.hpp"
 #include "..\Util\Util.hpp"
@@ -6,7 +6,7 @@
 const float Camera::MOVEMENT_SPEED = 5.f;
 const float Camera::CROUCH_SPEED_FACTOR = .25f;
 
-float Camera::mouseSensitivity = .55f;
+float Camera::mouseSensitivity = 30.f;
 
 Camera::Camera(glm::vec3 position, unsigned int screenWidth, unsigned int screenHeight) : Transform(position)
 {
@@ -32,7 +32,7 @@ void Camera::rotatePitch(float amount)
 {
 	pitch += amount * mouseSensitivity;
 
-	float pitchLock = glm::radians(90.f);
+	float pitchLock = 90.f;
 
 	if (pitch < -pitchLock)
 		pitch = -pitchLock;
@@ -54,34 +54,19 @@ void Camera::update(Input &input, float delta)
 {
 	//acceleration = glm::vec3(0.f, 0.f, 0.f);
 
-	if (input.isForwardKeyPressed() && !input.isBackKeyPressed())
-		position += forward * MOVEMENT_SPEED * delta * (input.isCrouchKeyPressed() ? CROUCH_SPEED_FACTOR : 1.f) * 1.001f;
-	else if (input.isBackKeyPressed() && !input.isForwardKeyPressed())
-		position -= forward * MOVEMENT_SPEED * delta * (input.isCrouchKeyPressed() ? CROUCH_SPEED_FACTOR : 1.f) * 1.001f;
+	if (input.forwardKeyPressed && !input.backKeyPressed)
+		position += getForward() * MOVEMENT_SPEED * delta * (input.crouchKeyPressed ? CROUCH_SPEED_FACTOR : 1.f);
+	else if (input.backKeyPressed && !input.forwardKeyPressed)
+		position -= getForward() * MOVEMENT_SPEED * delta * (input.crouchKeyPressed ? CROUCH_SPEED_FACTOR : 1.f);
 
-	if (input.isLeftKeyPressed() && !input.isRightKeyPressed())
-		position += right * MOVEMENT_SPEED * delta * (input.isCrouchKeyPressed() ? CROUCH_SPEED_FACTOR : 1.f) * 1.001f;
-	else if (input.isRightKeyPressed() && !input.isLeftKeyPressed())
-		position -= right * MOVEMENT_SPEED * delta * (input.isCrouchKeyPressed() ? CROUCH_SPEED_FACTOR : 1.f) * 1.001f;
+	if (input.leftKeyPressed && !input.rightKeyPressed)
+		position += getRight() * MOVEMENT_SPEED * delta * (input.crouchKeyPressed ? CROUCH_SPEED_FACTOR : 1.f);
+	else if (input.rightKeyPressed && !input.leftKeyPressed)
+		position -= getRight() * MOVEMENT_SPEED * delta * (input.crouchKeyPressed ? CROUCH_SPEED_FACTOR : 1.f);
 
 	updateTransform(delta);
 
-	viewMatrix = glm::lookAt(position, position + forward, up);
-}
-
-glm::mat4 Camera::getViewMatrix()
-{
-	return viewMatrix;
-}
-
-glm::mat4 Camera::getProjectionMatrix()
-{
-	return projectionMatrix;
-}
-
-float Camera::getFOV()
-{
-	return fov;
+	viewMatrix = glm::lookAt(position, position + getForward(), getUp());
 }
 
 void Camera::setFOV(float fov, unsigned int screenWidth, unsigned int screenHeight)

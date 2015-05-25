@@ -2,8 +2,8 @@
 
 #include "PointLight.hpp"
 
-struct SpotLight : public PointLight
+class SpotLight : public PointLight
 {
-	float direction[3];
+public:
 	float cutoffAngle;
 };

@@ -17,5 +17,5 @@ public:
 	bool create();
 
 	void setWorldViewProjectionMatrixUniforms(const glm::mat4 &worldMatrix, const glm::mat4 &viewMatrix, const glm::mat4 &projectionMatrix);
-	void setTintColorUniform(float r, float g, float b);
+	void setTintColorUniform(const glm::vec3 &tintColor);
 };

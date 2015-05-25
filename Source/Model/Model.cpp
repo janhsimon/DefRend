@@ -125,14 +125,14 @@ void Model::render(bool bindMaterials)
 	{
 		if (bindMaterials)
 		{
-			assert(m->getMaterialIndex() >= 0 && m->getMaterialIndex() < materials.size());
-			Material *material = materials[m->getMaterialIndex()];
+			assert(m->materialIndex >= 0 && m->materialIndex < materials.size());
+			Material *material = materials[m->materialIndex];
 			assert(material);
 			material->bind();
 		}
 
 		m->render(vertex);
 
-		vertex += m->getVertexCount();
+		vertex += m->vertexCount;
 	}
 }

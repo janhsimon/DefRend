@@ -21,8 +21,3 @@ bool SceneManager::addModel(std::string filename, glm::vec3 position)
 
 	return true;
 }
-
-std::vector<Model*> *SceneManager::getModels()
-{
-	return &models;
-}

@@ -10,6 +10,11 @@
 #include "..\Util\Error.hpp"
 #include "..\Util\Util.hpp"
 
+const std::string BillboardRenderer::DIRECTIONAL_LIGHT_BILLBOARD_FILENAME = "Textures\\BillboardDirectionalLight.png";
+const std::string BillboardRenderer::POINT_LIGHT_BILLBOARD_FILENAME = "Textures\\BillboardPointLight.png";
+const std::string BillboardRenderer::SPOT_LIGHT_BILLBOARD_FILENAME = "Textures\\BillboardSpotLight.png";
+
+extern std::vector<DirectionalLight*> directionalLights;
 extern std::vector<PointLight*> pointLights;
 extern std::vector<SpotLight*> spotLights;
 
@@ -21,88 +26,129 @@ bool BillboardRenderer::create()
 	if (!billboardDrawShader->create())
 		return false;
 
-	if (!Util::checkMemory(texture = new Texture()))
+	if (!Util::checkMemory(lineDrawShader = new LineDrawShader()))
 		return false;
 
-	if (!texture->load("Textures\\BillboardPointlight.png"))
+	if (!lineDrawShader->create())
 		return false;
-	
-	float data[4][4] =
-	{
-		{ -1.f,  1.f, 0.f, 0.f },
-		{ -1.f, -1.f, 0.f, 1.f },
-		{ 1.f,   1.f, 1.f, 0.f },
-		{ 1.f,  -1.f, 1.f, 1.f }
-	};
 
-	// generate and bind a VAO
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-	// enable vertex attribute arrays
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-
-	// generate and bind a VBO
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
-
-	// set vertex attribute array pointers
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, 0);								// position
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void *)(sizeof(float) * 2));	// tex coord uvs
-
-	GLenum error = glGetError();
-	if (error != GL_NO_ERROR)
-	{
-		Error::report("Error", "Failed to generate VBO and VAO for billboard renderer: " + Error::getOpenGLErrorString(error));
+	if (!Util::checkMemory(directionalLightBillboard = new Texture()))
 		return false;
-	}
+
+	if (!directionalLightBillboard->load(DIRECTIONAL_LIGHT_BILLBOARD_FILENAME))
+		return false;
+
+	if (!Util::checkMemory(pointLightBillboard = new Texture()))
+		return false;
+
+	if (!pointLightBillboard->load(POINT_LIGHT_BILLBOARD_FILENAME))
+		return false;
+
+	if (!Util::checkMemory(spotLightBillboard = new Texture()))
+		return false;
+
+	if (!spotLightBillboard->load(SPOT_LIGHT_BILLBOARD_FILENAME))
+		return false;
+
+	if (!Util::checkMemory(unitArrow = new UnitArrow()))
+		return false;
+
+	if (!unitArrow->create())
+		return false;
+
+	if (!Util::checkMemory(unitQuad = new UnitQuad()))
+		return false;
+
+	if (!unitQuad->create())
+		return false;
 
 	return true;
 }
 
 BillboardRenderer::~BillboardRenderer()
 {
-	delete texture;
+	delete unitArrow;
+	delete unitQuad;
+
+	delete directionalLightBillboard;
+	delete pointLightBillboard;
+	delete spotLightBillboard;
+
 	delete billboardDrawShader;
+	delete lineDrawShader;
+}
+
+glm::mat4 BillboardRenderer::calculateBillboardMatrix(Camera *camera, DirectionalLight *light)
+{
+	assert(light);
+
+	glm::mat4 billboardMatrix;
+
+	billboardMatrix[0] = glm::vec4(camera->getRight(), 0.f);
+	billboardMatrix[1] = glm::vec4(camera->getUp(), 0.f);
+	billboardMatrix[2] = glm::vec4(glm::normalize(camera->position - light->position), 0.f);
+	billboardMatrix[3] = glm::vec4(light->position, 1.f);
+
+	return glm::scale(billboardMatrix, glm::vec3(35.f, 35.f, 35.f));
 }
 
 void BillboardRenderer::render(Camera *camera)
 {
-	glUseProgram(billboardDrawShader->getProgram());
+	for (DirectionalLight *d : directionalLights)
+	{
+		glUseProgram(billboardDrawShader->program);
+
+		billboardDrawShader->setWorldViewProjectionMatrixUniforms(calculateBillboardMatrix(camera, d), camera->viewMatrix, camera->projectionMatrix);
+		billboardDrawShader->setTintColorUniform(d->diffuseColor);
+		
+		directionalLightBillboard->bind(GL_TEXTURE0);
+		unitQuad->render();
+
+
+		glUseProgram(lineDrawShader->program);
+
+		lineDrawShader->setWorldViewProjectionMatrixUniforms(glm::scale(d->getWorldMatrix(), glm::vec3(100.f, 100.f, 100.f)), camera->viewMatrix, camera->projectionMatrix);
+		lineDrawShader->setColorUniform(d->diffuseColor);
+
+		unitArrow->render();
+	}
 
 	for (PointLight *l : pointLights)
 	{
-		glm::mat4 bmatrix;
+		glUseProgram(billboardDrawShader->program);
 
-		glm::vec3 look;
+		billboardDrawShader->setWorldViewProjectionMatrixUniforms(calculateBillboardMatrix(camera, l), camera->viewMatrix, camera->projectionMatrix);
+		billboardDrawShader->setTintColorUniform(l->diffuseColor);
 
-		look.x = camera->getPosition().x - l->position[0];
-		look.y = camera->getPosition().y - l->position[1];
-		look.z = camera->getPosition().z - l->position[2];
+		pointLightBillboard->bind(GL_TEXTURE0);
+		unitQuad->render();
 
-		glm::normalize(look);
+		/*
+		glUseProgram(lineDrawShader->program);
 
-		bmatrix[0] = glm::vec4(camera->getRight(), 0.f);
-		bmatrix[1] = glm::vec4(camera->getUp(), 0.f);
-		bmatrix[2] = glm::vec4(look, 0.f);
+		lineDrawShader->setWorldViewProjectionMatrixUniforms(glm::scale(l->getWorldMatrix(), glm::vec3(100.f, 100.f, 100.f)), camera->viewMatrix, camera->projectionMatrix);
+		lineDrawShader->setColorUniform(glm::vec3(1.f, 0.f, 0.f));
 
-		bmatrix[3].x = l->position[0];
-		bmatrix[3].y = l->position[1];
-		bmatrix[3].z = l->position[2];
-		bmatrix[3].w = 1.f;
-		
-		bmatrix = glm::scale(bmatrix, glm::vec3(35.f, 35.f, 35.f));
+		unitArrow->render();
+		*/
+	}
 
-		billboardDrawShader->setWorldViewProjectionMatrixUniforms(bmatrix, camera->getViewMatrix(), camera->getProjectionMatrix());
-		billboardDrawShader->setTintColorUniform(l->diffuseColor[0], l->diffuseColor[1], l->diffuseColor[2]);
-		
-		glBindVertexArray(vao);
+	for (SpotLight *s : spotLights)
+	{
+		glUseProgram(billboardDrawShader->program);
 
-		texture->bind(GL_TEXTURE0);
-	
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		billboardDrawShader->setWorldViewProjectionMatrixUniforms(calculateBillboardMatrix(camera, s), camera->viewMatrix, camera->projectionMatrix);
+		billboardDrawShader->setTintColorUniform(s->diffuseColor);
+
+		spotLightBillboard->bind(GL_TEXTURE0);
+		unitQuad->render();
+
+
+		glUseProgram(lineDrawShader->program);
+
+		lineDrawShader->setWorldViewProjectionMatrixUniforms(glm::scale(s->getWorldMatrix(), glm::vec3(100.f, 100.f, 100.f)), camera->viewMatrix, camera->projectionMatrix);
+		lineDrawShader->setColorUniform(s->diffuseColor);
+
+		unitArrow->render();
 	}
 }

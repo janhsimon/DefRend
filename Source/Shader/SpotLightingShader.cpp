@@ -24,7 +24,7 @@ bool SpotLightingShader::create()
 	if (!link())
 		return false;
 
-	glUseProgram(getProgram());
+	glUseProgram(program);
 
 	if (!getUniformLocation(WORLD_VIEW_PROJECTION_MATRIX_UNIFORM_NAME, worldViewProjectionMatrixUniformLocation))
 		return false;
@@ -89,39 +89,21 @@ void SpotLightingShader::setScreenSizeUniform(unsigned int screenWidth, unsigned
 	glUniform2f(screenSizeUniformLocation, (float)screenWidth, (float)screenHeight);
 }
 
-void SpotLightingShader::setLightPositionUniform(float x, float y, float z)
+void SpotLightingShader::setLightParameters(const SpotLight *spotLight)
 {
-	glUniform3f(lightPositionUniformLocation, x, y, z);
+	assert(spotLight);
+
+	glUniform3f(lightPositionUniformLocation, spotLight->position.x, spotLight->position.y, spotLight->position.z);
+	glUniform3f(lightDiffuseColorUniformLocation, spotLight->diffuseColor.r, spotLight->diffuseColor.g, spotLight->diffuseColor.b);
+	glUniform1f(lightDiffuseIntensityUniformLocation, spotLight->diffuseIntensity);
+	glUniform1f(lightSpecularIntensityUniformLocation, spotLight->specularIntensity);
+	glUniform1f(lightSpecularPowerUniformLocation, spotLight->specularPower);
+	glUniform3f(lightDirectionUniformLocation, spotLight->getForward().x, spotLight->getForward().y, spotLight->getForward().z);
+	glUniform1f(lightCutoffCosineUniformLocation, glm::cos(glm::radians(spotLight->cutoffAngle)));
+	glUniform3f(lightAttenuationUniformLocation, spotLight->attenuation.x, spotLight->attenuation.y, spotLight->attenuation.z);
 }
 
-void SpotLightingShader::setLightDiffuseUniforms(float r, float g, float b, float intensity)
+void SpotLightingShader::setEyePositionUniform(const glm::vec3 &lightPosition)
 {
-	glUniform3f(lightDiffuseColorUniformLocation, r, g, b);
-	glUniform1f(lightDiffuseIntensityUniformLocation, intensity);
-}
-
-void SpotLightingShader::setLightSpecularUniforms(float intensity, float power)
-{
-	glUniform1f(lightSpecularIntensityUniformLocation, intensity);
-	glUniform1f(lightSpecularPowerUniformLocation, power);
-}
-
-void SpotLightingShader::setLightDirectionUniform(float x, float y, float z)
-{
-	glUniform3f(lightDirectionUniformLocation, x, y, z);
-}
-
-void SpotLightingShader::setLightCutoffAngleUniform(float cutoffCosine)
-{
-	glUniform1f(lightCutoffCosineUniformLocation, glm::cos(glm::radians(cutoffCosine)));
-}
-
-void SpotLightingShader::setLightAttenuationUniform(float constant, float linear, float exponent)
-{
-	glUniform3f(lightAttenuationUniformLocation, constant, linear, exponent);
-}
-
-void SpotLightingShader::setEyePositionUniform(float x, float y, float z)
-{
-	glUniform3f(eyePositionUniformLocation, x, y, z);
+	glUniform3f(eyePositionUniformLocation, lightPosition.x, lightPosition.y, lightPosition.z);
 }

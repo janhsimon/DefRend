@@ -14,7 +14,7 @@ bool FontDrawShader::create()
 	if (!link())
 		return false;
 
-	glUseProgram(getProgram());
+	glUseProgram(program);
 
 	if (!getUniformLocation(WORLD_MATRIX_UNIFORM_NAME, worldMatrixUniformLocation))
 		return false;

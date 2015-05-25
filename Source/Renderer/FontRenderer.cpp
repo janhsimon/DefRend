@@ -108,7 +108,7 @@ void FontRenderer::drawFontText(TTF_Font *f, std::string text, float x, float y,
 
 	SDL_BlitSurface(sText, &area, temp, NULL);
 
-	glUseProgram(fontDrawShader->getProgram());
+	glUseProgram(fontDrawShader->program);
 
 	glm::mat4 worldMatrix;
 	worldMatrix = glm::translate(worldMatrix, glm::vec3(((x + sText->w / 2.f) / 1600.f) * 2.f - 1.f, ((y + sText->h / 2.f) / 900.f) * 2.f - 1.f, 0.f));

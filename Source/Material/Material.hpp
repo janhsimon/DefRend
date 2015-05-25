@@ -19,5 +19,4 @@ public:
 
 	bool load(aiMaterial *material, const std::string &modelFilename);
 	void bind();
-	std::string getName();
 };

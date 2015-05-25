@@ -19,8 +19,8 @@ public:
 	static Texture* refTexture(std::string filename);
 	static void unrefTexture(Texture *texture);
 
-	static std::string getDefaultDiffuseTextureFilename();
-	static std::string getDefaultNormalTextureFilename();
-	static std::string getDefaultSpecularTextureFilename();
-	static std::string getDefaultOpacityTextureFilename();
+	const static std::string &getDefaultDiffuseTextureFilename();
+	const static std::string &getDefaultNormalTextureFilename();
+	const static std::string &getDefaultSpecularTextureFilename();
+	const static std::string &getDefaultOpacityTextureFilename();
 };

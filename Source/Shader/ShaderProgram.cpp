@@ -135,7 +135,7 @@ bool ShaderProgram::link()
 	return true;
 }
 
-bool ShaderProgram::getUniformLocation(const std::string &uniformName, GLint &locationOut)
+const bool ShaderProgram::getUniformLocation(const std::string &uniformName, GLint &locationOut)
 {
 	locationOut = glGetUniformLocation(program, uniformName.c_str());
 
@@ -155,24 +155,4 @@ ShaderProgram::~ShaderProgram()
 	glDeleteShader(geometryShader);
 	glDeleteShader(fragmentShader);
 	glDeleteProgram(program);
-}
-
-GLuint ShaderProgram::getProgram()
-{
-	return program;
-}
-
-GLuint ShaderProgram::getVertexShader()
-{
-	return vertexShader;
-}
-
-GLuint ShaderProgram::getGeometryShader()
-{
-	return geometryShader;
-}
-
-GLuint ShaderProgram::getFragmentShader()
-{
-	return fragmentShader;
 }

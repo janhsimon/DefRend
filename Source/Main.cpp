@@ -21,9 +21,12 @@ Input input;
 SceneManager *sceneManager;
 Window *window;
 
+std::vector<DirectionalLight*> directionalLights;
 std::vector<PointLight*> pointLights;
 std::vector<SpotLight*> spotLights;
-SpotLight *flashLight;
+//SpotLight *flashLight;
+
+unsigned int pointLightSelected = -1;
 
 unsigned int thisTickTime, lastTickTime = 0;
 
@@ -104,7 +107,7 @@ bool load()
 
 	// create camera
 
-	if (!Util::checkMemory(camera = new Camera(glm::vec3(0.f, 100.f, 0.f), window->getWidth(), window->getHeight())))
+	if (!Util::checkMemory(camera = new Camera(glm::vec3(0.f, 100.f, 0.f), window->width, window->height)))
 		return false;
 
 
@@ -123,43 +126,46 @@ bool load()
 		return false;
 
 
+	// add a directional light
+
+	DirectionalLight *d;
+
+	if (!Util::checkMemory(d = new DirectionalLight()))
+		return false;
+
+	d->position = glm::vec3(0.f, 1200.f, 0.f);
+	d->setYaw(45.f);
+	d->setPitch(45.f);
+	d->diffuseColor = glm::vec3(.7f, .7f, 1.f);
+	d->diffuseIntensity = 1.f;
+	directionalLights.push_back(d);
+
+
 	// add a point light
 	
-	PointLight *l;
+	PointLight *p;
 
-	if (!Util::checkMemory(l = new PointLight()))
+	if (!Util::checkMemory(p = new PointLight()))
 		return false;
 
-	l->position[0] = 0.f;
-	l->position[1] = 10.f;//200.f;
-	l->position[2] = 0.f;
-	l->diffuseColor[0] = 1.f;
-	l->diffuseColor[1] = 1.f;
-	l->diffuseColor[2] = .9f;
-	l->diffuseIntensity = 1.f;
-	l->specularIntensity = 1.f;
-	l->specularPower = 32.f;
-	l->attenuation[0] = .0001f;		// constant
-	l->attenuation[1] = .00001f;	// linear
-	l->attenuation[2] = .00001f;	// exponent
-	pointLights.push_back(l);
+	p->position = glm::vec3(0.f, 10.f, 0.f);
+	p->diffuseColor = glm::vec3(1.f, 1.f, .9f);
+	p->diffuseIntensity = 1.f;
+	p->specularIntensity = 1.f;
+	p->specularPower = 32.f;
+	p->attenuation = glm::vec3(.0001f, .00001f, .00001f);
+	pointLights.push_back(p);
 
-	if (!Util::checkMemory(l = new PointLight()))
+	if (!Util::checkMemory(p = new PointLight()))
 		return false;
 
-	l->position[0] = 300.f;
-	l->position[1] = 1000.f;
-	l->position[2] = 0.f;
-	l->diffuseColor[0] = .1f;
-	l->diffuseColor[1] = .1f;
-	l->diffuseColor[2] = 1.f;
-	l->diffuseIntensity = 1.f;
-	l->specularIntensity = 1.f;
-	l->specularPower = 32.f;
-	l->attenuation[0] = .0001f;		// constant
-	l->attenuation[1] = .00001f;	// linear
-	l->attenuation[2] = .00001f;	// exponent
-	pointLights.push_back(l);
+	p->position = glm::vec3(300.f, 1000.f, 0.f);
+	p->diffuseColor = glm::vec3(.1f, .1f, 1.f);
+	p->diffuseIntensity = 1.f;
+	p->specularIntensity = 1.f;
+	p->specularPower = 32.f;
+	p->attenuation = glm::vec3(.0001f, .00001f, .00001f);
+	pointLights.push_back(p);
 
 
 	// and some spot lights
@@ -171,62 +177,44 @@ bool load()
 		if (!Util::checkMemory(s = new SpotLight()))
 			return false;
 
-		s->position[0] = 1075.f - i * 189.f;
-		s->position[1] = 0.f;
-		s->position[2] = 560.f;
-		s->diffuseColor[0] = 1.f;
-		s->diffuseColor[1] = 1.f;
-		s->diffuseColor[2] = .9f;
+		s->position = glm::vec3(1075.f - i * 189.f, 0.f, 560.f);
+		s->diffuseColor = glm::vec3(1.f, 1.f, .9f);
 		s->diffuseIntensity = 2.f;
 		s->specularIntensity = 1.f;
 		s->specularPower = 32.f;
-		s->attenuation[0] = .0001f;		// constant
-		s->attenuation[1] = .00001f;	// linear
-		s->attenuation[2] = .00001f;	// exponent
-		s->direction[0] = 0.f;
-		s->direction[1] = 1.f;
-		s->direction[2] = 0.f;
+		s->attenuation = glm::vec3(.0001f, .00001f, .00001f);
+		s->setPitch(-90.f);
 		s->cutoffAngle = 25.f;
 		spotLights.push_back(s);
 
 		if (!Util::checkMemory(s = new SpotLight()))
 			return false;
 
-		s->position[0] = 1075.f - i * 189.f;
-		s->position[1] = 0.f;
-		s->position[2] = -630.f;
-		s->diffuseColor[0] = 1.f;
-		s->diffuseColor[1] = 1.f;
-		s->diffuseColor[2] = .9f;
+		s->position = glm::vec3(1075.f - i * 189.f, 0.f, -630.f);
+		s->diffuseColor = glm::vec3(1.f, 1.f, .9f);
 		s->diffuseIntensity = 2.f;
 		s->specularIntensity = 1.f;
 		s->specularPower = 32.f;
-		s->attenuation[0] = .0001f;		// constant
-		s->attenuation[1] = .00001f;	// linear
-		s->attenuation[2] = .00001f;	// exponent
-		s->direction[0] = 0.f;
-		s->direction[1] = 1.f;
-		s->direction[2] = 0.f;
+		s->attenuation = glm::vec3(.0001f, .00001f, .00001f);
+		s->setPitch(-90.f);
 		s->cutoffAngle = 25.f;
 		spotLights.push_back(s);
 	}
 
-
+	/*
 	// also create a flashlight
 
 	if (!Util::checkMemory(flashLight = new SpotLight()))
 		return false;
 
-	flashLight->diffuseColor[0] = .9f;
-	flashLight->diffuseColor[1] = .9f;
-	flashLight->diffuseColor[2] = 1.f;
+	flashLight->diffuseColor = glm::vec3(.9f, .9f, 1.f);
 	flashLight->diffuseIntensity = 1.f;
 	flashLight->specularIntensity = 1.f;
 	flashLight->specularPower = 32.f;
-	flashLight->attenuation[0] = .0001f;	// constant
-	flashLight->attenuation[1] = .00001f;	// linear
-	flashLight->attenuation[2] = .00001f;	// exponent
+	flashLight->attenuation = glm::vec3(.0001f, .00001f, .00001f);
 	flashLight->cutoffAngle = 30.f;
+	spotLights.push_back(flashLight);
+	*/
 
 	return true;
 }
@@ -236,10 +224,9 @@ void update(float delta)
 	camera->update(input, delta);
 
 	static float z = 0.f;
-	pointLights[0]->position[0] = sinf(z) * 1200.f;
+	pointLights[0]->position.x = sinf(z) * 1200.f;
+	pointLights[1]->position.y = 500.f + sinf(z) * 500.f;
 	z += .005f * delta;
-
-	pointLights[1]->position[1] = sinf(z) * 500.f;
 
 	//manModel->setYaw(manModel->getYaw() + delta * .003f);
 }
@@ -282,7 +269,7 @@ int main(int argc, char **argv)
 	if (!load())
 		return -1;
 
-	while (window->getAlive())
+	while (window->alive)
 	{
 		thisTickTime = SDL_GetTicks();
 		float delta = (thisTickTime - lastTickTime) * .1f;
@@ -292,25 +279,25 @@ int main(int argc, char **argv)
 		{
 			if (event.type == SDL_QUIT)
 			// quit event
-				window->setAlive(false);
+				window->alive = false;
 			else if (event.type == SDL_MOUSEMOTION)
 			// mouse input
 			{
-				int w2 = window->getWidth() / 2;
-				int h2 = window->getHeight() / 2;
+				int w2 = window->width / 2;
+				int h2 = window->height / 2;
 
 				camera->rotateYaw((event.motion.x - w2) / (float)w2);
 				camera->rotatePitch((event.motion.y - h2) / (float)h2);
 
-				SDL_WarpMouseInWindow(window->getSDLWindow(), w2, h2);
+				SDL_WarpMouseInWindow(window->sdlWindow, w2, h2);
 			}
 			else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
 			// keyboard input
 			{
 				if (event.key.keysym.sym == SDLK_ESCAPE && event.type == SDL_KEYUP)
-					window->setAlive(false);
+					window->alive = false;
 				else if (event.key.keysym.sym == SDLK_F10 && event.type == SDL_KEYUP)
-					window->changeResolution(window->getWidth(), window->getHeight(), !window->getFullscreen());
+					window->changeResolution(window->width, window->height, !window->fullscreen);
 				else
 					input.sendKeyboardEvent(event);
 			}

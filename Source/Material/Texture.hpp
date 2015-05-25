@@ -8,19 +8,15 @@ class Texture
 {
 private:
 	GLuint handle;
+
+public:
 	std::string filename;
 	unsigned int refCount;
 
-public:
 	~Texture();
 
 	bool operator==(const Texture &other);
 
 	bool load(const std::string &filename);
 	void bind(GLenum textureUnit);
-
-	unsigned int getRefCount();
-	void setRefCount(unsigned int refCount);
-
-	std::string getFilename();
 };

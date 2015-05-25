@@ -51,13 +51,3 @@ void Mesh::render(unsigned int firstVertex)
 {
 	glDrawArrays(GL_TRIANGLES, firstVertex, vertexCount);
 }
-
-unsigned int Mesh::getVertexCount()
-{
-	return vertexCount;
-}
-
-unsigned int Mesh::getMaterialIndex()
-{
-	return materialIndex;
-}

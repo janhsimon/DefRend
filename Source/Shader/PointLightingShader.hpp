@@ -1,6 +1,7 @@
 #include <glm.hpp>
 
 #include "ShaderProgram.hpp"
+#include "..\Light\PointLight.hpp"
 
 class PointLightingShader : public ShaderProgram
 {
@@ -29,9 +30,6 @@ public:
 
 	void setWorldViewProjectionUniforms(const glm::mat4 &worldMatrix, const glm::mat4 &viewMatrix, const glm::mat4 &projectionMatrix);
 	void setScreenSizeUniform(unsigned int screenWidth, unsigned int screenHeight);
-	void setLightPositionUniform(float x, float y, float z);
-	void setLightDiffuseUniforms(float r, float g, float b, float intensity);
-	void setLightSpecularUniforms(float intensity, float power);
-	void setLightAttenuationUniform(float constant, float linear, float exponent);
+	void setLightParameters(const PointLight *pointLight);
 	void setEyePositionUniform(float x, float y, float z);
 };

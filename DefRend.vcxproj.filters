@@ -85,6 +85,12 @@
     <None Include="Binaries\Shaders\BillboardDraw.vs.glsl">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="Binaries\Shaders\LineDraw.fs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\LineDraw.vs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Camera\Camera.hpp">
@@ -168,6 +174,18 @@
     <ClInclude Include="Source\Renderer\BillboardRenderer.hpp">
       <Filter>Source Files\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Light\DirectionalLight.hpp">
+      <Filter>Source Files\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\UnitQuad.hpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\UnitArrow.hpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Shader\LineDrawShader.hpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Camera\Camera.cpp">
@@ -247,6 +265,21 @@
     </ClCompile>
     <ClCompile Include="Source\Renderer\BillboardRenderer.cpp">
       <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Light\SpotLight.cpp">
+      <Filter>Source Files\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Light\DirectionalLight.cpp">
+      <Filter>Source Files\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer\UnitQuad.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer\UnitArrow.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Shader\LineDrawShader.cpp">
+      <Filter>Source Files\Shader</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

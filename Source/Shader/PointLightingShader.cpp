@@ -22,7 +22,7 @@ bool PointLightingShader::create()
 	if (!link())
 		return false;
 
-	glUseProgram(getProgram());
+	glUseProgram(program);
 
 	if (!getUniformLocation(WORLD_VIEW_PROJECTION_MATRIX_UNIFORM_NAME, worldViewProjectionMatrixUniformLocation))
 		return false;
@@ -81,26 +81,16 @@ void PointLightingShader::setScreenSizeUniform(unsigned int screenWidth, unsigne
 	glUniform2f(screenSizeUniformLocation, (float)screenWidth, (float)screenHeight);
 }
 
-void PointLightingShader::setLightPositionUniform(float x, float y, float z)
+void PointLightingShader::setLightParameters(const PointLight *pointLight)
 {
-	glUniform3f(lightPositionUniformLocation, x, y, z);
-}
+	assert(pointLight);
 
-void PointLightingShader::setLightDiffuseUniforms(float r, float g, float b, float intensity)
-{
-	glUniform3f(lightDiffuseColorUniformLocation, r, g, b);
-	glUniform1f(lightDiffuseIntensityUniformLocation, intensity);
-}
-
-void PointLightingShader::setLightSpecularUniforms(float intensity, float power)
-{
-	glUniform1f(lightSpecularIntensityUniformLocation, intensity);
-	glUniform1f(lightSpecularPowerUniformLocation, power);
-}
-
-void PointLightingShader::setLightAttenuationUniform(float constant, float linear, float exponent)
-{
-	glUniform3f(lightAttenuationUniformLocation, constant, linear, exponent);
+	glUniform3f(lightPositionUniformLocation, pointLight->position.x, pointLight->position.y, pointLight->position.z);
+	glUniform3f(lightDiffuseColorUniformLocation, pointLight->diffuseColor.r, pointLight->diffuseColor.g, pointLight->diffuseColor.b);
+	glUniform1f(lightDiffuseIntensityUniformLocation, pointLight->diffuseIntensity);
+	glUniform1f(lightSpecularIntensityUniformLocation, pointLight->specularIntensity);
+	glUniform1f(lightSpecularPowerUniformLocation, pointLight->specularPower);
+	glUniform3f(lightAttenuationUniformLocation, pointLight->attenuation.x, pointLight->attenuation.y, pointLight->attenuation.z);
 }
 
 void PointLightingShader::setEyePositionUniform(float x, float y, float z)

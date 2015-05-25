@@ -1,6 +1,7 @@
 #include <glm.hpp>
 
 #include "ShaderProgram.hpp"
+#include "..\Light\SpotLight.hpp"
 
 class SpotLightingShader : public ShaderProgram
 {
@@ -33,11 +34,6 @@ public:
 
 	void setWorldViewProjectionUniforms(const glm::mat4 &worldMatrix, const glm::mat4 &viewMatrix, const glm::mat4 &projectionMatrix);
 	void setScreenSizeUniform(unsigned int screenWidth, unsigned int screenHeight);
-	void setLightPositionUniform(float x, float y, float z);
-	void setLightDiffuseUniforms(float r, float g, float b, float intensity);
-	void setLightSpecularUniforms(float intensity, float power);
-	void setLightDirectionUniform(float x, float y, float z);
-	void setLightCutoffAngleUniform(float cutoffCosine);
-	void setLightAttenuationUniform(float constant, float linear, float exponent);
-	void setEyePositionUniform(float x, float y, float z);
+	void setLightParameters(const SpotLight *spotLight);
+	void setEyePositionUniform(const glm::vec3 &eyePosition);
 };

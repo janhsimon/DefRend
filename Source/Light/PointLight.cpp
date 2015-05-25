@@ -14,7 +14,9 @@ PointLight::~PointLight()
 	//delete shadowMap;
 }
 
+/*
 void PointLight::beginDrawingToShadowMap()
 {
 	//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, shadowMap->getFBO());
 }
+*/

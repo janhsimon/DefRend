@@ -4,29 +4,33 @@
 
 class Transform
 {
-protected:
-	glm::vec3 position, velocity, acceleration;
-	float pitch, yaw, roll;
+private:
 	glm::vec3 forward, right, up;
+	
+protected:
+	float pitch, yaw, roll;
 
 public:
+	glm::vec3 position, velocity, acceleration;
+	
+
 	Transform(glm::vec3 position);
+	Transform();
 
 	void updateTransform(float delta);
 
-	glm::mat4 getWorldMatrix();
+	glm::mat4 getWorldMatrix() const;
 
-	glm::vec3 getPosition();
-	glm::vec3 getForward();
-	glm::vec3 getRight();
-	glm::vec3 getUp();
-
-	float getPitch();
+	inline float getPitch() const { return pitch; }
 	void setPitch(float pitch);
 
-	float getYaw();
+	inline float getYaw() const { return yaw; }
 	void setYaw(float yaw);
 
-	float getRoll();
+	inline float getRoll() const { return roll; }
 	void setRoll(float roll);
+
+	inline glm::vec3 getForward() const { return forward; }
+	inline glm::vec3 getRight() const { return right; }
+	inline glm::vec3 getUp() const { return up; }
 };

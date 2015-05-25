@@ -8,6 +8,6 @@ class Error
 {
 public:
 	static void report(const std::string &title, const std::string &description);
-	static const std::string getOpenGLErrorString(GLenum errorFlag);
-	static const std::string Error::getOpenGLFrameBufferErrorString(GLenum errorFlag);
+	static std::string getOpenGLErrorString(GLenum errorFlag);
+	static std::string Error::getOpenGLFrameBufferErrorString(GLenum errorFlag);
 };

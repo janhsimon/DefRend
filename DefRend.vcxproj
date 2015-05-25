@@ -89,6 +89,8 @@
     <None Include="Binaries\Shaders\Lighting.vs.glsl" />
     <None Include="Binaries\Shaders\Geometry.fs.glsl" />
     <None Include="Binaries\Shaders\Geometry.vs.glsl" />
+    <None Include="Binaries\Shaders\LineDraw.fs.glsl" />
+    <None Include="Binaries\Shaders\LineDraw.vs.glsl" />
     <None Include="Binaries\Shaders\PointLighting.fs.glsl" />
     <None Include="Binaries\Shaders\ShadowPass.fs.glsl" />
     <None Include="Binaries\Shaders\ShadowPass.vs.glsl" />
@@ -99,6 +101,7 @@
   <ItemGroup>
     <ClInclude Include="Source\Camera\Camera.hpp" />
     <ClInclude Include="Source\Input\Input.hpp" />
+    <ClInclude Include="Source\Light\DirectionalLight.hpp" />
     <ClInclude Include="Source\Light\PointLight.hpp" />
     <ClInclude Include="Source\Light\SpotLight.hpp" />
     <ClInclude Include="Source\Material\Material.hpp" />
@@ -112,11 +115,14 @@
     <ClInclude Include="Source\Renderer\FontRenderer.hpp" />
     <ClInclude Include="Source\Renderer\GBuffer.hpp" />
     <ClInclude Include="Source\Renderer\IRenderer.hpp" />
+    <ClInclude Include="Source\Renderer\UnitArrow.hpp" />
+    <ClInclude Include="Source\Renderer\UnitQuad.hpp" />
     <ClInclude Include="Source\Scene\SceneManager.hpp" />
     <ClInclude Include="Source\Shader\BillboardDrawShader.hpp" />
     <ClInclude Include="Source\Shader\DirectionalLightingShader.hpp" />
     <ClInclude Include="Source\Shader\FontDrawShader.hpp" />
     <ClInclude Include="Source\Shader\GeometryShader.hpp" />
+    <ClInclude Include="Source\Shader\LineDrawShader.hpp" />
     <ClInclude Include="Source\Shader\PointLightingShader.hpp" />
     <ClInclude Include="Source\Shader\ShaderProgram.hpp" />
     <ClInclude Include="Source\Shader\SpotLightingShader.hpp" />
@@ -128,7 +134,9 @@
   <ItemGroup>
     <ClCompile Include="Source\Camera\Camera.cpp" />
     <ClCompile Include="Source\Input\Input.cpp" />
+    <ClCompile Include="Source\Light\DirectionalLight.cpp" />
     <ClCompile Include="Source\Light\PointLight.cpp" />
+    <ClCompile Include="Source\Light\SpotLight.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Material\Material.cpp" />
     <ClCompile Include="Source\Material\Texture.cpp" />
@@ -140,11 +148,14 @@
     <ClCompile Include="Source\Renderer\DeferredRenderer.cpp" />
     <ClCompile Include="Source\Renderer\FontRenderer.cpp" />
     <ClCompile Include="Source\Renderer\GBuffer.cpp" />
+    <ClCompile Include="Source\Renderer\UnitArrow.cpp" />
+    <ClCompile Include="Source\Renderer\UnitQuad.cpp" />
     <ClCompile Include="Source\Scene\SceneManager.cpp" />
     <ClCompile Include="Source\Shader\BillboardDrawShader.cpp" />
     <ClCompile Include="Source\Shader\DirectionalLightingShader.cpp" />
     <ClCompile Include="Source\Shader\FontDrawShader.cpp" />
     <ClCompile Include="Source\Shader\GeometryShader.cpp" />
+    <ClCompile Include="Source\Shader\LineDrawShader.cpp" />
     <ClCompile Include="Source\Shader\PointLightingShader.cpp" />
     <ClCompile Include="Source\Shader\ShaderProgram.cpp" />
     <ClCompile Include="Source\Shader\SpotLightingShader.cpp" />

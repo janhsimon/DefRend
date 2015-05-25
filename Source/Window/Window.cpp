@@ -116,38 +116,3 @@ void Window::finalizeFrame()
 	// swap the buffers
 	SDL_GL_SwapWindow(sdlWindow);
 }
-
-SDL_GLContext Window::getGLContext()
-{
-	return glContext;
-}
-
-SDL_Window *Window::getSDLWindow()
-{
-	return sdlWindow;
-}
-
-bool Window::getAlive()
-{
-	return alive;
-}
-
-void Window::setAlive(bool alive)
-{
-	this->alive = alive;
-}
-
-unsigned int Window::getWidth()
-{
-	return width;
-}
-
-unsigned int Window::getHeight()
-{
-	return height;
-}
-
-bool Window::getFullscreen()
-{
-	return fullscreen;
-}

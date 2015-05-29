@@ -41,6 +41,9 @@
     <Filter Include="Source Files\Renderer">
       <UniqueIdentifier>{ad8bd349-85ea-4315-beb4-f9697e105207}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\UI">
+      <UniqueIdentifier>{95462385-f3f3-47c1-98f6-09d9c0666c60}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Binaries\Shaders\SimpleDraw.vs.glsl">
@@ -162,12 +165,6 @@
     <ClInclude Include="Source\Window\Window.hpp">
       <Filter>Source Files\Window</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Renderer\FontRenderer.hpp">
-      <Filter>Source Files\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Shader\FontDrawShader.hpp">
-      <Filter>Source Files\Shader</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Shader\BillboardDrawShader.hpp">
       <Filter>Source Files\Shader</Filter>
     </ClInclude>
@@ -185,6 +182,24 @@
     </ClInclude>
     <ClInclude Include="Source\Shader\LineDrawShader.hpp">
       <Filter>Source Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Frame.hpp">
+      <Filter>Source Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Light\LightManager.hpp">
+      <Filter>Source Files\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\UIRenderer.hpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Shader\UIDrawShader.hpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Label.hpp">
+      <Filter>Source Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Element.hpp">
+      <Filter>Source Files\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -254,12 +269,6 @@
     <ClCompile Include="Source\Window\Window.cpp">
       <Filter>Source Files\Window</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Renderer\FontRenderer.cpp">
-      <Filter>Source Files\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Shader\FontDrawShader.cpp">
-      <Filter>Source Files\Shader</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Shader\BillboardDrawShader.cpp">
       <Filter>Source Files\Shader</Filter>
     </ClCompile>
@@ -280,6 +289,24 @@
     </ClCompile>
     <ClCompile Include="Source\Shader\LineDrawShader.cpp">
       <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Frame.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Light\LightManager.cpp">
+      <Filter>Source Files\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer\UIRenderer.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Shader\UIDrawShader.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Label.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Element.cpp">
+      <Filter>Source Files\UI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

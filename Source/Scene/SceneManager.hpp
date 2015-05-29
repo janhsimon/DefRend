@@ -9,5 +9,5 @@ public:
 
 	~SceneManager();
 
-	bool addModel(std::string filename, glm::vec3 position);
+	bool addModel(std::string filename, glm::vec3 position = glm::vec3(0.f));
 };

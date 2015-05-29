@@ -2,18 +2,22 @@
 
 #include "Camera.hpp"
 #include "..\Util\Util.hpp"
+#include "..\Window\Window.hpp"
 
 const float Camera::MOVEMENT_SPEED = 5.f;
 const float Camera::CROUCH_SPEED_FACTOR = .25f;
 
 float Camera::mouseSensitivity = 30.f;
 
-Camera::Camera(glm::vec3 position, unsigned int screenWidth, unsigned int screenHeight) : Transform(position)
+extern Window *window;
+
+Camera::Camera(glm::vec3 position) : Transform(position)
 {
 	nearClipPlane = 1.f;
 	farClipPlane = 10000.f;
 
-	setFOV(90.f, screenWidth, screenHeight);
+	setFOV(90.f, window->width, window->height);
+	setFirstPerson(true);
 
 	viewMatrix = glm::mat4(1.f);
 }
@@ -76,4 +80,13 @@ void Camera::setFOV(float fov, unsigned int screenWidth, unsigned int screenHeig
 	float verticalFOV = Util::convertHorizontalToVerticalFOV(fov, (float)screenWidth, (float)screenHeight);
 	float aspectRatio = (float)screenWidth / (float)screenHeight;
 	projectionMatrix = glm::perspective(glm::radians(verticalFOV / 2.f), aspectRatio, 1.0f, 10000.0f);
+}
+
+void Camera::setFirstPerson(bool firstPerson)
+{
+	this->firstPerson = firstPerson;
+	SDL_ShowCursor(!firstPerson);
+
+	if (firstPerson)
+		SDL_WarpMouseInWindow(window->sdlWindow, window->width / 2, window->height / 2);
 }

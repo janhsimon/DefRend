@@ -1,6 +1,8 @@
 #include <assert.h>
+#include <sstream>
 
 #include "TextureManager.hpp"
+#include "..\Util\Error.hpp"
 #include "..\Util\Util.hpp"
 
 std::vector<Texture*> TextureManager::textures;
@@ -38,9 +40,6 @@ void TextureManager::unrefTexture(Texture *texture)
 {
 	assert(texture);
 
-	if (textures.size() <= 0)
-		return;
-
 	for (std::vector<Texture*>::iterator i = textures.begin(); i != textures.end(); ++i)
 	{
 		if (*i == texture)
@@ -56,6 +55,10 @@ void TextureManager::unrefTexture(Texture *texture)
 			return;
 		}
 	}
+
+	std::stringstream s;
+	s << "Failed to unreference texture \"" << texture->filename << "\", not previously loaded.";
+	Error::report("Error", s.str());
 }
 
 const std::string &TextureManager::getDefaultDiffuseTextureFilename()

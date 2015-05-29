@@ -3,22 +3,17 @@
 #include <vector>
 
 #include "DeferredRenderer.hpp"
-#include "..\Light\DirectionalLight.hpp"
-#include "..\Light\PointLight.hpp"
-#include "..\Light\SpotLight.hpp"
+#include "UnitQuad.hpp"
+#include "..\Light\LightManager.hpp"
 #include "..\Scene\SceneManager.hpp"
 #include "..\Util\Util.hpp"
 
-extern std::vector<DirectionalLight*> directionalLights;
-extern std::vector<PointLight*> pointLights;
-extern std::vector<SpotLight*> spotLights;
-
+extern LightManager *lightManager;
 extern SceneManager *sceneManager;
 
 DeferredRenderer::~DeferredRenderer()
 {
 	delete gBuffer;
-	delete unitQuad;
 	delete unitSphereModel;
 	delete geometryShader;
 	delete directionalLightingShader;
@@ -80,12 +75,6 @@ bool DeferredRenderer::init(Window *window)
 		return false;
 
 	if (!loadModels())
-		return false;
-
-	if (!Util::checkMemory(unitQuad = new UnitQuad()))
-		return false;
-
-	if (!unitQuad->create())
 		return false;
 
 	this->window = window;
@@ -212,12 +201,12 @@ void DeferredRenderer::doDirectionalLightPass(Camera *camera)
 
 	glUseProgram(directionalLightingShader->program);
 
-	for (DirectionalLight *directionalLight : directionalLights)
+	for (DirectionalLight *directionalLight : lightManager->directionalLights)
 	{
 		directionalLightingShader->setWorldViewProjectionUniforms(glm::mat4(1.f), glm::mat4(1.f), glm::mat4(1.f));
 		directionalLightingShader->setLightParameters(directionalLight);
 		directionalLightingShader->setScreenSizeUniforms(window->width, window->height);
-		unitQuad->render();
+		UnitQuad::render();
 	}
 }
 
@@ -237,7 +226,7 @@ void DeferredRenderer::doPointLightPass(Camera *camera)
 
 	glUseProgram(pointLightingShader->program);
 
-	for (PointLight *pointLight : pointLights)
+	for (PointLight *pointLight : lightManager->pointLights)
 	{
 		glm::mat4 worldMatrix;
 		worldMatrix = glm::translate(worldMatrix, glm::vec3(pointLight->position[0], pointLight->position[1], pointLight->position[2]));
@@ -259,7 +248,7 @@ void DeferredRenderer::doSpotLightPass(Camera *camera)
 
 	glUseProgram(spotLightingShader->program);
 
-	for (SpotLight *spotLight : spotLights)
+	for (SpotLight *spotLight : lightManager->spotLights)
 	{
 		glm::mat4 worldMatrix;
 		worldMatrix = glm::translate(worldMatrix, glm::vec3(spotLight->position[0], spotLight->position[1], spotLight->position[2]));

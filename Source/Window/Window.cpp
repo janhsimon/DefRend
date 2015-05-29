@@ -68,9 +68,6 @@ bool Window::create(unsigned int width, unsigned int height)
 	// set up blend func for opacity maps
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	// hide the mouse cursor
-	SDL_ShowCursor(false);
-
 	alive = true;
 	this->width = width;
 	this->height = height;

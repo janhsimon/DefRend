@@ -14,8 +14,7 @@ public:
 	glm::vec3 position, velocity, acceleration;
 	
 
-	Transform(glm::vec3 position);
-	Transform();
+	Transform(glm::vec3 position = glm::vec3(0.f));
 
 	void updateTransform(float delta);
 

@@ -5,8 +5,8 @@
 #include <vector>
 
 #include "BillboardRenderer.hpp"
-#include "..\Light\PointLight.hpp"
-#include "..\Light\SpotLight.hpp"
+#include "UnitQuad.hpp"
+#include "..\Light\LightManager.hpp"
 #include "..\Util\Error.hpp"
 #include "..\Util\Util.hpp"
 
@@ -14,9 +14,7 @@ const std::string BillboardRenderer::DIRECTIONAL_LIGHT_BILLBOARD_FILENAME = "Tex
 const std::string BillboardRenderer::POINT_LIGHT_BILLBOARD_FILENAME = "Textures\\BillboardPointLight.png";
 const std::string BillboardRenderer::SPOT_LIGHT_BILLBOARD_FILENAME = "Textures\\BillboardSpotLight.png";
 
-extern std::vector<DirectionalLight*> directionalLights;
-extern std::vector<PointLight*> pointLights;
-extern std::vector<SpotLight*> spotLights;
+extern LightManager *lightManager;
 
 bool BillboardRenderer::create()
 {
@@ -56,19 +54,12 @@ bool BillboardRenderer::create()
 	if (!unitArrow->create())
 		return false;
 
-	if (!Util::checkMemory(unitQuad = new UnitQuad()))
-		return false;
-
-	if (!unitQuad->create())
-		return false;
-
 	return true;
 }
 
 BillboardRenderer::~BillboardRenderer()
 {
 	delete unitArrow;
-	delete unitQuad;
 
 	delete directionalLightBillboard;
 	delete pointLightBillboard;
@@ -84,7 +75,7 @@ glm::mat4 BillboardRenderer::calculateBillboardMatrix(Camera *camera, Directiona
 
 	glm::mat4 billboardMatrix;
 
-	billboardMatrix[0] = glm::vec4(camera->getRight(), 0.f);
+	billboardMatrix[0] = glm::vec4(-camera->getRight(), 0.f);
 	billboardMatrix[1] = glm::vec4(camera->getUp(), 0.f);
 	billboardMatrix[2] = glm::vec4(glm::normalize(camera->position - light->position), 0.f);
 	billboardMatrix[3] = glm::vec4(light->position, 1.f);
@@ -94,7 +85,7 @@ glm::mat4 BillboardRenderer::calculateBillboardMatrix(Camera *camera, Directiona
 
 void BillboardRenderer::render(Camera *camera)
 {
-	for (DirectionalLight *d : directionalLights)
+	for (DirectionalLight *d : lightManager->directionalLights)
 	{
 		glUseProgram(billboardDrawShader->program);
 
@@ -102,7 +93,7 @@ void BillboardRenderer::render(Camera *camera)
 		billboardDrawShader->setTintColorUniform(d->diffuseColor);
 		
 		directionalLightBillboard->bind(GL_TEXTURE0);
-		unitQuad->render();
+		UnitQuad::render();
 
 
 		glUseProgram(lineDrawShader->program);
@@ -113,15 +104,16 @@ void BillboardRenderer::render(Camera *camera)
 		unitArrow->render();
 	}
 
-	for (PointLight *l : pointLights)
+	for (PointLight *l : lightManager->pointLights)
 	{
 		glUseProgram(billboardDrawShader->program);
 
 		billboardDrawShader->setWorldViewProjectionMatrixUniforms(calculateBillboardMatrix(camera, l), camera->viewMatrix, camera->projectionMatrix);
+		
 		billboardDrawShader->setTintColorUniform(l->diffuseColor);
 
 		pointLightBillboard->bind(GL_TEXTURE0);
-		unitQuad->render();
+		UnitQuad::render();
 
 		/*
 		glUseProgram(lineDrawShader->program);
@@ -133,15 +125,21 @@ void BillboardRenderer::render(Camera *camera)
 		*/
 	}
 
-	for (SpotLight *s : spotLights)
+	for (unsigned int i = 0; i < lightManager->spotLights.size(); ++i)
 	{
+		SpotLight *s = lightManager->spotLights[i];
+
 		glUseProgram(billboardDrawShader->program);
 
 		billboardDrawShader->setWorldViewProjectionMatrixUniforms(calculateBillboardMatrix(camera, s), camera->viewMatrix, camera->projectionMatrix);
-		billboardDrawShader->setTintColorUniform(s->diffuseColor);
+		
+		if (i == lightManager->getSelectedPointLight())
+			billboardDrawShader->setTintColorUniform(glm::vec3(1.f, 0.f, 1.f));
+		else
+			billboardDrawShader->setTintColorUniform(s->diffuseColor);
 
 		spotLightBillboard->bind(GL_TEXTURE0);
-		unitQuad->render();
+		UnitQuad::render();
 
 
 		glUseProgram(lineDrawShader->program);

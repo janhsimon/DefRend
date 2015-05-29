@@ -1,19 +1,17 @@
 #include "UnitQuad.hpp"
 #include "..\Util\Error.hpp"
 
-UnitQuad::~UnitQuad()
-{
-
-}
+GLuint UnitQuad::VBO;
+GLuint UnitQuad::VAO;
 
 bool UnitQuad::create()
 {
 	float data[4][4] =
 	{
-		{ -1.f, 1.f, 1.f, 0.f },
-		{ -1.f, -1.f, 1.f, 1.f },
-		{ 1.f, 1.f, 0.f, 0.f },
-		{ 1.f, -1.f, 0.f, 1.f }
+		{ -1.f, 1.f, 0.f, 0.f },
+		{ -1.f, -1.f, 0.f, 1.f },
+		{ 1.f, 1.f, 1.f, 0.f },
+		{ 1.f, -1.f, 1.f, 1.f }
 	};
 
 	// generate and bind a VAO
@@ -41,6 +39,12 @@ bool UnitQuad::create()
 	}
 
 	return true;
+}
+
+void UnitQuad::destroy()
+{
+	glDeleteBuffers(1, &VBO);
+	glDeleteVertexArrays(1, &VAO);
 }
 
 void UnitQuad::render()

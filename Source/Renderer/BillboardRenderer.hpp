@@ -4,7 +4,6 @@
 #include <string>
 
 #include "UnitArrow.hpp"
-#include "UnitQuad.hpp"
 #include "..\Camera\Camera.hpp"
 #include "..\Light\DirectionalLight.hpp"
 #include "..\Material\Texture.hpp"
@@ -22,7 +21,6 @@ private:
 	LineDrawShader *lineDrawShader;
 	Texture *directionalLightBillboard, *pointLightBillboard, *spotLightBillboard;
 	UnitArrow *unitArrow;
-	UnitQuad *unitQuad;
 
 	glm::mat4 calculateBillboardMatrix(Camera *camera, DirectionalLight *light);
 

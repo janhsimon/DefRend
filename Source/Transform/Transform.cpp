@@ -16,11 +16,6 @@ Transform::Transform(glm::vec3 position)
 	up = glm::vec3(1.f, 0.f, 0.f);
 }
 
-Transform::Transform() : Transform(glm::vec3(0.f))
-{
-
-}
-
 void Transform::updateTransform(float delta)
 {
 	velocity += acceleration * delta;

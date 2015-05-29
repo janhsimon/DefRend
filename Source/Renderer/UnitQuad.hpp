@@ -5,12 +5,11 @@
 class UnitQuad
 {
 private:
-	GLuint VBO;
-	GLuint VAO;
+	static GLuint VBO;
+	static GLuint VAO;
 
 public:
-	~UnitQuad();
-
-	bool create();
-	void render();
+	static bool create();
+	static void destroy();
+	static void render();
 };

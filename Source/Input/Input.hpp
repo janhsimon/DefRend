@@ -16,5 +16,7 @@ public:
 
 	Input();
 
+	void sendMouseButtonEvent(const SDL_Event &event);
+	void sendMouseMoveEvent(const SDL_Event &event);
 	void sendKeyboardEvent(const SDL_Event &event);
 };

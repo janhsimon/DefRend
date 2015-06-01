@@ -15,6 +15,7 @@ public:
 	virtual void destroy() = 0;
 	virtual void render(UIRenderer *uiRenderer, glm::vec2 parentPosition) = 0;
 
+	bool isPointOnArea(glm::vec2 point, glm::vec2 position, glm::vec2 size);
 	bool isPointOnElement(glm::vec2 point);
 
 	virtual void onMouseButtonDown(glm::vec2 mousePosition, int mouseButton) = 0;

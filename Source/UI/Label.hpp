@@ -10,7 +10,7 @@ public:
 	std::string text;
 	glm::vec3 color;
 
-	Label(std::string text, glm::vec2 position, glm::vec2 size);
+	Label(glm::vec2 position, std::string text = "");
 	void destroy();
 
 	void render(UIRenderer *uiRenderer, glm::vec2 parentPosition);

@@ -117,6 +117,7 @@
     <ClInclude Include="Source\Renderer\GBuffer.hpp" />
     <ClInclude Include="Source\Renderer\IRenderer.hpp" />
     <ClInclude Include="Source\Renderer\UnitArrow.hpp" />
+    <ClInclude Include="Source\Renderer\UnitGizmo.hpp" />
     <ClInclude Include="Source\Renderer\UnitQuad.hpp" />
     <ClInclude Include="Source\Scene\SceneManager.hpp" />
     <ClInclude Include="Source\Shader\BillboardDrawShader.hpp" />
@@ -131,6 +132,8 @@
     <ClInclude Include="Source\UI\Element.hpp" />
     <ClInclude Include="Source\UI\Frame.hpp" />
     <ClInclude Include="Source\UI\Label.hpp" />
+    <ClInclude Include="Source\UI\Panel.hpp" />
+    <ClInclude Include="Source\UI\Slider.hpp" />
     <ClInclude Include="Source\Util\Error.hpp" />
     <ClInclude Include="Source\Util\Util.hpp" />
     <ClInclude Include="Source\Window\Window.hpp" />
@@ -154,6 +157,7 @@
     <ClCompile Include="Source\Renderer\UIRenderer.cpp" />
     <ClCompile Include="Source\Renderer\GBuffer.cpp" />
     <ClCompile Include="Source\Renderer\UnitArrow.cpp" />
+    <ClCompile Include="Source\Renderer\UnitGizmo.cpp" />
     <ClCompile Include="Source\Renderer\UnitQuad.cpp" />
     <ClCompile Include="Source\Scene\SceneManager.cpp" />
     <ClCompile Include="Source\Shader\BillboardDrawShader.cpp" />
@@ -168,6 +172,8 @@
     <ClCompile Include="Source\UI\Element.cpp" />
     <ClCompile Include="Source\UI\Frame.cpp" />
     <ClCompile Include="Source\UI\Label.cpp" />
+    <ClCompile Include="Source\UI\Panel.cpp" />
+    <ClCompile Include="Source\UI\Slider.cpp" />
     <ClCompile Include="Source\Util\Error.cpp" />
     <ClCompile Include="Source\Util\Util.cpp" />
     <ClCompile Include="Source\Window\Window.cpp" />

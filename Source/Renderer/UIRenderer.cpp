@@ -21,7 +21,7 @@ bool UIRenderer::loadFont()
 		return false;
 	}
 
-	font = TTF_OpenFont(FONT_FILENAME.c_str(), 20);
+	font = TTF_OpenFont(FONT_FILENAME.c_str(), 14);
 
 	if (!font)
 	{
@@ -91,6 +91,8 @@ void UIRenderer::drawText(std::string text, glm::vec2 position, SDL_Color color)
 	worldMatrix = glm::translate(worldMatrix, glm::vec3(((position.x + sText->w / 2.f) / window->width) * 2.f - 1.f, -((position.y + sText->h / 2.f) / window->height) * 2.f + 1.f, 0.f));
 	worldMatrix = glm::scale(worldMatrix, glm::vec3(float(sText->w) / window->width, sText->h / float(window->height), 1.f));
 	uiDrawShader->setWorldMatrixUniform(worldMatrix);
+
+	uiDrawShader->setUVScaleUniform(glm::vec2(1.f));
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, fontTextureID);

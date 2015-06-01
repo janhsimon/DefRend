@@ -28,8 +28,8 @@ bool UnitQuad::create()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
 
 	// set vertex attribute array pointers
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float)* 4, 0);								// position
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float)* 4, (void *)(sizeof(float)* 2));	// tex coord uvs
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, 0);								// position
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void *)(sizeof(float) * 2));	// tex coord uvs
 
 	GLenum error = glGetError();
 	if (error != GL_NO_ERROR)

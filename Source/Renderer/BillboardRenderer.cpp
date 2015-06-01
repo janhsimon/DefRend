@@ -5,6 +5,8 @@
 #include <vector>
 
 #include "BillboardRenderer.hpp"
+#include "UnitArrow.hpp"
+#include "UnitGizmo.hpp"
 #include "UnitQuad.hpp"
 #include "..\Light\LightManager.hpp"
 #include "..\Util\Error.hpp"
@@ -48,19 +50,11 @@ bool BillboardRenderer::create()
 	if (!spotLightBillboard->load(SPOT_LIGHT_BILLBOARD_FILENAME))
 		return false;
 
-	if (!Util::checkMemory(unitArrow = new UnitArrow()))
-		return false;
-
-	if (!unitArrow->create())
-		return false;
-
 	return true;
 }
 
 BillboardRenderer::~BillboardRenderer()
 {
-	delete unitArrow;
-
 	delete directionalLightBillboard;
 	delete pointLightBillboard;
 	delete spotLightBillboard;
@@ -80,7 +74,7 @@ glm::mat4 BillboardRenderer::calculateBillboardMatrix(Camera *camera, Directiona
 	billboardMatrix[2] = glm::vec4(glm::normalize(camera->position - light->position), 0.f);
 	billboardMatrix[3] = glm::vec4(light->position, 1.f);
 
-	return glm::scale(billboardMatrix, glm::vec3(35.f, 35.f, 35.f));
+	return glm::scale(billboardMatrix, glm::vec3(25.f, 25.f, 25.f));
 }
 
 void BillboardRenderer::render(Camera *camera)
@@ -101,7 +95,7 @@ void BillboardRenderer::render(Camera *camera)
 		lineDrawShader->setWorldViewProjectionMatrixUniforms(glm::scale(d->getWorldMatrix(), glm::vec3(100.f, 100.f, 100.f)), camera->viewMatrix, camera->projectionMatrix);
 		lineDrawShader->setColorUniform(d->diffuseColor);
 
-		unitArrow->render();
+		UnitArrow::render();
 	}
 
 	for (PointLight *l : lightManager->pointLights)
@@ -121,7 +115,7 @@ void BillboardRenderer::render(Camera *camera)
 		lineDrawShader->setWorldViewProjectionMatrixUniforms(glm::scale(l->getWorldMatrix(), glm::vec3(100.f, 100.f, 100.f)), camera->viewMatrix, camera->projectionMatrix);
 		lineDrawShader->setColorUniform(glm::vec3(1.f, 0.f, 0.f));
 
-		unitArrow->render();
+		UnitArrow::render();
 		*/
 	}
 
@@ -132,11 +126,7 @@ void BillboardRenderer::render(Camera *camera)
 		glUseProgram(billboardDrawShader->program);
 
 		billboardDrawShader->setWorldViewProjectionMatrixUniforms(calculateBillboardMatrix(camera, s), camera->viewMatrix, camera->projectionMatrix);
-		
-		if (i == lightManager->getSelectedPointLight())
-			billboardDrawShader->setTintColorUniform(glm::vec3(1.f, 0.f, 1.f));
-		else
-			billboardDrawShader->setTintColorUniform(s->diffuseColor);
+		billboardDrawShader->setTintColorUniform(s->diffuseColor);
 
 		spotLightBillboard->bind(GL_TEXTURE0);
 		UnitQuad::render();
@@ -145,8 +135,17 @@ void BillboardRenderer::render(Camera *camera)
 		glUseProgram(lineDrawShader->program);
 
 		lineDrawShader->setWorldViewProjectionMatrixUniforms(glm::scale(s->getWorldMatrix(), glm::vec3(100.f, 100.f, 100.f)), camera->viewMatrix, camera->projectionMatrix);
-		lineDrawShader->setColorUniform(s->diffuseColor);
+		lineDrawShader->setColorUniform(glm::vec3(1.f));
 
-		unitArrow->render();
+		UnitArrow::render();
+
+
+		if (i == lightManager->getSelectedPointLight())
+		{
+			lineDrawShader->setWorldViewProjectionMatrixUniforms(glm::scale(s->getWorldMatrix(), glm::vec3(20.f, 20.f, 20.f)), camera->viewMatrix, camera->projectionMatrix);
+			lineDrawShader->setColorUniform(glm::vec3(1.f));
+
+			UnitGizmo::render();
+		}
 	}
 }

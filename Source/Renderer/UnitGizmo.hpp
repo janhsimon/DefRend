@@ -2,11 +2,14 @@
 
 #include <glew.h>
 
-class UnitArrow
+class UnitGizmo
 {
 private:
+	static const float LINE_LENGTH;
+
 	static GLuint VBO;
 	static GLuint VAO;
+	
 
 public:
 	static bool create();

@@ -201,6 +201,15 @@
     <ClInclude Include="Source\UI\Element.hpp">
       <Filter>Source Files\UI</Filter>
     </ClInclude>
+    <ClInclude Include="Source\UI\Slider.hpp">
+      <Filter>Source Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\UnitGizmo.hpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Panel.hpp">
+      <Filter>Source Files\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Camera\Camera.cpp">
@@ -306,6 +315,15 @@
       <Filter>Source Files\UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\UI\Element.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Slider.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer\UnitGizmo.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Panel.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,14 +1,12 @@
 #include "UnitArrow.hpp"
 #include "..\Util\Error.hpp"
 
-UnitArrow::~UnitArrow()
-{
-
-}
+GLuint UnitArrow::VBO;
+GLuint UnitArrow::VAO;
 
 bool UnitArrow::create()
 {
-	float data[10][3] =
+	float data[6][3] =
 	{
 		{ 0.f, 0.f, 0.f },
 		{ 0.f, 0.f, 1.f },
@@ -45,10 +43,16 @@ bool UnitArrow::create()
 	return true;
 }
 
+void UnitArrow::destroy()
+{
+	glDeleteBuffers(1, &VBO);
+	glDeleteVertexArrays(1, &VAO);
+}
+
 void UnitArrow::render()
 {
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glLineWidth(3.f);
+	glLineWidth(1.f);
 	glDrawArrays(GL_LINES, 0, 6);
 }

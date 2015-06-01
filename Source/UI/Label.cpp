@@ -1,6 +1,6 @@
 #include "Label.hpp"
 
-Label::Label(std::string text, glm::vec2 position, glm::vec2 size) : Element(position, size)
+Label::Label(glm::vec2 position, std::string text) : Element(position, glm::vec2())
 {
 	this->text = text;
 

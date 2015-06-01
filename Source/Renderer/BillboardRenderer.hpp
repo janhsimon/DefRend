@@ -3,7 +3,6 @@
 #include <SDL_ttf.h>
 #include <string>
 
-#include "UnitArrow.hpp"
 #include "..\Camera\Camera.hpp"
 #include "..\Light\DirectionalLight.hpp"
 #include "..\Material\Texture.hpp"
@@ -20,7 +19,6 @@ private:
 	BillboardDrawShader *billboardDrawShader;
 	LineDrawShader *lineDrawShader;
 	Texture *directionalLightBillboard, *pointLightBillboard, *spotLightBillboard;
-	UnitArrow *unitArrow;
 
 	glm::mat4 calculateBillboardMatrix(Camera *camera, DirectionalLight *light);
 

@@ -9,7 +9,6 @@
 class DeferredRenderer : public IRenderer
 {
 private:
-	GBuffer *gBuffer;
 	
 	GeometryShader *geometryShader;
 	DirectionalLightingShader *directionalLightingShader;
@@ -29,6 +28,8 @@ private:
 	void doSpotLightPass(Camera *camera);
 
 public:
+	GBuffer *gBuffer;
+
 	~DeferredRenderer();
 
 	bool init(Window *window);

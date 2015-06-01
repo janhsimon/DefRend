@@ -7,10 +7,14 @@
 #include "Renderer\DeferredRenderer.hpp"
 #include "Renderer\UIRenderer.hpp"
 #include "Renderer\IRenderer.hpp"
+#include "Renderer\UnitArrow.hpp"
+#include "Renderer\UnitGizmo.hpp"
 #include "Renderer\UnitQuad.hpp"
 #include "Scene\SceneManager.hpp"
 #include "UI\Label.hpp"
 #include "UI\Frame.hpp"
+#include "UI\Panel.hpp"
+#include "UI\Slider.hpp"
 #include "Util\Error.hpp"
 #include "Util\Util.hpp"
 #include "Window\Window.hpp"
@@ -21,8 +25,11 @@ UIRenderer *uiRenderer;
 Frame *frame;
 IRenderer *sceneRenderer;
 Input input;
+Label *sliderLabelRGB;
 LightManager *lightManager;
+Panel *panelDiffMap;
 SceneManager *sceneManager;
+Slider *sliderR, *sliderG, *sliderB;
 Window *window;
 
 unsigned int thisTickTime, lastTickTime = 0;
@@ -131,24 +138,61 @@ bool load()
 		return false;
 
 
-	// load unit quad
+	// load primitives
 
 	if (!UnitQuad::create())
 		return false;
+
+	if (!UnitArrow::create())
+		return false;
+
+	if (!UnitGizmo::create())
+		return false;
 	
 
-	if (!Util::checkMemory(frame = new Frame(glm::vec2(window->width - 256.f, 0.f), glm::vec2(256.f, 256.f))))
+	// set up UI
+
+	if (!Util::checkMemory(frame = new Frame(glm::vec2(window->width - 266.f, window->height - 266.f), glm::vec2(256.f, 256.f))))
 		return false;
 
-	if (!frame->load())
+	if (!frame->load("LIGHT EDITOR"))
 		return false;
 
-	Label *label;
-
-	if (!Util::checkMemory(label = new Label("Light Editor", glm::vec2(90.f, 15.f), glm::vec2(0.f, 0.f))))
+	if (!Util::checkMemory(sliderR = new Slider(glm::vec2(30.f, 20.f), glm::vec2(196.f), 0, 255)))
 		return false;
 
-	frame->addChildElement(label);
+	if (!sliderR->load())
+		return false;
+
+	frame->addChildElement(sliderR);
+
+	if (!Util::checkMemory(sliderG = new Slider(glm::vec2(30.f, 40.f), glm::vec2(196.f), 0, 255)))
+		return false;
+
+	if (!sliderG->load())
+		return false;
+
+	frame->addChildElement(sliderG);
+
+	if (!Util::checkMemory(sliderB = new Slider(glm::vec2(30.f, 60.f), glm::vec2(196.f), 0, 255)))
+		return false;
+
+	if (!sliderB->load())
+		return false;
+
+	frame->addChildElement(sliderB);
+
+	if (!Util::checkMemory(sliderLabelRGB = new Label(glm::vec2(30.f, 80.f))))
+		return false;
+
+	frame->addChildElement(sliderLabelRGB);
+
+	if (!Util::checkMemory(panelDiffMap = new Panel(glm::vec2(48.f, 100.f), glm::vec2(160.f, 90.f))))
+		return false;
+
+	panelDiffMap->texture = ((DeferredRenderer*)sceneRenderer)->gBuffer->textures[1];
+
+	frame->addChildElement(panelDiffMap);
 
 	return true;
 }
@@ -160,6 +204,15 @@ void update(float delta)
 
 	assert(lightManager);
 	lightManager->update(delta);
+
+	glm::vec3 color(sliderR->value / 255.f, sliderG->value / 255.f, sliderB->value / 255.f);
+
+	std::stringstream s;
+	s << "Diffuse Color: " << sliderR->value << "/" << sliderG->value << "/" << sliderB->value;
+	sliderLabelRGB->text = s.str();
+	sliderLabelRGB->color = color;
+
+	lightManager->spotLights[lightManager->getSelectedPointLight()]->diffuseColor = color;
 
 	//manModel->setYaw(manModel->getYaw() + delta * .003f);
 }
@@ -194,6 +247,8 @@ void render()
 void destroy()
 {
 	UnitQuad::destroy();
+	UnitArrow::destroy();
+	UnitGizmo::destroy();
 
 	delete frame;
 	delete lightManager;

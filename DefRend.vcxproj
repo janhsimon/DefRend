@@ -63,7 +63,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
@@ -84,8 +84,8 @@
     <None Include="Binaries\Shaders\BillboardDraw.fs.glsl" />
     <None Include="Binaries\Shaders\BillboardDraw.vs.glsl" />
     <None Include="Binaries\Shaders\DirectionalLighting.fs.glsl" />
-    <None Include="Binaries\Shaders\FontDraw.fs.glsl" />
-    <None Include="Binaries\Shaders\FontDraw.vs.glsl" />
+    <None Include="Binaries\Shaders\UIDraw.fs.glsl" />
+    <None Include="Binaries\Shaders\UIDraw.vs.glsl" />
     <None Include="Binaries\Shaders\Lighting.vs.glsl" />
     <None Include="Binaries\Shaders\Geometry.fs.glsl" />
     <None Include="Binaries\Shaders\Geometry.vs.glsl" />
@@ -100,7 +100,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Camera\Camera.hpp" />
-    <ClInclude Include="Source\Input\Input.hpp" />
+    <ClInclude Include="Source\Input\InputManager.hpp" />
     <ClInclude Include="Source\Light\DirectionalLight.hpp" />
     <ClInclude Include="Source\Light\LightManager.hpp" />
     <ClInclude Include="Source\Light\PointLight.hpp" />
@@ -131,7 +131,9 @@
     <ClInclude Include="Source\Transform\Transform.hpp" />
     <ClInclude Include="Source\UI\Element.hpp" />
     <ClInclude Include="Source\UI\Frame.hpp" />
+    <ClInclude Include="Source\UI\GBufferInspector.hpp" />
     <ClInclude Include="Source\UI\Label.hpp" />
+    <ClInclude Include="Source\UI\LightEditor.hpp" />
     <ClInclude Include="Source\UI\Panel.hpp" />
     <ClInclude Include="Source\UI\Slider.hpp" />
     <ClInclude Include="Source\Util\Error.hpp" />
@@ -140,7 +142,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Camera\Camera.cpp" />
-    <ClCompile Include="Source\Input\Input.cpp" />
+    <ClCompile Include="Source\Input\InputManager.cpp" />
     <ClCompile Include="Source\Light\DirectionalLight.cpp" />
     <ClCompile Include="Source\Light\LightManager.cpp" />
     <ClCompile Include="Source\Light\PointLight.cpp" />
@@ -171,7 +173,9 @@
     <ClCompile Include="Source\Transform\Transform.cpp" />
     <ClCompile Include="Source\UI\Element.cpp" />
     <ClCompile Include="Source\UI\Frame.cpp" />
+    <ClCompile Include="Source\UI\GBufferInspector.cpp" />
     <ClCompile Include="Source\UI\Label.cpp" />
+    <ClCompile Include="Source\UI\LightEditor.cpp" />
     <ClCompile Include="Source\UI\Panel.cpp" />
     <ClCompile Include="Source\UI\Slider.cpp" />
     <ClCompile Include="Source\Util\Error.cpp" />

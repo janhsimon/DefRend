@@ -1,15 +1,17 @@
-#include "Input.hpp"
+#include "InputManager.hpp"
 #include "..\Camera\Camera.hpp"
-#include "..\UI\Frame.hpp"
+#include "..\UI\GBufferInspector.hpp"
+#include "..\UI\LightEditor.hpp"
 #include "..\Light\LightManager.hpp"
 #include "..\Window\Window.hpp"
 
 extern Camera *camera;
+extern GBufferInspector *gBufferInspector;
 extern LightManager *lightManager;
-extern Frame *frame;
+extern LightEditor *lightEditor;
 extern Window *window;
 
-Input::Input()
+InputManager::InputManager()
 {
 	forwardKeyPressed = backKeyPressed = leftKeyPressed = rightKeyPressed = crouchKeyPressed = false;
 
@@ -17,7 +19,7 @@ Input::Input()
 	flashLight = false;
 }
 
-void Input::sendMouseButtonEvent(const SDL_Event &event)
+void InputManager::sendMouseButtonEvent(const SDL_Event &event)
 {
 	int x, y;
 	SDL_GetMouseState(&x, &y);
@@ -25,10 +27,14 @@ void Input::sendMouseButtonEvent(const SDL_Event &event)
 	if (!camera->getFirstPerson())
 	{
 		if (event.type == SDL_MOUSEBUTTONDOWN)
-			frame->onMouseButtonDown(glm::vec2(x, y), event.button.button);
+		{
+			lightEditor->onMouseButtonDown(glm::vec2(x, y), event.button.button);
+			gBufferInspector->onMouseButtonDown(glm::vec2(x, y), event.button.button);
+		}
 		else if (event.type == SDL_MOUSEBUTTONUP)
 		{
-			frame->onMouseButtonUp(glm::vec2(x, y), event.button.button);
+			lightEditor->onMouseButtonUp(glm::vec2(x, y), event.button.button);
+			gBufferInspector->onMouseButtonUp(glm::vec2(x, y), event.button.button);
 
 			if (event.button.button == 1)
 				lightManager->selectPointLight(glm::vec2(x, y));
@@ -36,9 +42,10 @@ void Input::sendMouseButtonEvent(const SDL_Event &event)
 	}
 }
 
-void Input::sendMouseMoveEvent(const SDL_Event &event)
+void InputManager::sendMouseMoveEvent(const SDL_Event &event)
 {
-	frame->onMouseMove(glm::vec2(event.motion.x, event.motion.y));
+	lightEditor->onMouseMove(glm::vec2(event.motion.x, event.motion.y));
+	gBufferInspector->onMouseMove(glm::vec2(event.motion.x, event.motion.y));
 
 	if (camera->getFirstPerson())
 	{
@@ -52,7 +59,7 @@ void Input::sendMouseMoveEvent(const SDL_Event &event)
 	}
 }
 
-void Input::sendKeyboardEvent(const SDL_Event &event)
+void InputManager::sendKeyboardEvent(const SDL_Event &event)
 {
 	if (event.key.keysym.sym == SDLK_ESCAPE && event.type == SDL_KEYUP)
 		window->alive = false;

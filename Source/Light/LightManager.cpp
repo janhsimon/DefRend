@@ -36,12 +36,13 @@ bool LightManager::create()
 	if (!Util::checkMemory(p = new PointLight()))
 		return false;
 
-	p->position = glm::vec3(0.f, 10.f, 0.f);
+	p->position = glm::vec3(0.f, 50.f, 0.f);
 	p->diffuseColor = glm::vec3(1.f, 1.f, .9f);
-	p->diffuseIntensity = 1.f;
-	p->specularIntensity = 1.f;
+	p->diffuseIntensity = 512.f;
+	p->specularIntensity = 512.f;
 	p->specularPower = 32.f;
-	p->attenuation = glm::vec3(.0001f, .00001f, .00001f);
+	//p->attenuation = glm::vec3(.0001f, .00001f, .00001f);
+	//p->attenuation = glm::vec3(0.0f, 0.0f, 1.f);
 	pointLights.push_back(p);
 
 	if (!Util::checkMemory(p = new PointLight()))
@@ -49,10 +50,10 @@ bool LightManager::create()
 
 	p->position = glm::vec3(300.f, 1000.f, 0.f);
 	p->diffuseColor = glm::vec3(.1f, .1f, 1.f);
-	p->diffuseIntensity = 1.f;
-	p->specularIntensity = 1.f;
+	p->diffuseIntensity = 512.f;
+	p->specularIntensity = 512.f;
 	p->specularPower = 32.f;
-	p->attenuation = glm::vec3(.0001f, .00001f, .00001f);
+	//p->attenuation = glm::vec3(.0001f, .00001f, .00001f);
 	pointLights.push_back(p);
 
 
@@ -67,10 +68,10 @@ bool LightManager::create()
 
 		s->position = glm::vec3(1075.f - i * 189.f, 0.f, 560.f);
 		s->diffuseColor = glm::vec3(1.f, 1.f, .9f);
-		s->diffuseIntensity = 2.f;
-		s->specularIntensity = 1.f;
+		s->diffuseIntensity = 512.f;
+		s->specularIntensity = 512.f;
 		s->specularPower = 32.f;
-		s->attenuation = glm::vec3(.0001f, .00001f, .00001f);
+		//s->attenuation = glm::vec3(.0001f, .00001f, .00001f);
 		s->setPitch(-90.f);
 		s->cutoffAngle = 25.f;
 		spotLights.push_back(s);
@@ -80,10 +81,10 @@ bool LightManager::create()
 
 		s->position = glm::vec3(1075.f - i * 189.f, 0.f, -630.f);
 		s->diffuseColor = glm::vec3(1.f, 1.f, .9f);
-		s->diffuseIntensity = 2.f;
-		s->specularIntensity = 1.f;
+		s->diffuseIntensity = 512.f;
+		s->specularIntensity = 512.f;
 		s->specularPower = 32.f;
-		s->attenuation = glm::vec3(.0001f, .00001f, .00001f);
+		//s->attenuation = glm::vec3(.0001f, .00001f, .00001f);
 		s->setPitch(-90.f);
 		s->cutoffAngle = 25.f;
 		spotLights.push_back(s);
@@ -127,13 +128,13 @@ void LightManager::selectPointLight(glm::vec2 mousePosition)
 	Error::report("Debug", s.str());
 	*/
 
-	float nearestDistance = glm::length(glm::vec3(spotLights[0]->position - /*un*/camera->position));
+	float nearestDistance = glm::length(glm::vec3(spotLights[0]->position - camera->position));
 	int nearestIndex = 0;
 
 	for (unsigned int i = 1; i < spotLights.size(); ++i)
 	{
 		SpotLight *s = spotLights[i];
-		float distance = glm::length(glm::vec3(s->position - /*un*/camera->position));
+		float distance = glm::length(glm::vec3(s->position - camera->position));
 
 		if (distance < nearestDistance)
 		{

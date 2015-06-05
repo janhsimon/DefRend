@@ -8,9 +8,19 @@
 
 extern Window *window;
 
-Panel::Panel(glm::vec2 position, glm::vec2 size) : Element(position, size)
+Panel::Panel(glm::vec2 position, glm::vec2 size, bool isTextured) : Element(position, size)
 {
-	
+	this->isTextured = isTextured;
+}
+
+void *Panel::operator new(size_t size)
+{
+	return _aligned_malloc(size, 16);
+}
+
+void Panel::operator delete(void *p)
+{
+	_aligned_free(p);
 }
 
 void Panel::destroy()
@@ -27,12 +37,18 @@ void Panel::render(UIRenderer *uiRenderer, glm::vec2 parentPosition)
 	worldMatrix = glm::scale(worldMatrix, glm::vec3(size.x / window->width, size.y / window->height, 1.f));
 	uiRenderer->getUIDrawShader()->setWorldMatrixUniform(worldMatrix);
 
-	uiRenderer->getUIDrawShader()->setUVScaleUniform(glm::vec2(1.f));
+	// flip texture vertically which is needed for some reason
+	uiRenderer->getUIDrawShader()->setUVScaleUniform(glm::vec2(1.f, -1.f));
 
-	//texture->bind(GL_TEXTURE0);
+	uiRenderer->getUIDrawShader()->setColorOverrideUniform(!isTextured);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	if (isTextured)
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture);
+	}
+	else
+		uiRenderer->getUIDrawShader()->setColorUniform(color);
 
 	UnitQuad::render();
 }

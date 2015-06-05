@@ -76,12 +76,6 @@
     <None Include="Binaries\Shaders\DirectionalLighting.fs.glsl">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="Binaries\Shaders\FontDraw.fs.glsl">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="Binaries\Shaders\FontDraw.vs.glsl">
-      <Filter>Shader Files</Filter>
-    </None>
     <None Include="Binaries\Shaders\BillboardDraw.fs.glsl">
       <Filter>Shader Files</Filter>
     </None>
@@ -94,13 +88,16 @@
     <None Include="Binaries\Shaders\LineDraw.vs.glsl">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="Binaries\Shaders\UIDraw.fs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\UIDraw.vs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Camera\Camera.hpp">
       <Filter>Source Files\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Input\Input.hpp">
-      <Filter>Source Files\Input</Filter>
     </ClInclude>
     <ClInclude Include="Source\Light\PointLight.hpp">
       <Filter>Source Files\Light</Filter>
@@ -210,6 +207,15 @@
     <ClInclude Include="Source\UI\Panel.hpp">
       <Filter>Source Files\UI</Filter>
     </ClInclude>
+    <ClInclude Include="Source\UI\LightEditor.hpp">
+      <Filter>Source Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Input\InputManager.hpp">
+      <Filter>Source Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\GBufferInspector.hpp">
+      <Filter>Source Files\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Camera\Camera.cpp">
@@ -217,9 +223,6 @@
     </ClCompile>
     <ClCompile Include="Source\Main.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Input\Input.cpp">
-      <Filter>Source Files\Input</Filter>
     </ClCompile>
     <ClCompile Include="Source\Light\PointLight.cpp">
       <Filter>Source Files\Light</Filter>
@@ -324,6 +327,15 @@
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Source\UI\Panel.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\LightEditor.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Input\InputManager.cpp">
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\GBufferInspector.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
   </ItemGroup>

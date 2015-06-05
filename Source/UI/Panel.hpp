@@ -8,10 +8,18 @@
 
 class Panel : public Element
 {
+private:
+	bool isTextured;
+
 public:
 	GLuint texture;
+	glm::vec4 color;
 
-	Panel(glm::vec2 position, glm::vec2 size);
+	Panel(glm::vec2 position, glm::vec2 size, bool isTextured);
+
+	// 16-byte alignment for fast SSE math instructions
+	void *operator new(size_t size);
+	void operator delete(void *p);
 
 	void destroy();
 

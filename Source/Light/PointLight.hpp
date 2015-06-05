@@ -12,7 +12,7 @@ public:
 	float specularIntensity;
 	float specularPower;
 	
-	glm::vec3 attenuation; // constant, linear, exponent
+	//glm::vec3 attenuation; // constant, linear, exponent
 
 	~PointLight();
 

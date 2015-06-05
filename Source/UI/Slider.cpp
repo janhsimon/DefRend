@@ -79,6 +79,8 @@ void Slider::render(UIRenderer *uiRenderer, glm::vec2 parentPosition)
 
 	uiRenderer->getUIDrawShader()->setUVScaleUniform(glm::vec2(size.x / 16.f, 1.f));
 
+	uiRenderer->getUIDrawShader()->setColorOverrideUniform(false);
+
 	barTexture->bind(GL_TEXTURE0);
 	UnitQuad::render();
 
@@ -95,6 +97,8 @@ void Slider::render(UIRenderer *uiRenderer, glm::vec2 parentPosition)
 
 	uiRenderer->getUIDrawShader()->setUVScaleUniform(glm::vec2(1.f, 1.f));
 
+	uiRenderer->getUIDrawShader()->setColorOverrideUniform(false);
+
 	barLeftEndTexture->bind(GL_TEXTURE0);
 	UnitQuad::render();
 
@@ -107,6 +111,8 @@ void Slider::render(UIRenderer *uiRenderer, glm::vec2 parentPosition)
 	uiRenderer->getUIDrawShader()->setWorldMatrixUniform(worldMatrix);
 
 	uiRenderer->getUIDrawShader()->setUVScaleUniform(glm::vec2(1.f, 1.f));
+
+	uiRenderer->getUIDrawShader()->setColorOverrideUniform(false);
 
 	barRightEndTexture->bind(GL_TEXTURE0);
 	UnitQuad::render();
@@ -128,6 +134,8 @@ void Slider::render(UIRenderer *uiRenderer, glm::vec2 parentPosition)
 
 	uiRenderer->getUIDrawShader()->setUVScaleUniform(glm::vec2(1.f));
 
+	uiRenderer->getUIDrawShader()->setColorOverrideUniform(false);
+
 	UnitQuad::render();
 
 	handlePositionWorld.x = position.x + parentPosition.x + size.x * normalizedValue - 8.f;
@@ -138,7 +146,7 @@ void Slider::onMouseButtonDown(glm::vec2 mousePosition, int mouseButton)
 {
 	float normalizedValue = (float)(value - min) / (max - min);
 
-	if (isPointOnArea(mousePosition, barPositionWorld, glm::vec2(size.x, 16.f)))
+	if (isPointOnArea(mousePosition, glm::vec2(barPositionWorld.x - 8.f, barPositionWorld.y), glm::vec2(size.x + 16.f, 16.f)))
 	{
 		mouseDragging = true;
 		onMouseMove(mousePosition);

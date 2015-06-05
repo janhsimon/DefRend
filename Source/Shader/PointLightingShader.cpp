@@ -3,16 +3,20 @@
 #include "PointLightingShader.hpp"
 #include "..\Util\Error.hpp"
 
-const std::string PointLightingShader::WORLD_VIEW_PROJECTION_MATRIX_UNIFORM_NAME = "worldViewProjectionMatrix";
+const std::string PointLightingShader::WORLD_MATRIX_UNIFORM_NAME = "worldMatrix";
+const std::string PointLightingShader::VIEW_MATRIX_UNIFORM_NAME = "viewMatrix";
+const std::string PointLightingShader::PROJECTION_MATRIX_UNIFORM_NAME = "projectionMatrix";
+//const std::string PointLightingShader::INV_WORLD_MATRIX_UNIFORM_NAME = "invWorldMatrix";
+//const std::string PointLightingShader::CAMERA_FAR_CLIP_UNIFORM_NAME = "cameraFarClip";
 const std::string PointLightingShader::SCREEN_SIZE_UNIFORM_NAME = "screenSize";
 const std::string PointLightingShader::LIGHT_POSITION_UNIFORM_NAME = "lightPosition";
 const std::string PointLightingShader::LIGHT_DIFFUSE_COLOR_UNIFORM_NAME = "lightDiffuseColor";
 const std::string PointLightingShader::LIGHT_DIFFUSE_INTENSITY_UNIFORM_NAME = "lightDiffuseIntensity";
 const std::string PointLightingShader::LIGHT_SPECULAR_INTENSITY_UNIFORM_NAME = "lightSpecularIntensity";
 const std::string PointLightingShader::LIGHT_SPECULAR_POWER_UNIFORM_NAME = "lightSpecularPower";
-const std::string PointLightingShader::LIGHT_ATTENUATION_UNIFORM_NAME = "lightAttenuation";
+//const std::string PointLightingShader::LIGHT_ATTENUATION_UNIFORM_NAME = "lightAttenuation";
 const std::string PointLightingShader::EYE_POSITION_UNIFORM_NAME = "eyePosition";
-const std::string PointLightingShader::GBUFFER_MAPS_UNIFORM_NAMES[4] = { "gbuffer_worldPosition", "gbuffer_diffuse", "gbuffer_specular", "gbuffer_normal" };
+const std::string PointLightingShader::GBUFFER_MAPS_UNIFORM_NAMES[2] = { "inGBufferMRT0", "inGBufferMRT1" };
 
 bool PointLightingShader::create()
 {
@@ -24,8 +28,22 @@ bool PointLightingShader::create()
 
 	glUseProgram(program);
 
-	if (!getUniformLocation(WORLD_VIEW_PROJECTION_MATRIX_UNIFORM_NAME, worldViewProjectionMatrixUniformLocation))
+	if (!getUniformLocation(WORLD_MATRIX_UNIFORM_NAME, worldMatrixUniformLocation))
 		return false;
+
+	if (!getUniformLocation(VIEW_MATRIX_UNIFORM_NAME, viewMatrixUniformLocation))
+		return false;
+
+	if (!getUniformLocation(PROJECTION_MATRIX_UNIFORM_NAME, projectionMatrixUniformLocation))
+		return false;
+
+	/*
+	if (!getUniformLocation(INV_WORLD_MATRIX_UNIFORM_NAME, invWorldMatrixUniformLocation))
+		return false;
+
+	if (!getUniformLocation(CAMERA_FAR_CLIP_UNIFORM_NAME, cameraFarClipUniformLocation))
+		return false;
+	*/
 
 	if (!getUniformLocation(SCREEN_SIZE_UNIFORM_NAME, screenSizeUniformLocation))
 		return false;
@@ -45,15 +63,15 @@ bool PointLightingShader::create()
 	if (!getUniformLocation(LIGHT_SPECULAR_POWER_UNIFORM_NAME, lightSpecularPowerUniformLocation))
 		return false;
 
-	if (!getUniformLocation(LIGHT_ATTENUATION_UNIFORM_NAME, lightAttenuationUniformLocation))
-		return false;
+	//if (!getUniformLocation(LIGHT_ATTENUATION_UNIFORM_NAME, lightAttenuationUniformLocation))
+		//return false;
 
 	if (!getUniformLocation(EYE_POSITION_UNIFORM_NAME, eyePositionUniformLocation))
 		return false;
 
 	GLint gBufferMapsUniformLocation;
 
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < 2; ++i)
 	{
 		if (!getUniformLocation(GBUFFER_MAPS_UNIFORM_NAMES[i], gBufferMapsUniformLocation))
 			return false;
@@ -71,9 +89,20 @@ bool PointLightingShader::create()
 	return true;
 }
 
+/*
+void PointLightingShader::setCameraFarClipUniform(float cameraFarClip)
+{
+	glUniform1f(cameraFarClipUniformLocation, cameraFarClip);
+}
+*/
+
 void PointLightingShader::setWorldViewProjectionUniforms(const glm::mat4 &worldMatrix, const glm::mat4 &viewMatrix, const glm::mat4 &projectionMatrix)
 {
-	glUniformMatrix4fv(worldViewProjectionMatrixUniformLocation, 1, GL_FALSE, glm::value_ptr((projectionMatrix * viewMatrix) * worldMatrix));
+	glUniformMatrix4fv(worldMatrixUniformLocation, 1, GL_FALSE, glm::value_ptr(worldMatrix));
+	glUniformMatrix4fv(viewMatrixUniformLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+	glUniformMatrix4fv(projectionMatrixUniformLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+
+	//glUniformMatrix4fv(invWorldMatrixUniformLocation, 1, GL_FALSE, glm::value_ptr(glm::inverse(viewMatrix)));
 }
 
 void PointLightingShader::setScreenSizeUniform(unsigned int screenWidth, unsigned int screenHeight)
@@ -90,10 +119,10 @@ void PointLightingShader::setLightParameters(const PointLight *pointLight)
 	glUniform1f(lightDiffuseIntensityUniformLocation, pointLight->diffuseIntensity);
 	glUniform1f(lightSpecularIntensityUniformLocation, pointLight->specularIntensity);
 	glUniform1f(lightSpecularPowerUniformLocation, pointLight->specularPower);
-	glUniform3f(lightAttenuationUniformLocation, pointLight->attenuation.x, pointLight->attenuation.y, pointLight->attenuation.z);
+	//glUniform3f(lightAttenuationUniformLocation, pointLight->attenuation.x, pointLight->attenuation.y, pointLight->attenuation.z);
 }
 
-void PointLightingShader::setEyePositionUniform(float x, float y, float z)
+void PointLightingShader::setEyePositionUniform(const glm::vec3 &eyePosition)
 {
-	glUniform3f(eyePositionUniformLocation, x, y, z);
+	glUniform3f(eyePositionUniformLocation, eyePosition.x, eyePosition.y, eyePosition.z);
 }

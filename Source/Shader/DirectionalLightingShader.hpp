@@ -8,14 +8,16 @@
 class DirectionalLightingShader : public ShaderProgram
 {
 private:
-	static const std::string WORLD_VIEW_PROJECTION_MATRIX_UNIFORM_NAME;
+	static const std::string WORLD_MATRIX_UNIFORM_NAME;
+	static const std::string VIEW_MATRIX_UNIFORM_NAME;
+	static const std::string PROJECTION_MATRIX_UNIFORM_NAME;
 	static const std::string LIGHT_DIRECTION_UNIFORM_NAME;
 	static const std::string LIGHT_DIFFUSE_COLOR_UNIFORM_NAME;
 	static const std::string LIGHT_DIFFUSE_INTENSITY_UNIFORM_NAME;
 	static const std::string SCREEN_SIZE_UNIFORM_NAME;
-	static const std::string GBUFFER_MAPS_UNIFORM_NAMES[4];
+	static const std::string GBUFFER_MAPS_UNIFORM_NAMES[2];
 
-	GLint worldViewProjectionMatrixUniformLocation;
+	GLint worldMatrixUniformLocation, viewMatrixUniformLocation, projectionMatrixUniformLocation;
 	GLint lightDirectionUniformLocation;
 	GLint lightDiffuseColorUniformLocation;
 	GLint lightDiffuseIntensityUniformLocation;

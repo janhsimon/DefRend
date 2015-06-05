@@ -3,12 +3,14 @@
 #include "DirectionalLightingShader.hpp"
 #include "..\Util\Error.hpp"
 
-const std::string DirectionalLightingShader::WORLD_VIEW_PROJECTION_MATRIX_UNIFORM_NAME = "worldViewProjectionMatrix";
+const std::string DirectionalLightingShader::WORLD_MATRIX_UNIFORM_NAME = "worldMatrix";
+const std::string DirectionalLightingShader::VIEW_MATRIX_UNIFORM_NAME = "viewMatrix";
+const std::string DirectionalLightingShader::PROJECTION_MATRIX_UNIFORM_NAME = "projectionMatrix";
 const std::string DirectionalLightingShader::LIGHT_DIRECTION_UNIFORM_NAME = "lightDirection";
 const std::string DirectionalLightingShader::LIGHT_DIFFUSE_COLOR_UNIFORM_NAME = "lightDiffuseColor";
 const std::string DirectionalLightingShader::LIGHT_DIFFUSE_INTENSITY_UNIFORM_NAME = "lightDiffuseIntensity";
 const std::string DirectionalLightingShader::SCREEN_SIZE_UNIFORM_NAME = "screenSize";
-const std::string DirectionalLightingShader::GBUFFER_MAPS_UNIFORM_NAMES[4] = { "gbuffer_worldPosition", "gbuffer_diffuse", "gbuffer_specular", "gbuffer_normal" };
+const std::string DirectionalLightingShader::GBUFFER_MAPS_UNIFORM_NAMES[2] = { "inGBufferMRT0", "inGBufferMRT1" };
 
 bool DirectionalLightingShader::create()
 {
@@ -20,7 +22,13 @@ bool DirectionalLightingShader::create()
 
 	glUseProgram(program);
 
-	if (!getUniformLocation(WORLD_VIEW_PROJECTION_MATRIX_UNIFORM_NAME, worldViewProjectionMatrixUniformLocation))
+	if (!getUniformLocation(WORLD_MATRIX_UNIFORM_NAME, worldMatrixUniformLocation))
+		return false;
+
+	if (!getUniformLocation(VIEW_MATRIX_UNIFORM_NAME, viewMatrixUniformLocation))
+		return false;
+
+	if (!getUniformLocation(PROJECTION_MATRIX_UNIFORM_NAME, projectionMatrixUniformLocation))
 		return false;
 
 	if (!getUniformLocation(LIGHT_DIRECTION_UNIFORM_NAME, lightDirectionUniformLocation))
@@ -37,7 +45,7 @@ bool DirectionalLightingShader::create()
 
 	GLint gBufferMapsUniformLocation;
 
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < 2; ++i)
 	{
 		if (!getUniformLocation(GBUFFER_MAPS_UNIFORM_NAMES[i], gBufferMapsUniformLocation))
 			return false;
@@ -57,7 +65,9 @@ bool DirectionalLightingShader::create()
 
 void DirectionalLightingShader::setWorldViewProjectionUniforms(const glm::mat4 &worldMatrix, const glm::mat4 &viewMatrix, const glm::mat4 &projectionMatrix)
 {
-	glUniformMatrix4fv(worldViewProjectionMatrixUniformLocation, 1, GL_FALSE, glm::value_ptr((projectionMatrix * viewMatrix) * worldMatrix));
+	glUniformMatrix4fv(worldMatrixUniformLocation, 1, GL_FALSE, glm::value_ptr(worldMatrix));
+	glUniformMatrix4fv(viewMatrixUniformLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+	glUniformMatrix4fv(projectionMatrixUniformLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 }
 
 void DirectionalLightingShader::setScreenSizeUniforms(unsigned int screenWidth, unsigned int screenHeight)

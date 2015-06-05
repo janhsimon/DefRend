@@ -5,11 +5,13 @@
 
 const std::string UIDrawShader::WORLD_MATRIX_UNIFORM_NAME = "worldMatrix";
 const std::string UIDrawShader::UV_SCALE_UNIFORM_NAME = "uvScale";
+const std::string UIDrawShader::COLOR_OVERRIDE_UNIFORM_NAME = "colorOverride";
+const std::string UIDrawShader::COLOR_UNIFORM_NAME = "color";
 const std::string UIDrawShader::DIFFUSE_MAP_UNIFORM_NAME = "diffuseMap";
 
 bool UIDrawShader::create()
 {
-	if (!load("Shaders\\FontDraw.vs.glsl", "", "Shaders\\FontDraw.fs.glsl"))
+	if (!load("Shaders\\UIDraw.vs.glsl", "", "Shaders\\UIDraw.fs.glsl"))
 		return false;
 
 	if (!link())
@@ -23,6 +25,12 @@ bool UIDrawShader::create()
 	if (!getUniformLocation(UV_SCALE_UNIFORM_NAME, uvScaleUniformLocation))
 		return false;
 
+	if (!getUniformLocation(COLOR_OVERRIDE_UNIFORM_NAME, colorOverrideUniformLocation))
+		return false;
+
+	if (!getUniformLocation(COLOR_UNIFORM_NAME, colorUniformLocation))
+		return false;
+
 	if (!getUniformLocation(DIFFUSE_MAP_UNIFORM_NAME, diffuseMapUniformLocation))
 		return false;
 
@@ -31,7 +39,7 @@ bool UIDrawShader::create()
 	GLenum error = glGetError();
 	if (error != GL_NO_ERROR)
 	{
-		Error::report("Error", "Failed to load ui draw shader: " + Error::getOpenGLErrorString(error));
+		Error::report("Error", "Failed to load UI draw shader: " + Error::getOpenGLErrorString(error));
 		return false;
 	}
 
@@ -46,4 +54,14 @@ void UIDrawShader::setWorldMatrixUniform(const glm::mat4 &worldMatrix)
 void UIDrawShader::setUVScaleUniform(const glm::vec2 &uv)
 {
 	glUniform2f(uvScaleUniformLocation, uv.x, uv.y);
+}
+
+void UIDrawShader::setColorOverrideUniform(bool colorOverride)
+{
+	glUniform1i(colorOverrideUniformLocation, colorOverride);
+}
+
+void UIDrawShader::setColorUniform(const glm::vec4 &color)
+{
+	glUniform4f(colorUniformLocation, color.r, color.g, color.b, color.a);
 }

@@ -4,16 +4,17 @@ in vec2 vs_fs_uv;
 in vec3 vs_fs_normal;
 in vec3 vs_fs_worldPosition;
 in vec3 vs_fs_tangent;
+in vec4 vs_fs_posVS;
 
-layout(location = 0) out vec3 outWorldPosition;
-layout(location = 1) out vec3 outDiffuse;
-layout(location = 2) out vec3 outSpecular;
-layout(location = 3) out vec3 outNormal;
+layout(location = 0) out vec4 outGBufferMRT0;
+layout(location = 1) out vec4 outGBufferMRT1;
 
 uniform sampler2D diffuseMap;
 uniform sampler2D specularMap;
 uniform sampler2D normalMap;
 uniform sampler2D opacityMap;
+
+uniform float cameraFarClip;
 
 vec3 calcTangentSpaceNormal()
 {
@@ -29,8 +30,11 @@ vec3 calcTangentSpaceNormal()
 
 void main()
 {
-	outWorldPosition = vs_fs_worldPosition;
-	outDiffuse = texture(diffuseMap, vs_fs_uv).rgb + texture(opacityMap, vs_fs_uv).rgb * 0.0001;
-	outSpecular = texture(specularMap, vs_fs_uv).rgb;
-	outNormal = calcTangentSpaceNormal();//texture(normalMap, vs_fs_uv).rgb;
+	//outWorldPosition = vs_fs_worldPosition;
+	//outDiffuse = texture(diffuseMap, vs_fs_uv).rgb + texture(opacityMap, vs_fs_uv).rgb * 0.0001;
+	//outSpecular = texture(specularMap, vs_fs_uv).rgb;
+	//outNormal = calcTangentSpaceNormal();//texture(normalMap, vs_fs_uv).rgb;
+
+	outGBufferMRT0 = vec4(texture(diffuseMap, vs_fs_uv).rgb + texture(opacityMap, vs_fs_uv).rgb * 0.0001, length(vs_fs_posVS.xyz));//-vs_fs_depth / cameraFarClip);
+	outGBufferMRT1 = vec4(calcTangentSpaceNormal(), texture(specularMap, vs_fs_uv).r);
 }

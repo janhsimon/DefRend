@@ -1,7 +1,7 @@
 #include <sstream>
 
 #include "Camera\Camera.hpp"
-#include "Input\Input.hpp"
+#include "Input\InputManager.hpp"
 #include "Light\LightManager.hpp"
 #include "Renderer\BillboardRenderer.hpp"
 #include "Renderer\DeferredRenderer.hpp"
@@ -11,10 +11,8 @@
 #include "Renderer\UnitGizmo.hpp"
 #include "Renderer\UnitQuad.hpp"
 #include "Scene\SceneManager.hpp"
-#include "UI\Label.hpp"
-#include "UI\Frame.hpp"
-#include "UI\Panel.hpp"
-#include "UI\Slider.hpp"
+#include "UI\GBufferInspector.hpp"
+#include "UI\LightEditor.hpp"
 #include "Util\Error.hpp"
 #include "Util\Util.hpp"
 #include "Window\Window.hpp"
@@ -22,14 +20,12 @@
 BillboardRenderer *billboardRenderer;
 Camera *camera;
 UIRenderer *uiRenderer;
-Frame *frame;
+GBufferInspector *gBufferInspector;
 IRenderer *sceneRenderer;
-Input input;
-Label *sliderLabelRGB;
+InputManager *inputManager;
+LightEditor *lightEditor;
 LightManager *lightManager;
-Panel *panelDiffMap;
 SceneManager *sceneManager;
-Slider *sliderR, *sliderG, *sliderB;
 Window *window;
 
 unsigned int thisTickTime, lastTickTime = 0;
@@ -81,7 +77,7 @@ bool load()
 	}
 
 
-	// create font renderer
+	// create billboard, scene and UI renderers
 
 	if (!Util::checkMemory(billboardRenderer = new BillboardRenderer()))
 		return false;
@@ -89,17 +85,11 @@ bool load()
 	if (!billboardRenderer->create())
 		return false;
 
-
-	// create scene renderer
-
 	if (!Util::checkMemory(sceneRenderer = new DeferredRenderer()))
 		return false;
 
 	if (!sceneRenderer->init(window))
 		return false;
-
-
-	// create font renderer
 
 	if (!Util::checkMemory(uiRenderer = new UIRenderer()))
 		return false;
@@ -114,7 +104,7 @@ bool load()
 		return false;
 
 
-	// create light manager
+	// create light, scene and input managers
 
 	if (!Util::checkMemory(lightManager = new LightManager()))
 		return false;
@@ -122,10 +112,10 @@ bool load()
 	if (!lightManager->create())
 		return false;
 		
-
-	// create scene manager
-
 	if (!Util::checkMemory(sceneManager = new SceneManager()))
+		return false;
+
+	if (!Util::checkMemory(inputManager = new InputManager()))
 		return false;
 
 
@@ -150,49 +140,20 @@ bool load()
 		return false;
 	
 
-	// set up UI
+	// load UI elements
 
-	if (!Util::checkMemory(frame = new Frame(glm::vec2(window->width - 266.f, window->height - 266.f), glm::vec2(256.f, 256.f))))
+	if (!Util::checkMemory(lightEditor = new LightEditor(glm::vec2(window->width - 266.f, window->height - 522.f))))
 		return false;
 
-	if (!frame->load("LIGHT EDITOR"))
+	if (!lightEditor->create())
 		return false;
 
-	if (!Util::checkMemory(sliderR = new Slider(glm::vec2(30.f, 20.f), glm::vec2(196.f), 0, 255)))
+	if (!Util::checkMemory(gBufferInspector = new GBufferInspector(glm::vec2(window->width - 420.f, 48.f))))
 		return false;
 
-	if (!sliderR->load())
+	if (!gBufferInspector->create())
 		return false;
 
-	frame->addChildElement(sliderR);
-
-	if (!Util::checkMemory(sliderG = new Slider(glm::vec2(30.f, 40.f), glm::vec2(196.f), 0, 255)))
-		return false;
-
-	if (!sliderG->load())
-		return false;
-
-	frame->addChildElement(sliderG);
-
-	if (!Util::checkMemory(sliderB = new Slider(glm::vec2(30.f, 60.f), glm::vec2(196.f), 0, 255)))
-		return false;
-
-	if (!sliderB->load())
-		return false;
-
-	frame->addChildElement(sliderB);
-
-	if (!Util::checkMemory(sliderLabelRGB = new Label(glm::vec2(30.f, 80.f))))
-		return false;
-
-	frame->addChildElement(sliderLabelRGB);
-
-	if (!Util::checkMemory(panelDiffMap = new Panel(glm::vec2(48.f, 100.f), glm::vec2(160.f, 90.f))))
-		return false;
-
-	panelDiffMap->texture = ((DeferredRenderer*)sceneRenderer)->gBuffer->textures[1];
-
-	frame->addChildElement(panelDiffMap);
 
 	return true;
 }
@@ -200,19 +161,16 @@ bool load()
 void update(float delta)
 {
 	assert(camera);
-	camera->update(input, delta);
+	camera->update(delta);
 
 	assert(lightManager);
 	lightManager->update(delta);
 
-	glm::vec3 color(sliderR->value / 255.f, sliderG->value / 255.f, sliderB->value / 255.f);
+	assert(lightEditor);
+	lightEditor->update();
 
-	std::stringstream s;
-	s << "Diffuse Color: " << sliderR->value << "/" << sliderG->value << "/" << sliderB->value;
-	sliderLabelRGB->text = s.str();
-	sliderLabelRGB->color = color;
-
-	lightManager->spotLights[lightManager->getSelectedPointLight()]->diffuseColor = color;
+	assert(gBufferInspector);
+	gBufferInspector->update();
 
 	//manModel->setYaw(manModel->getYaw() + delta * .003f);
 }
@@ -226,7 +184,8 @@ void render()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	frame->render(uiRenderer);
+	lightEditor->render(uiRenderer);
+	gBufferInspector->render(uiRenderer);
 
 	std::stringstream s;
 	unsigned int ms = (thisTickTime - lastTickTime);
@@ -250,9 +209,11 @@ void destroy()
 	UnitArrow::destroy();
 	UnitGizmo::destroy();
 
-	delete frame;
+	delete lightEditor;
+	delete gBufferInspector;
 	delete lightManager;
 	delete sceneManager;
+	delete inputManager;
 	delete camera;
 	delete sceneRenderer;
 	delete uiRenderer;
@@ -276,11 +237,11 @@ int main(int argc, char **argv)
 			if (event.type == SDL_QUIT)
 				window->alive = false;
 			else if (event.type == SDL_MOUSEMOTION)
-				input.sendMouseMoveEvent(event);
+				inputManager->sendMouseMoveEvent(event);
 			else if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP)
-				input.sendMouseButtonEvent(event);
+				inputManager->sendMouseButtonEvent(event);
 			else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
-				input.sendKeyboardEvent(event);
+				inputManager->sendKeyboardEvent(event);
 		}
 
 		update(delta);

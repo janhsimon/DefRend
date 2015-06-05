@@ -2,7 +2,7 @@
 
 #include <SDL.h>
 
-class Input
+class InputManager
 {
 public:
 	bool forwardKeyPressed;
@@ -14,7 +14,7 @@ public:
 	bool debugMode;
 	bool flashLight;
 
-	Input();
+	InputManager();
 
 	void sendMouseButtonEvent(const SDL_Event &event);
 	void sendMouseMoveEvent(const SDL_Event &event);

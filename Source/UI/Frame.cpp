@@ -69,6 +69,8 @@ void Frame::render(UIRenderer *uiRenderer, glm::vec2 parentPosition)
 
 	uiRenderer->getUIDrawShader()->setUVScaleUniform(glm::vec2(1.f));
 
+	uiRenderer->getUIDrawShader()->setColorOverrideUniform(false);
+
 	mainTexture->bind(GL_TEXTURE0);
 	UnitQuad::render();
 
@@ -81,6 +83,8 @@ void Frame::render(UIRenderer *uiRenderer, glm::vec2 parentPosition)
 	uiRenderer->getUIDrawShader()->setWorldMatrixUniform(worldMatrix);
 
 	uiRenderer->getUIDrawShader()->setUVScaleUniform(glm::vec2(1.f));
+
+	uiRenderer->getUIDrawShader()->setColorOverrideUniform(false);
 
 	headerTexture->bind(GL_TEXTURE0);
 	UnitQuad::render();

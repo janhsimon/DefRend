@@ -1,6 +1,5 @@
 #pragma once
 
-#include "..\Input\Input.hpp"
 #include "..\Transform\Transform.hpp"
 
 class Camera : public Transform
@@ -27,7 +26,7 @@ public:
 	void rotateYaw(float amount);
 	void rotateRoll(float amount);
 	
-	void update(Input &input, float delta);
+	void update(float delta);
 
 	inline float getFOV() const { return fov; }
 	void setFOV(float fov, unsigned int screenWidth, unsigned int screenHeight);

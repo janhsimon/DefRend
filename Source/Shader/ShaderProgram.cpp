@@ -124,7 +124,7 @@ bool ShaderProgram::link()
 		glGetProgramInfoLog(program, len, &len, log);
 
 		std::stringstream s;
-		s << "Failed to link shader program:" << std::endl << std::endl << log;
+		s << "Failed to link shader program \"" << filename << "\":" << std::endl << std::endl << log;
 		Error::report("Error", s.str());
 
 		delete[] log;

@@ -2,25 +2,38 @@
 
 layout(location = 0) out vec4 color;
 
-uniform sampler2D gbuffer_worldPosition;
-uniform sampler2D gbuffer_diffuse;
-uniform sampler2D gbuffer_specular;
-uniform sampler2D gbuffer_normal;
+//in vec4 vs_fs_positionVS;
+//in mat4 vs_fs_invWorldMatrix;
+in vec3 vs_fs_viewRay;
+in vec3 vs_fs_eyePosition;
+
+uniform sampler2D inGBufferMRT0;
+uniform sampler2D inGBufferMRT1;
 
 uniform vec3 lightPosition;
 uniform vec3 lightDiffuseColor;
 uniform float lightDiffuseIntensity;
 uniform float lightSpecularIntensity;
 uniform float lightSpecularPower;
-uniform vec3 lightAttenuation;
+//uniform vec3 lightAttenuation;
 uniform vec3 lightDirection;
 uniform float lightCutoffCosine;
 
-uniform vec3 eyePosition;
-
 uniform vec2 screenSize;
 
-vec4 calcLightInternal(vec3 LightDirection, vec3 WorldPos, vec3 Normal, vec2 uv)
+uniform float cameraFarClip;
+
+vec3 reconstructFromDepth(float depth)
+{
+	//vec3 frustumRay = vs_fs_positionVS.xyz * (cameraFarClip / -vs_fs_positionVS.z);
+	//frustumRay = vec3(vs_fs_invWorldMatrix * vec4(frustumRay, 0.0));
+	//return frustumRay * depth;
+
+	vec3 viewRay = normalize(vs_fs_viewRay);
+	return vs_fs_eyePosition + viewRay * depth;
+}
+
+vec4 calcLightInternal(vec3 LightDirection, vec3 WorldPos, vec3 Normal, vec2 uv, float Distance)
 {
 	float diffuseFactor = dot(Normal, -LightDirection);
 	float SpecularFactor = 0.0;
@@ -30,19 +43,22 @@ vec4 calcLightInternal(vec3 LightDirection, vec3 WorldPos, vec3 Normal, vec2 uv)
 	
 	if (diffuseFactor > 0.0)
 	{
-		DiffuseColor = vec4(lightDiffuseColor, 1.0) * lightDiffuseIntensity * diffuseFactor;
+		DiffuseColor = vec4(lightDiffuseColor, 1.0) /** lightDiffuseIntensity*/ * diffuseFactor;
 
-		vec3 VertexToEye = normalize(eyePosition - WorldPos);
+		vec3 VertexToEye = normalize(vs_fs_eyePosition - WorldPos);
 		vec3 LightReflect = normalize(reflect(LightDirection, Normal));
 		SpecularFactor = pow(dot(VertexToEye, LightReflect), lightSpecularPower);
 
 		if (SpecularFactor > 0.0)
 		{
-			SpecularColor = vec4(1.0, 1.0, 1.0, 1.0) * SpecularFactor * lightSpecularIntensity * texture(gbuffer_specular, uv).r;
+			SpecularColor = vec4(1.0, 1.0, 1.0, 1.0) * SpecularFactor /** lightSpecularIntensity*/ * texture(inGBufferMRT1, uv).a;
 		}
 	}
 
-	return DiffuseColor + SpecularColor;
+	float diffuseAttenuationFactor = 1.0 - sqrt(Distance / lightDiffuseIntensity);
+	float specularAttenuationFactor = 1.0 - sqrt(Distance / lightSpecularIntensity);
+
+	return DiffuseColor * clamp(diffuseAttenuationFactor, 0.0, 1.0) + SpecularColor * clamp(specularAttenuationFactor, 0.0, 1.0);
 }
 
 vec4 calcPointLight(vec3 WorldPos, vec3 Normal, vec2 uv)
@@ -51,14 +67,7 @@ vec4 calcPointLight(vec3 WorldPos, vec3 Normal, vec2 uv)
 	float Distance = length(LightDirection);
 	LightDirection = normalize(LightDirection);
 
-	vec4 Color = calcLightInternal(LightDirection, WorldPos, Normal, uv);
-
-	// x = constant, y = linear, z = exponent
-	float Attenuation = lightAttenuation.x + lightAttenuation.y * Distance + lightAttenuation.z * Distance * Distance;
-
-	Attenuation = max(1.0, Attenuation);
-
-	return Color / Attenuation;
+	return calcLightInternal(LightDirection, WorldPos, Normal, uv, Distance);
 }
 
 vec4 calcSpotLight(vec3 WorldPos, vec3 Normal, vec2 uv)
@@ -79,10 +88,14 @@ void main()
 {
 	vec2 uv = gl_FragCoord.xy / screenSize;
 
-	vec3 worldPos = texture(gbuffer_worldPosition, uv).rgb;
-	vec3 diffuse = texture(gbuffer_diffuse, uv).rgb;
-	float specular = texture(gbuffer_specular, uv).r;
-	vec3 normal = normalize(texture(gbuffer_normal, uv).rgb);
+	vec3 diffuse = texture(inGBufferMRT0, uv).rgb;
+	vec3 worldPosition = reconstructFromDepth(texture(inGBufferMRT0, uv).a);
+	vec3 normal = normalize(texture(inGBufferMRT1, uv).rgb);
 
-	color = vec4(diffuse, 1.0) * calcSpotLight(worldPos, normal, uv) + specular * 0.00001;
+	//vec3 worldPos = texture(gbuffer_worldPosition, uv).rgb;
+	//vec3 diffuse = texture(gbuffer_diffuse, uv).rgb;
+	//float specular = texture(gbuffer_specular, uv).r;
+	//vec3 normal = normalize(texture(gbuffer_normal, uv).rgb);
+
+	color = vec4(diffuse, 1.0) * calcSpotLight(worldPosition, normal, uv);
 }

@@ -212,12 +212,12 @@ void DeferredRenderer::doDirectionalLightPass(Camera *camera)
 
 float calcPointLightBSphere(const PointLight &l)
 {
-	float maxChannel = std::max(std::max(l.diffuseColor[0], l.diffuseColor[1]), l.diffuseColor[2]);
+	//float maxChannel = std::max(std::max(l.diffuseColor[0], l.diffuseColor[1]), l.diffuseColor[2]);
 
 	// [0] = constant, [1] = linear, [2] = exponent
-	float s = (-l.attenuation[1] + sqrtf(l.attenuation[1] * l.attenuation[1] - 4.f * l.attenuation[2] * (l.attenuation[0] - 256.f * maxChannel * l.diffuseIntensity))) / (2.f * l.attenuation[2]);
+	//float s = (-l.attenuation[1] + sqrtf(l.attenuation[1] * l.attenuation[1] - 4.f * l.attenuation[2] * (l.attenuation[0] - 256.f * maxChannel * l.diffuseIntensity))) / (2.f * l.attenuation[2]);
 
-	return s;
+	return std::max(l.diffuseIntensity, l.specularIntensity);
 }
 
 void DeferredRenderer::doPointLightPass(Camera *camera)
@@ -225,6 +225,8 @@ void DeferredRenderer::doPointLightPass(Camera *camera)
 	assert(camera);
 
 	glUseProgram(pointLightingShader->program);
+
+	//pointLightingShader->setCameraFarClipUniform(camera->farClipPlane);
 
 	for (PointLight *pointLight : lightManager->pointLights)
 	{
@@ -236,7 +238,7 @@ void DeferredRenderer::doPointLightPass(Camera *camera)
 		pointLightingShader->setWorldViewProjectionUniforms(worldMatrix, camera->viewMatrix, camera->projectionMatrix);
 		pointLightingShader->setScreenSizeUniform(window->width, window->height);
 		pointLightingShader->setLightParameters(pointLight);
-		pointLightingShader->setEyePositionUniform(camera->position.x, camera->position.y, camera->position.z);
+		pointLightingShader->setEyePositionUniform(glm::vec3(camera->position.x, camera->position.y, camera->position.z));
 		
 		unitSphereModel->render(false);
 	}
@@ -247,6 +249,8 @@ void DeferredRenderer::doSpotLightPass(Camera *camera)
 	assert(camera);
 
 	glUseProgram(spotLightingShader->program);
+
+	//spotLightingShader->setCameraFarClipUniform(camera->farClipPlane);
 
 	for (SpotLight *spotLight : lightManager->spotLights)
 	{
@@ -300,6 +304,8 @@ void DeferredRenderer::render(Camera *camera)
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, gBuffer->FBO);
 	glUseProgram(geometryShader->program);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+	geometryShader->setCameraFarClipUniform(camera->farClipPlane);
 
 	for (Model *model : sceneManager->models)
 	{
@@ -316,7 +322,7 @@ void DeferredRenderer::render(Camera *camera)
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
-	for (unsigned int i = 0; i < 4; ++i)
+	for (unsigned int i = 0; i < 2; ++i)
 	{
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, gBuffer->textures[i]);

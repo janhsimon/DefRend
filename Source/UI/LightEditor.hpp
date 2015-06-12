@@ -21,9 +21,12 @@ private:
 	Label *labelSpecularIntensity;
 	Slider *sliderSpecularPower;
 	Label *labelSpecularPower;
+	Slider *sliderShadowBias;
+	Label *labelShadowBias;
 
 public:
 	LightEditor(glm::vec2 position);
+	~LightEditor();
 
 	bool create();
 	void update();

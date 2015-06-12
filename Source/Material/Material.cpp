@@ -168,3 +168,18 @@ void Material::bind()
 	if (opacityMap)
 		opacityMap->bind(GL_TEXTURE3);
 }
+
+void Material::unbind()
+{
+	if (diffuseMap)
+		diffuseMap->unbind(GL_TEXTURE0);
+
+	if (specularMap)
+		specularMap->unbind(GL_TEXTURE1);
+
+	if (normalMap)
+		normalMap->unbind(GL_TEXTURE2);
+
+	if (opacityMap)
+		opacityMap->unbind(GL_TEXTURE3);
+}

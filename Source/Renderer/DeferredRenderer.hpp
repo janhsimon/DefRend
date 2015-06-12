@@ -4,12 +4,14 @@
 #include "..\Shader\DirectionalLightingShader.hpp"
 #include "..\Shader\GeometryShader.hpp"
 #include "..\Shader\PointLightingShader.hpp"
+#include "..\Shader\ShadowPassShader.hpp"
 #include "..\Shader\SpotLightingShader.hpp"
 
 class DeferredRenderer : public IRenderer
 {
 private:
 	
+	ShadowPassShader *shadowPassShader;
 	GeometryShader *geometryShader;
 	DirectionalLightingShader *directionalLightingShader;
 	PointLightingShader *pointLightingShader;
@@ -20,9 +22,7 @@ private:
 	bool loadShaders();
 	bool loadModels();
 
-	void renderGeometryPass(Camera *camera);
-	void renderGBufferDebug();
-	void beginLightPass();
+	void doShadowPass(PointLight *pointLight);
 	void doDirectionalLightPass(Camera *camera);
 	void doPointLightPass(Camera *camera);
 	void doSpotLightPass(Camera *camera);

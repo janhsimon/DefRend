@@ -7,9 +7,38 @@
 
 extern IRenderer *sceneRenderer;
 
-GBufferInspector::GBufferInspector(glm::vec2 position) : Frame(position, glm::vec2(410.f, 290.f))
+GBufferInspector::GBufferInspector(glm::vec2 position) : Frame(position, glm::vec2(410.f, 290.f + 90.f))
 {
 
+}
+
+GBufferInspector::~GBufferInspector()
+{
+	/*
+	if (testButton)
+	{
+		testButton->destroy();
+		delete testButton;
+	}
+
+	if (panelDiffMap)
+	{
+		panelDiffMap->destroy();
+		delete panelDiffMap;
+	}
+
+	if (sliderTextureSelect)
+	{
+		sliderTextureSelect->destroy();
+		delete sliderTextureSelect;
+	}
+
+	if (labelTextureSelect)
+	{
+		labelTextureSelect->destroy();
+		delete labelTextureSelect;
+	}
+	*/
 }
 
 bool GBufferInspector::create()
@@ -35,7 +64,39 @@ bool GBufferInspector::create()
 
 	addChildElement(labelTextureSelect);
 
-	return true;;
+	for (int y = 0; y < 2; ++y)
+	{
+		for (int x = 0; x < 2; ++x)
+		{
+			std::string text = "Albedo";
+
+			if (y == 0 && x == 1)
+				text = "Depth";
+			else if (y == 1 && x == 0)
+				text = "Normals";
+			else if (y == 1 && x == 1)
+				text = "Specular";
+
+			if (!Util::checkMemory(button[x][y] = new Button(glm::vec2(160.f + x * 110.f, 290.f + y * 50.f), text)))
+				return false;
+
+			button[x][y]->create();
+
+			addChildElement(button[x][y]);
+		}
+	}
+
+	if (!Util::checkMemory(labelMRT0 = new Label(glm::vec2(30.f, 290.f), "MRT 0 (RGB/A):")))
+		return false;
+
+	addChildElement(labelMRT0);
+
+	if (!Util::checkMemory(labelMRT0 = new Label(glm::vec2(30.f, 340.f), "MRT 1 (RGB/A):")))
+		return false;
+
+	addChildElement(labelMRT0);
+
+	return true;
 }
 
 void GBufferInspector::update()
@@ -48,6 +109,6 @@ void GBufferInspector::update()
 	else
 		s << " (RGB: Normal A: Specular Intensity)";
 
-	labelTextureSelect->text = s.str();
+	labelTextureSelect->setText(s.str());
 	panelDiffMap->texture = ((DeferredRenderer*)sceneRenderer)->gBuffer->textures[sliderTextureSelect->value];
 }

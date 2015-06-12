@@ -17,15 +17,15 @@ private:
 	glm::vec2 lastMousePosition;
 
 public:
-	Frame(glm::vec2 position, glm::vec2 size);
+	Frame(const glm::vec2 &position, const glm::vec2 &size);
 
-	bool load(std::string title = "");
+	bool load(const std::string &title = "");
 	void destroy();
 
 	void addChildElement(Element *element);
-	void render(UIRenderer *uiRenderer, glm::vec2 parentPosition = glm::vec2(0.f, 0.f));
+	void render(const glm::vec2 &parentPosition = glm::vec2(0.f, 0.f));
 
-	void onMouseButtonDown(glm::vec2 mousePosition, int mouseButton);
-	void onMouseButtonUp(glm::vec2 mousePosition, int mouseButton);
-	void onMouseMove(glm::vec2 mousePosition);
+	void onMouseButtonDown(const glm::vec2 &mousePosition, int mouseButton);
+	void onMouseButtonUp(const glm::vec2 &mousePosition, int mouseButton);
+	void onMouseMove(const glm::vec2 &mousePosition);
 };

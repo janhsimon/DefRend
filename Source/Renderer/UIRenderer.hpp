@@ -21,7 +21,7 @@ public:
 
 	void drawText(std::string text, glm::vec2 position, SDL_Color color);
 	
-	//const Vector2 getTextDimensions(std::string text);
+	glm::vec2 getTextDimensions(const std::string &text);
 
 	inline UIDrawShader *getUIDrawShader() const { return uiDrawShader; }
 };

@@ -16,7 +16,9 @@ const std::string PointLightingShader::LIGHT_SPECULAR_INTENSITY_UNIFORM_NAME = "
 const std::string PointLightingShader::LIGHT_SPECULAR_POWER_UNIFORM_NAME = "lightSpecularPower";
 //const std::string PointLightingShader::LIGHT_ATTENUATION_UNIFORM_NAME = "lightAttenuation";
 const std::string PointLightingShader::EYE_POSITION_UNIFORM_NAME = "eyePosition";
+const std::string PointLightingShader::SHADOW_BIAS_UNIFORM_NAME = "shadowBias";
 const std::string PointLightingShader::GBUFFER_MAPS_UNIFORM_NAMES[2] = { "inGBufferMRT0", "inGBufferMRT1" };
+const std::string PointLightingShader::SHADOW_MAP_UNIFORM_NAME = "inShadowMap";
 
 bool PointLightingShader::create()
 {
@@ -69,6 +71,9 @@ bool PointLightingShader::create()
 	if (!getUniformLocation(EYE_POSITION_UNIFORM_NAME, eyePositionUniformLocation))
 		return false;
 
+	if (!getUniformLocation(SHADOW_BIAS_UNIFORM_NAME, shadowBiasUniformLocation))
+		return false;
+
 	GLint gBufferMapsUniformLocation;
 
 	for (int i = 0; i < 2; ++i)
@@ -78,6 +83,13 @@ bool PointLightingShader::create()
 
 		glUniform1i(gBufferMapsUniformLocation, i);
 	}
+
+	GLint shadowMapUniformLocation;
+
+	if (!getUniformLocation(SHADOW_MAP_UNIFORM_NAME, shadowMapUniformLocation))
+		return false;
+
+	glUniform1i(shadowMapUniformLocation, 2);
 
 	GLenum error = glGetError();
 	if (error != GL_NO_ERROR)
@@ -125,4 +137,9 @@ void PointLightingShader::setLightParameters(const PointLight *pointLight)
 void PointLightingShader::setEyePositionUniform(const glm::vec3 &eyePosition)
 {
 	glUniform3f(eyePositionUniformLocation, eyePosition.x, eyePosition.y, eyePosition.z);
+}
+
+void PointLightingShader::setShadowBiasUniform(float shadowBias)
+{
+	glUniform1f(shadowBiasUniformLocation, shadowBias);
 }

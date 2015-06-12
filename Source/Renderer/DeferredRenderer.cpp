@@ -6,6 +6,7 @@
 #include "UnitQuad.hpp"
 #include "..\Light\LightManager.hpp"
 #include "..\Scene\SceneManager.hpp"
+#include "..\Util\Error.hpp"
 #include "..\Util\Util.hpp"
 
 extern LightManager *lightManager;
@@ -19,6 +20,7 @@ DeferredRenderer::~DeferredRenderer()
 	delete directionalLightingShader;
 	delete pointLightingShader;
 	delete spotLightingShader;
+	delete shadowPassShader;
 }
 
 bool DeferredRenderer::loadShaders()
@@ -45,6 +47,12 @@ bool DeferredRenderer::loadShaders()
 		return false;
 
 	if (!spotLightingShader->create())
+		return false;
+
+	if (!Util::checkMemory(shadowPassShader = new ShadowPassShader()))
+		return false;
+
+	if (!shadowPassShader->create())
 		return false;
 
 	return true;
@@ -82,118 +90,57 @@ bool DeferredRenderer::init(Window *window)
 	return true;
 }
 
-/*
-void DeferredRenderer::renderGeometryPass(Camera *camera)
+void DeferredRenderer::doShadowPass(PointLight *pointLight)
 {
-	assert(camera);
+	assert(pointLight);
 
-	//glUseProgram(geometryShader->getProgram());
-
-	//gBuffer->bindForWriting();
-
-	// make sure we write to the depth buffer
-	//glDepthMask(GL_TRUE);
-
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	//glEnable(GL_DEPTH_TEST);
-	//glDisable(GL_BLEND);
-
-	for (Model *model : *sceneManager->getModels())
+	shadowPassShader->setPointLightPositionUniform(pointLight->position);
+	shadowPassShader->setCameraFarClipUniform(std::max(pointLight->diffuseIntensity, pointLight->specularIntensity));
+	
+	float fovy = Util::convertHorizontalToVerticalFOV(90.f, (float)window->width, (float)window->height);
+	//glm::mat4 pointLightProjectionMatrix = glm::perspective((fovy / 2.f), 1.f, 1.f, std::max(pointLight->diffuseIntensity, pointLight->specularIntensity));
+	
+	float DEBUGFOV = /*(fovy / 2.f)*/80.f;
+	glm::mat4 pointLightProjectionMatrix = glm::perspective(DEBUGFOV, 1.f, 1.f, std::max(pointLight->diffuseIntensity, pointLight->specularIntensity));
+	
+	for (int i = 0; i < 6; ++i)
 	{
-		geometryShader->setWorldViewProjectionUniforms(model->getWorldMatrix(), camera->getViewMatrix(), camera->getProjectionMatrix());
-		model->render(true);
-	}
-}
-*/
+		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, pointLight->shadowMap->handle, 0);
+		glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
-/*
-void DeferredRenderer::renderGBufferDebug()
-{
-	// reset the frame buffer so we draw to the actual screen
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glm::vec3 sideDirection;
 
-	assert(gBuffer);
-	gBuffer->bindForReading(true);
+		if (i == 0)
+			sideDirection = glm::vec3(1.f, 0.f, 0.f);
+		else if (i == 1)
+			sideDirection = glm::vec3(-1.f, 0.f, 0.f);
+		else if (i == 2)
+			sideDirection = glm::vec3(0.f, 1.f, 0.f);
+		else if (i == 3)
+			sideDirection = glm::vec3(0.f, -1.f, 0.f);
+		else if (i == 4)
+			sideDirection = glm::vec3(0.f, 0.f, 1.f);
+		else
+			sideDirection = glm::vec3(0.f, 0.f, -1.f);
 
-	GLsizei halfWidth = (GLsizei)(window->getWidth() / 2.f);
-	GLsizei halfHeight = (GLsizei)(window->getHeight() / 2.f);
+		glm::vec3 upDirection = glm::vec3(0.f, 1.f, 0.f);
 
-	gBuffer->setReadBuffer(GBUFFER_TEXTURE_TYPE_DIFFUSE);
-	glBlitFramebuffer(0, 0, window->getWidth(), window->getHeight(), 0, halfHeight, halfWidth, window->getHeight(), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+		if (i == 2)
+			upDirection = glm::vec3(0.f, 0.f, -1.f);
+		else if (i == 3)
+			upDirection = glm::vec3(0.f, 0.f, 1.f);
 
-	gBuffer->setReadBuffer(GBUFFER_TEXTURE_TYPE_SPECULAR);
-	glBlitFramebuffer(0, 0, window->getWidth(), window->getHeight(), halfWidth, halfHeight, window->getWidth(), window->getHeight(), GL_COLOR_BUFFER_BIT, GL_LINEAR);
-
-	gBuffer->setReadBuffer(GBUFFER_TEXTURE_TYPE_NORMAL);
-	glBlitFramebuffer(0, 0, window->getWidth(), window->getHeight(), 0, 0, halfWidth, halfHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-
-	gBuffer->setReadBuffer(GBUFFER_TEXTURE_TYPE_POSITION);
-	glBlitFramebuffer(0, 0, window->getWidth(), window->getHeight(), halfWidth, 0, window->getWidth(), halfHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-}
-*/
-
-/*
-void DeferredRenderer::doShadowPass(float delta)
-{
-	glUseProgram(shadowPassShaderProgram->getProgram());
-
-	for (PointLight *pointLight : pointLights)
-	{
-		glm::mat4 pointLightProjectionMatrix = glm::perspective(glm::radians(90.f), 1.f, 1.0f, calcPointLightBSphere(*pointLight));
-
-		pointLight->beginDrawingToShadowMap();
-
-		for (int i = 0; i < 6; ++i)
-		{
-			glm::vec3 sideDirection;
-
-			if (i == 0)
-				sideDirection = glm::vec3(1.f, 0.f, 0.f);
-			else if (i == 1)
-				sideDirection = glm::vec3(-1.f, 0.f, 0.f);
-			else if (i == 2)
-				sideDirection = glm::vec3(0.f, 1.f, 0.f);
-			else if (i == 3)
-				sideDirection = glm::vec3(0.f, -1.f, 0.f);
-			else if (i == 4)
-				sideDirection = glm::vec3(0.f, 0.f, 1.f);
-			else
-				sideDirection = glm::vec3(0.f, 0.f, -1.f);
-
-			glm::vec3 upDirection = glm::vec3(0.f, 1.f, 0.f);
-
-			if (i == 2)
-				upDirection = glm::vec3(0.f, 0.f, -1.f);
-			else if (i == 3)
-				upDirection = glm::vec3(0.f, 0.f, 1.f);
-
-			glm::mat4 pointLightViewMatrix = glm::lookAt(glm::vec3(pointLight->position[0], pointLight->position[1], pointLight->position[2]), sideDirection, upDirection);
-
-			glUniformMatrix4fv(sp_viewProjectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(pointLightProjectionMatrix * pointLightViewMatrix));
-			glUniform3f(sp_pointLightPositionLocation, pointLight->position[0], pointLight->position[1], pointLight->position[2]);
-
-
-			glUniformMatrix4fv(sp_worldMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.f)));
+		glm::mat4 pointLightViewMatrix = glm::lookAt(pointLight->position, pointLight->position + sideDirection, upDirection);
 			
-			sponzaModel.render(true);
-
-
-			static float _angle;
-			glm::mat4 worldMatrix(1.f);
-			worldMatrix = glm::translate(worldMatrix, glm::vec3(-500.f, 0.f, 0.f));
-			worldMatrix = glm::rotate(worldMatrix, _angle, glm::vec3(0.f, 1.f, 0.f));
-			_angle += delta * .003f;
-
-			glUniformMatrix4fv(sp_worldMatrixLocation, 1, GL_FALSE, glm::value_ptr(worldMatrix));
-
-			manModel.render(true);
+		for (Model *model : sceneManager->models)
+		{
+			shadowPassShader->setWorldViewProjectionUniforms(model->getWorldMatrix(), pointLightViewMatrix, pointLightProjectionMatrix);
+			model->render(false); // no material binds please
 		}
 	}
 }
-*/
 
 void DeferredRenderer::doDirectionalLightPass(Camera *camera)
 {
@@ -210,35 +157,24 @@ void DeferredRenderer::doDirectionalLightPass(Camera *camera)
 	}
 }
 
-float calcPointLightBSphere(const PointLight &l)
-{
-	//float maxChannel = std::max(std::max(l.diffuseColor[0], l.diffuseColor[1]), l.diffuseColor[2]);
-
-	// [0] = constant, [1] = linear, [2] = exponent
-	//float s = (-l.attenuation[1] + sqrtf(l.attenuation[1] * l.attenuation[1] - 4.f * l.attenuation[2] * (l.attenuation[0] - 256.f * maxChannel * l.diffuseIntensity))) / (2.f * l.attenuation[2]);
-
-	return std::max(l.diffuseIntensity, l.specularIntensity);
-}
-
 void DeferredRenderer::doPointLightPass(Camera *camera)
 {
 	assert(camera);
 
 	glUseProgram(pointLightingShader->program);
 
-	//pointLightingShader->setCameraFarClipUniform(camera->farClipPlane);
-
 	for (PointLight *pointLight : lightManager->pointLights)
 	{
 		glm::mat4 worldMatrix;
 		worldMatrix = glm::translate(worldMatrix, glm::vec3(pointLight->position[0], pointLight->position[1], pointLight->position[2]));
-		float s = calcPointLightBSphere(*pointLight);
+		float s = std::max(pointLight->diffuseIntensity, pointLight->specularIntensity);
 		worldMatrix = glm::scale(worldMatrix, glm::vec3(s, s, s));
 		
 		pointLightingShader->setWorldViewProjectionUniforms(worldMatrix, camera->viewMatrix, camera->projectionMatrix);
 		pointLightingShader->setScreenSizeUniform(window->width, window->height);
 		pointLightingShader->setLightParameters(pointLight);
 		pointLightingShader->setEyePositionUniform(glm::vec3(camera->position.x, camera->position.y, camera->position.z));
+		pointLightingShader->setShadowBiasUniform(lightManager->pointLights[0]->shadowBias);
 		
 		unitSphereModel->render(false);
 	}
@@ -250,13 +186,11 @@ void DeferredRenderer::doSpotLightPass(Camera *camera)
 
 	glUseProgram(spotLightingShader->program);
 
-	//spotLightingShader->setCameraFarClipUniform(camera->farClipPlane);
-
 	for (SpotLight *spotLight : lightManager->spotLights)
 	{
 		glm::mat4 worldMatrix;
 		worldMatrix = glm::translate(worldMatrix, glm::vec3(spotLight->position[0], spotLight->position[1], spotLight->position[2]));
-		float s = calcPointLightBSphere(*spotLight);
+		float s = std::max(spotLight->diffuseIntensity, spotLight->specularIntensity);
 		worldMatrix = glm::scale(worldMatrix, glm::vec3(s, s, s));
 
 		spotLightingShader->setWorldViewProjectionUniforms(worldMatrix, camera->viewMatrix, camera->projectionMatrix);
@@ -281,7 +215,7 @@ void DeferredRenderer::doSpotLightPass(Camera *camera)
 		// set the world matrix
 		glm::mat4 worldMatrix;
 		worldMatrix = glm::translate(worldMatrix, glm::vec3(flashLight->position[0], flashLight->position[1], flashLight->position[2]));
-		float s = calcPointLightBSphere(*flashLight);
+		float s = std::max(pointLight->diffuseIntensity, pointLight->specularIntensity);
 		worldMatrix = glm::scale(worldMatrix, glm::vec3(s, s, s));
 		
 		spotLightingShader->setWorldViewProjectionUniforms(worldMatrix, camera->getViewMatrix(), camera->getProjectionMatrix());
@@ -301,18 +235,40 @@ void DeferredRenderer::doSpotLightPass(Camera *camera)
 
 void DeferredRenderer::render(Camera *camera)
 {
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, gBuffer->FBO);
-	glUseProgram(geometryShader->program);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-	geometryShader->setCameraFarClipUniform(camera->farClipPlane);
+	// SHADOW PASS: draw depth to the shadow maps
 
+	glViewport(0, 0, 1024, 1024);
+
+	for (PointLight *p : lightManager->pointLights)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, p->shadowMap->FBO);
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glUseProgram(shadowPassShader->program);
+
+		doShadowPass(p);
+	}
+
+
+	// GEOMETRY PASS: draw scene to the geometry buffer
+
+	glViewport(0, 0, window->width, window->height);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, gBuffer->FBO);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glUseProgram(geometryShader->program);
+	
 	for (Model *model : sceneManager->models)
 	{
 		geometryShader->setWorldViewProjectionUniforms(model->getWorldMatrix(), camera->viewMatrix, camera->projectionMatrix);
 		model->render(true);
 	}
-		
+	
+
+	// LIGHTING PASS: draw light primitives to the screen
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glClear(GL_COLOR_BUFFER_BIT);
+
 	glEnable(GL_BLEND);
 	glBlendEquation(GL_FUNC_ADD);
 	glBlendFunc(GL_ONE, GL_ONE);
@@ -320,22 +276,29 @@ void DeferredRenderer::render(Camera *camera)
 	glDepthMask(GL_FALSE);
 	glDisable(GL_DEPTH_TEST);
 
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-
 	for (unsigned int i = 0; i < 2; ++i)
 	{
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, gBuffer->textures[i]);
 	}
 
-	glClear(GL_COLOR_BUFFER_BIT);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, lightManager->pointLights[0]->shadowMap->handle);
 
 	doDirectionalLightPass(camera);
 	doPointLightPass(camera);
 	doSpotLightPass(camera);
 
-	glDepthMask(GL_TRUE);
-
 	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
+
+	for (unsigned int i = 0; i < 2; ++i)
+	{
+		glActiveTexture(GL_TEXTURE0 + i);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }

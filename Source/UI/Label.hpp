@@ -5,17 +5,21 @@
 class Label : public Element
 {
 private:
+	std::string text;
 
 public:
-	std::string text;
 	glm::vec3 color;
 
-	Label(glm::vec2 position, std::string text = "");
+	Label(const glm::vec2 &position, const std::string &text = "");
 	void destroy();
 
-	void render(UIRenderer *uiRenderer, glm::vec2 parentPosition);
+	void render(const glm::vec2 &parentPosition);
 
-	void onMouseButtonDown(glm::vec2 mousePosition, int mouseButton);
-	void onMouseButtonUp(glm::vec2 mousePosition, int mouseButton);
-	void onMouseMove(glm::vec2 mousePosition);
+	inline std::string &getText() { return text; }
+	void setText(const std::string &text);
+
+
+	void onMouseButtonDown(const glm::vec2 &mousePosition, int mouseButton);
+	void onMouseButtonUp(const glm::vec2 &mousePosition, int mouseButton);
+	void onMouseMove(const glm::vec2 & mousePosition);
 };

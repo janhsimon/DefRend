@@ -1,16 +1,16 @@
 #pragma once
 
-//#include "..\Renderer\Cubemap.hpp"
 #include "DirectionalLight.hpp"
+#include "..\Renderer\Cubemap.hpp"
 
 class PointLight : public DirectionalLight
 {
-private:
-	//Cubemap *shadowMap;
-
 public:
 	float specularIntensity;
 	float specularPower;
+	float shadowBias;
+
+	Cubemap *shadowMap;
 	
 	//glm::vec3 attenuation; // constant, linear, exponent
 
@@ -18,5 +18,4 @@ public:
 
 	bool create();
 	void update(float delta);
-	//void beginDrawingToShadowMap();
 };

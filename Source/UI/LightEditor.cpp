@@ -11,6 +11,47 @@ LightEditor::LightEditor(glm::vec2 position) : Frame(position, glm::vec2(256.f, 
 
 }
 
+LightEditor::~LightEditor()
+{
+	/*
+	if (panelDiffColorPreview)
+	{
+		panelDiffColorPreview->destroy();
+		delete panelDiffColorPreview;
+	}
+
+	if (sliderR)
+	{
+		sliderR->destroy();
+		delete sliderR;
+	}
+
+	if (sliderG)
+	{
+		sliderG->destroy();
+		delete sliderG;
+	}
+
+	if (sliderB)
+	{
+		sliderB->destroy();
+		delete sliderB;
+	}
+
+	if (labelRGB)
+
+	Label *labelRGB;
+	Slider *sliderCutoffAngle;
+	Label *labelCutoffAngle;
+	Slider *sliderDiffuseIntensity;
+	Label *labelDiffuseIntensity;
+	Slider *sliderSpecularIntensity;
+	Label *labelSpecularIntensity;
+	Slider *sliderSpecularPower;
+	Label *labelSpecularPower;
+	*/
+}
+
 bool LightEditor::create()
 {
 	if (!load("LIGHT EDITOR"))
@@ -93,7 +134,6 @@ bool LightEditor::create()
 	addChildElement(labelSpecularPower);
 
 
-
 	if (!Util::checkMemory(sliderCutoffAngle = new Slider(glm::vec2(30.f, 240.f), glm::vec2(150.f), 0, 180)))
 		return false;
 
@@ -108,6 +148,20 @@ bool LightEditor::create()
 	addChildElement(labelCutoffAngle);
 
 
+	if (!Util::checkMemory(sliderShadowBias = new Slider(glm::vec2(30.f, 290.f), glm::vec2(150.f), 0, 1000)))
+		return false;
+
+	if (!sliderShadowBias->load())
+		return false;
+
+	addChildElement(sliderShadowBias);
+
+	if (!Util::checkMemory(labelShadowBias = new Label(glm::vec2(30.f, 310.f))))
+		return false;
+
+	addChildElement(labelShadowBias);
+
+
 	return true;
 }
 
@@ -115,28 +169,34 @@ void LightEditor::update()
 {
 	std::stringstream s;
 	s << "Diffuse Color: " << sliderR->value << "/" << sliderG->value << "/" << sliderB->value;
-	labelRGB->text = s.str();
+	labelRGB->setText(s.str());
 	glm::vec3 color(sliderR->value / 255.f, sliderG->value / 255.f, sliderB->value / 255.f);
 	panelDiffColorPreview->color = glm::vec4(color, 1.f);
 	lightManager->spotLights[lightManager->getSelectedPointLight()]->diffuseColor = color;
 
 	s = std::stringstream();
 	s << "Diffuse Intensity: " << sliderDiffuseIntensity->value;
-	labelDiffuseIntensity->text = s.str();
+	labelDiffuseIntensity->setText(s.str());
 	lightManager->spotLights[lightManager->getSelectedPointLight()]->diffuseIntensity = (float)sliderDiffuseIntensity->value;
 
 	s = std::stringstream();
 	s << "Specular Intensity: " << sliderSpecularIntensity->value;
-	labelSpecularIntensity->text = s.str();
+	labelSpecularIntensity->setText(s.str());
 	lightManager->spotLights[lightManager->getSelectedPointLight()]->specularIntensity = (float)sliderSpecularIntensity->value;
 
 	s = std::stringstream();
 	s << "Specular Power: " << sliderSpecularPower->value;
-	labelSpecularPower->text = s.str();
+	labelSpecularPower->setText(s.str());
 	lightManager->spotLights[lightManager->getSelectedPointLight()]->specularPower = (float)sliderSpecularPower->value;
 
 	s = std::stringstream();
 	s << "Cutoff Angle: " << sliderCutoffAngle->value;
-	labelCutoffAngle->text = s.str();
+	labelCutoffAngle->setText(s.str());
 	lightManager->spotLights[lightManager->getSelectedPointLight()]->cutoffAngle = (float)sliderCutoffAngle->value;
+
+	s = std::stringstream();
+	float normalizedShadowBias = sliderShadowBias->value / 1000.f;
+	s << "Shadow Bias: " << normalizedShadowBias;
+	labelShadowBias->setText(s.str());
+	lightManager->pointLights[0]->shadowBias = normalizedShadowBias;
 }

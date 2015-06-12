@@ -3,12 +3,14 @@
 #include "Panel.hpp"
 #include "..\Material\TextureManager.hpp"
 #include "..\Renderer\UnitQuad.hpp"
+#include "..\Renderer\UIRenderer.hpp"
 #include "..\Util\Util.hpp"
 #include "..\Window\Window.hpp"
 
+extern UIRenderer *uiRenderer;
 extern Window *window;
 
-Panel::Panel(glm::vec2 position, glm::vec2 size, bool isTextured) : Element(position, size)
+Panel::Panel(const glm::vec2 &position, const glm::vec2 &size, bool isTextured) : Element(position, size)
 {
 	this->isTextured = isTextured;
 }
@@ -28,7 +30,7 @@ void Panel::destroy()
 	
 }
 
-void Panel::render(UIRenderer *uiRenderer, glm::vec2 parentPosition)
+void Panel::render(const glm::vec2 &parentPosition)
 {
 	glUseProgram(uiRenderer->getUIDrawShader()->program);
 
@@ -53,17 +55,17 @@ void Panel::render(UIRenderer *uiRenderer, glm::vec2 parentPosition)
 	UnitQuad::render();
 }
 
-void Panel::onMouseButtonDown(glm::vec2 mousePosition, int mouseButton)
+void Panel::onMouseButtonDown(const glm::vec2 &mousePosition, int mouseButton)
 {
 	
 }
 
-void Panel::onMouseButtonUp(glm::vec2 mousePosition, int mouseButton)
+void Panel::onMouseButtonUp(const glm::vec2 &mousePosition, int mouseButton)
 {
 	
 }
 
-void Panel::onMouseMove(glm::vec2 mousePosition)
+void Panel::onMouseMove(const glm::vec2 &mousePosition)
 {
 	
 }

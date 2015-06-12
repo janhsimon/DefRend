@@ -9,6 +9,7 @@ in vec3 vs_fs_eyePosition;
 
 uniform sampler2D inGBufferMRT0;
 uniform sampler2D inGBufferMRT1;
+uniform samplerCube inShadowMap;
 
 uniform vec3 lightPosition;
 uniform vec3 lightDiffuseColor;
@@ -16,6 +17,8 @@ uniform float lightDiffuseIntensity;
 uniform float lightSpecularIntensity;
 uniform float lightSpecularPower;
 //uniform vec3 lightAttenuation;
+
+uniform float shadowBias;
 
 uniform vec2 screenSize;
 
@@ -76,5 +79,42 @@ void main()
 	vec3 worldPosition = reconstructFromDepth(texture(inGBufferMRT0, uv).a);
 	vec3 normal = normalize(texture(inGBufferMRT1, uv).rgb);
 
-	color = vec4(diffuse, 1.0) * calcPointLight(worldPosition, normal, uv);
+	vec3  light_to_pixel = worldPosition - lightPosition;
+	//float   fDistSquared = dot(light_to_pixel, light_to_pixel);
+	float lightRadius = max(lightDiffuseIntensity, lightSpecularIntensity);
+	//float   fDepth = fDistSquared / (lightRadius * lightRadius);
+	float fDepth = length(light_to_pixel) / lightRadius;
+	//light_to_pixel.x = -light_to_pixel.x;
+	//light_to_pixel.y = -light_to_pixel.y;
+	//light_to_pixel.z = -light_to_pixel.z;
+	float vShadowSample = texture(inShadowMap, light_to_pixel).r;
+
+	float shadow_factor = 0.0;
+
+	if (vShadowSample > fDepth * shadowBias)
+		shadow_factor = 1.0;
+
+	/*
+	vec3 lookup_vector = worldPosition - lightPosition;
+
+	vec3 new_vec = vec3(lookup_vector.x, lookup_vector.y, lookup_vector.z);
+
+	float dist = texture(inShadowMap, new_vec).r;
+
+	float z_near = 1.0;
+	float z_far = max(lightDiffuseIntensity, lightSpecularIntensity);
+
+	vec3 abs_vec = abs(new_vec);
+	float local_z_comp = max(abs_vec.x, max(abs_vec.y, abs_vec.z));
+	float norm_z_comp = (z_far + z_near) /
+		(z_far - z_near) - (2 * z_far * z_near) / (z_far - z_near) / local_z_comp;
+	float curr_fragment_dist_to_light = (norm_z_comp + 1.0) * 0.5;
+	
+	float shadow_factor = 1.0;
+
+	if (dist < curr_fragment_dist_to_light)
+		shadow_factor = 0.0;
+	*/
+
+	color = vec4(diffuse, 1.0) * calcPointLight(worldPosition, normal, uv) * shadow_factor;
 }

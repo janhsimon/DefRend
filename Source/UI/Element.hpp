@@ -10,15 +10,15 @@ public:
 	glm::vec2 position;
 	glm::vec2 size;
 
-	Element(glm::vec2 position, glm::vec2 size);
+	Element(const glm::vec2 & position, const glm::vec2 & size);
 
 	virtual void destroy() = 0;
-	virtual void render(UIRenderer *uiRenderer, glm::vec2 parentPosition) = 0;
+	virtual void render(const glm::vec2 & parentPosition) = 0;
 
-	bool isPointOnArea(glm::vec2 point, glm::vec2 position, glm::vec2 size);
-	bool isPointOnElement(glm::vec2 point);
+	bool isPointOnArea(const glm::vec2 &point, const glm::vec2 &position, const glm::vec2 &size);
+	bool isPointOnElement(const glm::vec2 &point);
 
-	virtual void onMouseButtonDown(glm::vec2 mousePosition, int mouseButton) = 0;
-	virtual void onMouseButtonUp(glm::vec2 mousePosition, int mouseButton) = 0;
-	virtual void onMouseMove(glm::vec2 mousePosition) = 0;
+	virtual void onMouseButtonDown(const glm::vec2 &mousePosition, int mouseButton) = 0;
+	virtual void onMouseButtonUp(const glm::vec2 &mousePosition, int mouseButton) = 0;
+	virtual void onMouseMove(const glm::vec2 &mousePosition) = 0;
 };

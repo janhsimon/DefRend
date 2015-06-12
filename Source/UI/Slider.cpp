@@ -2,12 +2,14 @@
 
 #include "Slider.hpp"
 #include "..\Material\TextureManager.hpp"
+#include "..\Renderer\UIRenderer.hpp"
 #include "..\Renderer\UnitQuad.hpp"
 #include "..\Window\Window.hpp"
 
+extern UIRenderer *uiRenderer;
 extern Window *window;
 
-Slider::Slider(glm::vec2 position, glm::vec2 size, int min, int max) : Element(position, size)
+Slider::Slider(const glm::vec2 &position, const glm::vec2 &size, int min, int max) : Element(position, size)
 {
 	this->min = min;
 	this->max = max;
@@ -66,7 +68,7 @@ void Slider::destroy()
 		TextureManager::unrefTexture(handleTextureHover);
 }
 
-void Slider::render(UIRenderer *uiRenderer, glm::vec2 parentPosition)
+void Slider::render(const glm::vec2 &parentPosition)
 {
 	glUseProgram(uiRenderer->getUIDrawShader()->program);
 
@@ -142,7 +144,7 @@ void Slider::render(UIRenderer *uiRenderer, glm::vec2 parentPosition)
 	handlePositionWorld.y = position.y + parentPosition.y + 1.f;
 }
 
-void Slider::onMouseButtonDown(glm::vec2 mousePosition, int mouseButton)
+void Slider::onMouseButtonDown(const glm::vec2 &mousePosition, int mouseButton)
 {
 	float normalizedValue = (float)(value - min) / (max - min);
 
@@ -153,12 +155,12 @@ void Slider::onMouseButtonDown(glm::vec2 mousePosition, int mouseButton)
 	}
 }
 
-void Slider::onMouseButtonUp(glm::vec2 mousePosition, int mouseButton)
+void Slider::onMouseButtonUp(const glm::vec2 &mousePosition, int mouseButton)
 {
 	mouseDragging = false;
 }
 
-void Slider::onMouseMove(glm::vec2 mousePosition)
+void Slider::onMouseMove(const glm::vec2 &mousePosition)
 {
 	if (isPointOnArea(mousePosition, handlePositionWorld, glm::vec2(16.f, 16.f)))
 		hover = true;

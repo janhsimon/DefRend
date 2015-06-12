@@ -216,6 +216,12 @@
     <ClInclude Include="Source\UI\GBufferInspector.hpp">
       <Filter>Source Files\UI</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Shader\ShadowPassShader.hpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Button.hpp">
+      <Filter>Source Files\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Camera\Camera.cpp">
@@ -336,6 +342,12 @@
       <Filter>Source Files\Input</Filter>
     </ClCompile>
     <ClCompile Include="Source\UI\GBufferInspector.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Shader\ShadowPassShader.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Button.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
   </ItemGroup>

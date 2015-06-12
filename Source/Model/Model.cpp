@@ -123,16 +123,18 @@ void Model::render(bool bindMaterials)
 	unsigned int vertex = 0;
 	for (Mesh *m : meshes)
 	{
+		assert(m->materialIndex >= 0 && m->materialIndex < materials.size());
+		Material *material = materials[m->materialIndex];
+		assert(material);
+
 		if (bindMaterials)
-		{
-			assert(m->materialIndex >= 0 && m->materialIndex < materials.size());
-			Material *material = materials[m->materialIndex];
-			assert(material);
 			material->bind();
-		}
 
 		m->render(vertex);
 
 		vertex += m->vertexCount;
+
+		if (bindMaterials)
+			material->unbind();
 	}
 }

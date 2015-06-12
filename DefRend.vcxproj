@@ -122,6 +122,7 @@
     <ClInclude Include="Source\Scene\SceneManager.hpp" />
     <ClInclude Include="Source\Shader\BillboardDrawShader.hpp" />
     <ClInclude Include="Source\Shader\DirectionalLightingShader.hpp" />
+    <ClInclude Include="Source\Shader\ShadowPassShader.hpp" />
     <ClInclude Include="Source\Shader\UIDrawShader.hpp" />
     <ClInclude Include="Source\Shader\GeometryShader.hpp" />
     <ClInclude Include="Source\Shader\LineDrawShader.hpp" />
@@ -129,6 +130,7 @@
     <ClInclude Include="Source\Shader\ShaderProgram.hpp" />
     <ClInclude Include="Source\Shader\SpotLightingShader.hpp" />
     <ClInclude Include="Source\Transform\Transform.hpp" />
+    <ClInclude Include="Source\UI\Button.hpp" />
     <ClInclude Include="Source\UI\Element.hpp" />
     <ClInclude Include="Source\UI\Frame.hpp" />
     <ClInclude Include="Source\UI\GBufferInspector.hpp" />
@@ -164,6 +166,7 @@
     <ClCompile Include="Source\Scene\SceneManager.cpp" />
     <ClCompile Include="Source\Shader\BillboardDrawShader.cpp" />
     <ClCompile Include="Source\Shader\DirectionalLightingShader.cpp" />
+    <ClCompile Include="Source\Shader\ShadowPassShader.cpp" />
     <ClCompile Include="Source\Shader\UIDrawShader.cpp" />
     <ClCompile Include="Source\Shader\GeometryShader.cpp" />
     <ClCompile Include="Source\Shader\LineDrawShader.cpp" />
@@ -171,6 +174,7 @@
     <ClCompile Include="Source\Shader\ShaderProgram.cpp" />
     <ClCompile Include="Source\Shader\SpotLightingShader.cpp" />
     <ClCompile Include="Source\Transform\Transform.cpp" />
+    <ClCompile Include="Source\UI\Button.cpp" />
     <ClCompile Include="Source\UI\Element.cpp" />
     <ClCompile Include="Source\UI\Frame.cpp" />
     <ClCompile Include="Source\UI\GBufferInspector.cpp" />

@@ -11,6 +11,13 @@ public:
 	bool rightKeyPressed;
 	bool crouchKeyPressed;
 
+	bool lightForwardKeyPressed;
+	bool lightBackKeyPressed;
+	bool lightLeftKeyPressed;
+	bool lightRightKeyPressed;
+	bool lightUpKeyPressed;
+	bool lightDownKeyPressed;
+
 	bool debugMode;
 	bool flashLight;
 

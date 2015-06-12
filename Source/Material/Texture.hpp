@@ -19,4 +19,5 @@ public:
 
 	bool load(const std::string &filename);
 	void bind(GLenum textureUnit);
+	void unbind(GLenum textureUnit);
 };

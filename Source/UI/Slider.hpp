@@ -14,13 +14,13 @@ private:
 public:
 	int min, max, value;
 
-	Slider(glm::vec2 position, glm::vec2 size, int min, int max);
+	Slider(const glm::vec2 &position, const glm::vec2 &size, int min, int max);
 	bool load();
 	void destroy();
 
-	void render(UIRenderer *uiRenderer, glm::vec2 parentPosition);
+	void render(const glm::vec2 &parentPosition);
 
-	void onMouseButtonDown(glm::vec2 mousePosition, int mouseButton);
-	void onMouseButtonUp(glm::vec2 mousePosition, int mouseButton);
-	void onMouseMove(glm::vec2 mousePosition);
+	void onMouseButtonDown(const glm::vec2 &mousePosition, int mouseButton);
+	void onMouseButtonUp(const glm::vec2 &mousePosition, int mouseButton);
+	void onMouseMove(const glm::vec2 &mousePosition);
 };

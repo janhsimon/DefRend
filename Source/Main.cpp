@@ -184,8 +184,10 @@ void render()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	lightEditor->render(uiRenderer);
-	gBufferInspector->render(uiRenderer);
+	billboardRenderer->render(camera);
+
+	lightEditor->render();
+	gBufferInspector->render();
 
 	std::stringstream s;
 	unsigned int ms = (thisTickTime - lastTickTime);
@@ -194,8 +196,6 @@ void render()
 	uiRenderer->drawText(s.str(), glm::vec2(5.f, window->height - 25.f), color);
 
 	uiRenderer->drawText("SPACE to switch camera modes", glm::vec2(5.f, 5.f), color);
-
-	billboardRenderer->render(camera);
 
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);

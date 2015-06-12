@@ -1,13 +1,13 @@
 #version 330
 
-layout (location = 0) out vec4 color;
+layout(location = 0) out float color;
 
-in vec3 vs_fs_position;
+in vec4 vs_fs_posWS;
 
 uniform vec3 pointLightPosition;
+uniform float cameraFarClip;
 
 void main()
 {
-	float distance = length(pointLightPosition - vs_fs_position);
-	color = vec4(distance, distance, distance, 1.0);
+	color = length(pointLightPosition - vs_fs_posWS.xyz) / cameraFarClip;
 }

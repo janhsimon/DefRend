@@ -39,12 +39,20 @@ bool Texture::load(const std::string &filename)
 	}
 	else if (surface->format->BytesPerPixel == 3)
 	{
-		sourceFormat = GL_BGR;
+		if (surface->format->Rshift < surface->format->Gshift)
+			sourceFormat = GL_RGB;
+		else
+			sourceFormat = GL_BGR;
+
 		destinationFormat = GL_RGB8;
 	}
 	else if (surface->format->BytesPerPixel == 4)
 	{
-		sourceFormat = GL_BGRA;
+		if (surface->format->Rshift < surface->format->Gshift)
+			sourceFormat = GL_RGBA;
+		else
+			sourceFormat = GL_BGRA;
+
 		destinationFormat = GL_RGBA8;
 	}
 	else
@@ -72,6 +80,8 @@ bool Texture::load(const std::string &filename)
 
 	refCount = 1;
 
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 	return true;
 }
 
@@ -79,4 +89,10 @@ void Texture::bind(GLenum textureUnit)
 {
 	glActiveTexture(textureUnit);
 	glBindTexture(GL_TEXTURE_2D, handle);
+}
+
+void Texture::unbind(GLenum textureUnit)
+{
+	glActiveTexture(textureUnit);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }

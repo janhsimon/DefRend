@@ -79,9 +79,10 @@ void Camera::setFOV(float fov, unsigned int screenWidth, unsigned int screenHeig
 {
 	this->fov = fov;
 	
-	float verticalFOV = Util::convertHorizontalToVerticalFOV(fov, (float)screenWidth, (float)screenHeight);
-	float aspectRatio = (float)screenWidth / (float)screenHeight;
-	projectionMatrix = glm::perspective(glm::radians(verticalFOV / 2.f), aspectRatio, nearClipPlane, farClipPlane);
+	//float verticalFOV = Util::convertHorizontalToVerticalFOV(fov, (float)screenWidth, (float)screenHeight);
+	//float aspectRatio = (float)screenWidth / (float)screenHeight;
+	//projectionMatrix = glm::perspective(glm::radians(verticalFOV / 2.f), aspectRatio, nearClipPlane, farClipPlane);
+	projectionMatrix = glm::perspectiveFov(glm::radians(fov), (float)screenWidth, (float)screenHeight, nearClipPlane, farClipPlane);
 }
 
 void Camera::setFirstPerson(bool firstPerson)

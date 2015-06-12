@@ -2,16 +2,14 @@
 
 layout (location = 0) in vec3 inPosition;
 
-out vec3 vs_fs_position;
+out vec4 vs_fs_posWS;
 
 uniform mat4 worldMatrix;
-uniform mat4 viewProjectionMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 projectionMatrix;
 
 void main(void)
 {
-	// bring vertex position from model- to screenspace
-	gl_Position = viewProjectionMatrix * worldMatrix * vec4(inPosition, 1.0);
-
-	// store world position
-	vs_fs_position = (worldMatrix * vec4(inPosition, 1.0)).xyz;
+	vs_fs_posWS = worldMatrix * vec4(inPosition, 1.0);
+	gl_Position = projectionMatrix * viewMatrix * worldMatrix * vec4(inPosition, 1.0);
 }

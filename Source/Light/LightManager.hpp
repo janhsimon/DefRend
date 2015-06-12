@@ -17,6 +17,8 @@ public:
 	std::vector<PointLight*> pointLights;
 	std::vector<SpotLight*> spotLights;
 
+	~LightManager();
+
 	bool create();
 	void update(float delta);
 

@@ -15,7 +15,7 @@ public:
 	GLuint texture;
 	glm::vec4 color;
 
-	Panel(glm::vec2 position, glm::vec2 size, bool isTextured);
+	Panel(const glm::vec2 &position, const glm::vec2 &size, bool isTextured);
 
 	// 16-byte alignment for fast SSE math instructions
 	void *operator new(size_t size);
@@ -23,9 +23,9 @@ public:
 
 	void destroy();
 
-	void render(UIRenderer *uiRenderer, glm::vec2 parentPosition = glm::vec2(0.f, 0.f));
+	void render(const glm::vec2 &parentPosition = glm::vec2(0.f, 0.f));
 
-	void onMouseButtonDown(glm::vec2 mousePosition, int mouseButton);
-	void onMouseButtonUp(glm::vec2 mousePosition, int mouseButton);
-	void onMouseMove(glm::vec2 mousePosition);
+	void onMouseButtonDown(const glm::vec2 &mousePosition, int mouseButton);
+	void onMouseButtonUp(const glm::vec2 &mousePosition, int mouseButton);
+	void onMouseMove(const glm::vec2 &mousePosition);
 };

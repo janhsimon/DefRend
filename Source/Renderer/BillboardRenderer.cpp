@@ -96,6 +96,7 @@ void BillboardRenderer::render(Camera *camera)
 		lineDrawShader->setColorUniform(d->diffuseColor);
 
 		UnitArrow::render();
+		directionalLightBillboard->unbind(GL_TEXTURE0);
 	}
 
 	for (PointLight *l : lightManager->pointLights)
@@ -117,6 +118,8 @@ void BillboardRenderer::render(Camera *camera)
 
 		UnitArrow::render();
 		*/
+
+		pointLightBillboard->unbind(GL_TEXTURE0);
 	}
 
 	for (unsigned int i = 0; i < lightManager->spotLights.size(); ++i)
@@ -147,5 +150,7 @@ void BillboardRenderer::render(Camera *camera)
 
 			UnitGizmo::render();
 		}
+
+		spotLightBillboard->unbind(GL_TEXTURE0);
 	}
 }

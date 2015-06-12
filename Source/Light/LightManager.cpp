@@ -2,12 +2,26 @@
 
 #include "LightManager.hpp"
 #include "..\Camera\Camera.hpp"
+#include "..\Input\InputManager.hpp"
 #include "..\Util\Error.hpp"
 #include "..\Util\Util.hpp"
 
 #include "gtc\matrix_transform.hpp"
 
 extern Camera *camera;
+extern InputManager *inputManager;
+
+LightManager::~LightManager()
+{
+	for (DirectionalLight *d : directionalLights)
+		delete d;
+
+	for (PointLight *p : pointLights)
+		delete p;
+
+	for (SpotLight *s : spotLights)
+		delete s;
+}
 
 bool LightManager::create()
 {
@@ -36,16 +50,24 @@ bool LightManager::create()
 	if (!Util::checkMemory(p = new PointLight()))
 		return false;
 
+	if (!p->create())
+		return false;
+
 	p->position = glm::vec3(0.f, 50.f, 0.f);
 	p->diffuseColor = glm::vec3(1.f, 1.f, .9f);
-	p->diffuseIntensity = 512.f;
-	p->specularIntensity = 512.f;
-	p->specularPower = 32.f;
+	p->diffuseIntensity = 2000.f;
+	p->specularIntensity = 2000.f;
+	p->specularPower = 4.f;
+	p->shadowBias = .99f;
 	//p->attenuation = glm::vec3(.0001f, .00001f, .00001f);
 	//p->attenuation = glm::vec3(0.0f, 0.0f, 1.f);
 	pointLights.push_back(p);
 
+	/*
 	if (!Util::checkMemory(p = new PointLight()))
+		return false;
+
+	if (!p->create())
 		return false;
 
 	p->position = glm::vec3(300.f, 1000.f, 0.f);
@@ -55,6 +77,7 @@ bool LightManager::create()
 	p->specularPower = 32.f;
 	//p->attenuation = glm::vec3(.0001f, .00001f, .00001f);
 	pointLights.push_back(p);
+	*/
 
 
 	// and some spot lights
@@ -110,10 +133,27 @@ bool LightManager::create()
 
 void LightManager::update(float delta)
 {
+	/*
 	static float z = 0.f;
-	pointLights[0]->position.x = sinf(z) * 1200.f;
-	pointLights[1]->position.y = 500.f + sinf(z) * 500.f;
+	pointLights[0]->position.x = sinf(z) * 100.f;//* 1200.f;
+	//pointLights[1]->position.y = 500.f + sinf(z) * 500.f;
 	z += .005f * delta;
+	*/
+
+	if (inputManager->lightForwardKeyPressed && !inputManager->lightBackKeyPressed)
+		pointLights[0]->position += pointLights[0]->getForward() * delta;
+	else if (inputManager->lightBackKeyPressed && !inputManager->lightForwardKeyPressed)
+		pointLights[0]->position -= pointLights[0]->getForward() * delta;
+
+	if (inputManager->lightLeftKeyPressed && !inputManager->lightRightKeyPressed)
+		pointLights[0]->position += pointLights[0]->getRight() * delta;
+	else if (inputManager->lightRightKeyPressed && !inputManager->lightLeftKeyPressed)
+		pointLights[0]->position -= pointLights[0]->getRight() * delta;
+
+	if (inputManager->lightUpKeyPressed && !inputManager->lightDownKeyPressed)
+		pointLights[0]->position += pointLights[0]->getUp() * delta;
+	else if (inputManager->lightDownKeyPressed && !inputManager->lightUpKeyPressed)
+		pointLights[0]->position -= pointLights[0]->getUp() * delta;
 }
 
 void LightManager::selectPointLight(glm::vec2 mousePosition)

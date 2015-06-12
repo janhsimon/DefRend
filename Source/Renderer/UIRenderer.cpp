@@ -93,7 +93,6 @@ void UIRenderer::drawText(std::string text, glm::vec2 position, SDL_Color color)
 	uiDrawShader->setWorldMatrixUniform(worldMatrix);
 
 	uiDrawShader->setUVScaleUniform(glm::vec2(1.f));
-
 	uiDrawShader->setColorOverrideUniform(false);
 
 	glActiveTexture(GL_TEXTURE0);
@@ -109,12 +108,20 @@ void UIRenderer::drawText(std::string text, glm::vec2 position, SDL_Color color)
 	SDL_FreeSurface(temp);
 }
 
-/*
-Vector2 FontRenderer::getTextDimensions(std::string text)
+glm::vec2 UIRenderer::getTextDimensions(const std::string &text)
 {
+	assert(font);
+
+	if (text.empty())
+		return glm::vec2(0.f);
+
 	SDL_Surface *sText = TTF_RenderUTF8_Blended(font, text.c_str(), SDL_Color());
-	Vector2 out = Vector2(sText->w, sText->h);
+
+	assert(sText);
+
+	glm::vec2 out((float)sText->w, (float)sText->h);
+
 	SDL_FreeSurface(sText);
+
 	return out;
 }
-*/

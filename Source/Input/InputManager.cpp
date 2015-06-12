@@ -15,6 +15,8 @@ InputManager::InputManager()
 {
 	forwardKeyPressed = backKeyPressed = leftKeyPressed = rightKeyPressed = crouchKeyPressed = false;
 
+	lightForwardKeyPressed = lightBackKeyPressed = lightLeftKeyPressed = lightRightKeyPressed = lightUpKeyPressed = lightDownKeyPressed = false;
+
 	debugMode = false;
 	flashLight = false;
 }
@@ -71,6 +73,7 @@ void InputManager::sendKeyboardEvent(const SDL_Event &event)
 		flashLight = !flashLight;
 	else if (event.key.keysym.sym == SDLK_SPACE && event.type == SDL_KEYUP)
 		camera->setFirstPerson(!camera->getFirstPerson());
+
 	else if (event.key.keysym.sym == SDLK_w)
 		forwardKeyPressed = event.type == SDL_KEYDOWN;
 	else if (event.key.keysym.sym == SDLK_s)
@@ -81,4 +84,17 @@ void InputManager::sendKeyboardEvent(const SDL_Event &event)
 		rightKeyPressed = event.type == SDL_KEYDOWN;
 	else if (event.key.keysym.sym == SDLK_LSHIFT)
 		crouchKeyPressed = event.type == SDL_KEYDOWN;
+
+	else if (event.key.keysym.sym == SDLK_i)
+		lightForwardKeyPressed = event.type == SDL_KEYDOWN;
+	else if (event.key.keysym.sym == SDLK_k)
+		lightBackKeyPressed = event.type == SDL_KEYDOWN;
+	else if (event.key.keysym.sym == SDLK_j)
+		lightLeftKeyPressed = event.type == SDL_KEYDOWN;
+	else if (event.key.keysym.sym == SDLK_l)
+		lightRightKeyPressed = event.type == SDL_KEYDOWN;
+	else if (event.key.keysym.sym == SDLK_u)
+		lightDownKeyPressed = event.type == SDL_KEYDOWN;
+	else if (event.key.keysym.sym == SDLK_o)
+		lightUpKeyPressed = event.type == SDL_KEYDOWN;
 }

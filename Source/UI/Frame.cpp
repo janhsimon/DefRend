@@ -2,18 +2,21 @@
 
 #include "Frame.hpp"
 #include "..\Material\TextureManager.hpp"
+#include "..\Renderer\UIRenderer.hpp"
 #include "..\Renderer\UnitQuad.hpp"
+#include "..\Util\Error.hpp"
 #include "..\Util\Util.hpp"
 #include "..\Window\Window.hpp"
 
+extern UIRenderer *uiRenderer;
 extern Window *window;
 
-Frame::Frame(glm::vec2 position, glm::vec2 size) : Element(position, size)
+Frame::Frame(const glm::vec2 &position, const glm::vec2 &size) : Element(position, size)
 {
 	mouseDragging = false;
 }
 
-bool Frame::load(std::string title)
+bool Frame::load(const std::string &title)
 {
 	headerTexture = TextureManager::refTexture("Textures\\FrameHeader.png");
 
@@ -33,6 +36,9 @@ bool Frame::load(std::string title)
 
 void Frame::destroy()
 {
+	// TODO: this is NOT called
+	Error::report("Debug", "Frame dtor called for" + titleLabel->getText());
+
 	if (headerTexture)
 		TextureManager::unrefTexture(headerTexture);
 
@@ -55,7 +61,7 @@ void Frame::addChildElement(Element *element)
 	childElements.push_back(element);
 }
 
-void Frame::render(UIRenderer *uiRenderer, glm::vec2 parentPosition)
+void Frame::render(const glm::vec2 &parentPosition)
 {
 	glUseProgram(uiRenderer->getUIDrawShader()->program);
 
@@ -90,13 +96,13 @@ void Frame::render(UIRenderer *uiRenderer, glm::vec2 parentPosition)
 	UnitQuad::render();
 
 
-	titleLabel->render(uiRenderer, position + parentPosition);
+	titleLabel->render(position + parentPosition);
 
 	for (Element *element : childElements)
-		element->render(uiRenderer, position + parentPosition);
+		element->render(position + parentPosition);
 }
 
-void Frame::onMouseButtonDown(glm::vec2 mousePosition, int mouseButton)
+void Frame::onMouseButtonDown(const glm::vec2 &mousePosition, int mouseButton)
 {
 	if (isPointOnArea(mousePosition, glm::vec2(position.x, position.y - 36.f), glm::vec2(size.x, 32.f)))
 	{
@@ -114,7 +120,7 @@ void Frame::onMouseButtonDown(glm::vec2 mousePosition, int mouseButton)
 	}
 }
 
-void Frame::onMouseButtonUp(glm::vec2 mousePosition, int mouseButton)
+void Frame::onMouseButtonUp(const glm::vec2 &mousePosition, int mouseButton)
 {
 	for (Element *element : childElements)
 		element->onMouseButtonUp(mousePosition, mouseButton);
@@ -122,7 +128,7 @@ void Frame::onMouseButtonUp(glm::vec2 mousePosition, int mouseButton)
 	mouseDragging = false;
 }
 
-void Frame::onMouseMove(glm::vec2 mousePosition)
+void Frame::onMouseMove(const glm::vec2 &mousePosition)
 {
 	for (Element *element : childElements)
 		element->onMouseMove(mousePosition);

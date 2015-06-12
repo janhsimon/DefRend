@@ -21,7 +21,9 @@ private:
 	static const std::string LIGHT_SPECULAR_POWER_UNIFORM_NAME;
 	//static const std::string LIGHT_ATTENUATION_UNIFORM_NAME;
 	static const std::string EYE_POSITION_UNIFORM_NAME;
+	static const std::string SHADOW_BIAS_UNIFORM_NAME;
 	static const std::string GBUFFER_MAPS_UNIFORM_NAMES[2];
+	static const std::string SHADOW_MAP_UNIFORM_NAME;
 
 	GLint worldMatrixUniformLocation, viewMatrixUniformLocation, projectionMatrixUniformLocation;
 	GLint invWorldMatrixUniformLocation;
@@ -32,6 +34,7 @@ private:
 	GLint lightSpecularIntensityUniformLocation, lightSpecularPowerUniformLocation;
 	//GLint lightAttenuationUniformLocation;
 	GLint eyePositionUniformLocation;
+	GLint shadowBiasUniformLocation;
 
 public:
 	bool create();
@@ -41,4 +44,5 @@ public:
 	void setScreenSizeUniform(unsigned int screenWidth, unsigned int screenHeight);
 	void setLightParameters(const PointLight *pointLight);
 	void setEyePositionUniform(const glm::vec3 &eyePosition);
+	void setShadowBiasUniform(float shadowBias);
 };

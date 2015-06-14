@@ -253,6 +253,8 @@ int main(int argc, char **argv)
 				inputManager->sendMouseMoveEvent(event);
 			else if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP)
 				inputManager->sendMouseButtonEvent(event);
+			else if (event.type == SDL_MOUSEWHEEL)
+				inputManager->sendMouseWheelEvent(event);
 			else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
 				inputManager->sendKeyboardEvent(event);
 		}

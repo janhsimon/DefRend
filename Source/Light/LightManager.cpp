@@ -3,6 +3,7 @@
 #include "LightManager.hpp"
 #include "..\Camera\Camera.hpp"
 #include "..\Input\InputManager.hpp"
+#include "..\UI\LightEditor.hpp"
 #include "..\Util\Error.hpp"
 #include "..\Util\Util.hpp"
 
@@ -10,6 +11,7 @@
 
 extern Camera *camera;
 extern InputManager *inputManager;
+extern LightEditor *lightEditor;
 
 LightManager::~LightManager()
 {
@@ -178,4 +180,6 @@ void LightManager::selectLight(glm::vec2 mousePosition)
 	}
 
 	selectedLightIndex = nearestIndex;
+
+	lightEditor->loadSliderValuesFromLight(lights[selectedLightIndex]);
 }

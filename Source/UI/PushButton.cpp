@@ -73,3 +73,8 @@ void PushButton::onMouseMove(const glm::vec2 & mousePosition)
 	else
 		state = ButtonState::DOWN;
 }
+
+void PushButton::onMouseWheel(const glm::vec2 &mousePosition, int distance)
+{
+
+}

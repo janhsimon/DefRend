@@ -4,6 +4,7 @@
 #include "..\Material\TextureManager.hpp"
 #include "..\Renderer\UIRenderer.hpp"
 #include "..\Renderer\UnitQuad.hpp"
+#include "..\Util\Error.hpp"
 #include "..\Window\Window.hpp"
 
 extern UIRenderer *uiRenderer;
@@ -171,6 +172,19 @@ void Slider::onMouseMove(const glm::vec2 &mousePosition)
 	{
 		float stepSize = size.x / (max - min);
 		value = (int)(((mousePosition.x + stepSize / 2.f - barPositionWorld.x) / size.x) * (max - min));
+
+		if (value < min)
+			value = min;
+		else if (value > max)
+			value = max;
+	}
+}
+
+void Slider::onMouseWheel(const glm::vec2 &mousePosition, int distance)
+{
+	if (isPointOnArea(mousePosition, glm::vec2(barPositionWorld.x - 8.f, barPositionWorld.y), glm::vec2(size.x + 16.f, 16.f)))
+	{
+		value += ((max - min) / 50 + 1) * distance;
 
 		if (value < min)
 			value = min;

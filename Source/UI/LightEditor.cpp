@@ -134,7 +134,6 @@ void LightEditor::update()
 {
 	DirectionalLight *selectedDirectionalLight = lightManager->lights[lightManager->getSelectedLightIndex()];
 
-
 	std::stringstream s;
 	s << "Diffuse Color: " << sliderR->value << "/" << sliderG->value << "/" << sliderB->value;
 	labelRGB->setText(s.str());
@@ -179,4 +178,29 @@ void LightEditor::update()
 		labelShadowBias->setText(s.str());
 		selectedPointLight->shadowBias = normalizedShadowBias;
 	}
+}
+
+void LightEditor::loadSliderValuesFromLight(DirectionalLight *l)
+{
+	sliderR->value = (int)(l->diffuseColor.r * 255.f);
+	sliderG->value = (int)(l->diffuseColor.g * 255.f);
+	sliderB->value = (int)(l->diffuseColor.b * 255.f);
+
+	sliderDiffuseIntensity->value = (int)(l->diffuseIntensity);
+	
+	if (l->type == LightType::DIRECTIONAL_LIGHT)
+		return;
+
+	PointLight *p = (PointLight*)l;
+
+	sliderSpecularIntensity->value = (int)(p->specularIntensity);
+	sliderSpecularPower->value = (int)(p->specularPower);
+
+	if (l->type == LightType::SPOT_LIGHT)
+	{
+		SpotLight *s = (SpotLight*)p;
+		sliderCutoffAngle->value = (int)(s->cutoffAngle);
+	}
+	else
+		sliderShadowBias->value = (int)(p->shadowBias * 1000.f);
 }

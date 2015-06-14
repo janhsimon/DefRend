@@ -29,5 +29,6 @@ public:
 
 	void onMouseButtonDown(const glm::vec2 &mousePosition, int mouseButton);
 	void onMouseButtonUp(const glm::vec2 &mousePosition, int mouseButton);
+	void onMouseWheel(const glm::vec2 &mousePosition, int distance);
 	void onMouseMove(const glm::vec2 &mousePosition);
 };

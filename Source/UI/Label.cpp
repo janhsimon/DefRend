@@ -45,3 +45,8 @@ void Label::onMouseMove(const glm::vec2 & mousePosition)
 {
 
 }
+
+void Label::onMouseWheel(const glm::vec2 &mousePosition, int distance)
+{
+
+}

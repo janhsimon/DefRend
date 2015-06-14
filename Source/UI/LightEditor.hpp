@@ -6,6 +6,7 @@
 #include "Label.hpp"
 #include "Panel.hpp"
 #include "Slider.hpp"
+#include "..\Light\DirectionalLight.hpp"
 
 class LightEditor : public Frame
 {
@@ -30,4 +31,6 @@ public:
 
 	bool create();
 	void update();
+
+	void loadSliderValuesFromLight(DirectionalLight *l);
 };

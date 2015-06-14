@@ -61,6 +61,15 @@ void InputManager::sendMouseMoveEvent(const SDL_Event &event)
 	}
 }
 
+void InputManager::sendMouseWheelEvent(const SDL_Event &event)
+{
+	int x, y;
+	SDL_GetMouseState(&x, &y);
+
+	lightEditor->onMouseWheel(glm::vec2(x, y), event.wheel.y);
+	gBufferInspector->onMouseWheel(glm::vec2(x, y), event.wheel.y);
+}
+
 void InputManager::sendKeyboardEvent(const SDL_Event &event)
 {
 	if (event.key.keysym.sym == SDLK_ESCAPE && event.type == SDL_KEYUP)

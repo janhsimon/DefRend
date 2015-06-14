@@ -123,3 +123,8 @@ void Button::onMouseMove(const glm::vec2 & mousePosition)
 			state = ButtonState::NORMAL;
 	}
 }
+
+void Button::onMouseWheel(const glm::vec2 &mousePosition, int distance)
+{
+
+}

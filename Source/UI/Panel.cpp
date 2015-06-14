@@ -72,3 +72,8 @@ void Panel::onMouseMove(const glm::vec2 &mousePosition)
 {
 	
 }
+
+void Panel::onMouseWheel(const glm::vec2 &mousePosition, int distance)
+{
+
+}

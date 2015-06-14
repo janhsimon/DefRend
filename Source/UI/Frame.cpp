@@ -156,3 +156,12 @@ void Frame::onMouseMove(const glm::vec2 &mousePosition)
 			position.y = window->height - size.y - 1.f;
 	}
 }
+
+void Frame::onMouseWheel(const glm::vec2 &mousePosition, int distance)
+{
+	if (!visible)
+		return;
+
+	for (Element *element : childElements)
+		element->onMouseWheel(mousePosition, distance);
+}

@@ -11,8 +11,9 @@ public:
 	glm::vec2 size;
 
 	Element(const glm::vec2 & position, const glm::vec2 & size);
+	virtual ~Element();
+	//virtual void destroy() = 0;
 
-	virtual void destroy() = 0;
 	virtual void render(const glm::vec2 & parentPosition) = 0;
 
 	bool isPointOnArea(const glm::vec2 &point, const glm::vec2 &position, const glm::vec2 &size);

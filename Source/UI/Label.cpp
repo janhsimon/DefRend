@@ -10,7 +10,7 @@ Label::Label(const glm::vec2 &position, const std::string &text) : Element(posit
 	color = glm::vec3(1.f, 1.f, 1.f);
 }
 
-void Label::destroy()
+Label::~Label()
 {
 
 }

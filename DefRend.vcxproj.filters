@@ -222,6 +222,12 @@
     <ClInclude Include="Source\UI\Button.hpp">
       <Filter>Source Files\UI</Filter>
     </ClInclude>
+    <ClInclude Include="Source\UI\PushButton.hpp">
+      <Filter>Source Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\PushButtonGroup.hpp">
+      <Filter>Source Files\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Camera\Camera.cpp">
@@ -348,6 +354,12 @@
       <Filter>Source Files\Shader</Filter>
     </ClCompile>
     <ClCompile Include="Source\UI\Button.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\PushButton.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\PushButtonGroup.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
   </ItemGroup>

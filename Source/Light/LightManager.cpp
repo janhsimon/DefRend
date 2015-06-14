@@ -13,19 +13,13 @@ extern InputManager *inputManager;
 
 LightManager::~LightManager()
 {
-	for (DirectionalLight *d : directionalLights)
+	for (DirectionalLight *d : lights)
 		delete d;
-
-	for (PointLight *p : pointLights)
-		delete p;
-
-	for (SpotLight *s : spotLights)
-		delete s;
 }
 
 bool LightManager::create()
 {
-	selectedPointLight = 1;
+	selectedLightIndex = 1;
 
 
 	// add a directional light
@@ -40,7 +34,7 @@ bool LightManager::create()
 	d->setPitch(45.f);
 	d->diffuseColor = glm::vec3(.7f, .7f, 1.f);
 	d->diffuseIntensity = 1.f;
-	directionalLights.push_back(d);
+	lights.push_back(d);
 
 
 	// add point lights
@@ -61,7 +55,7 @@ bool LightManager::create()
 	p->shadowBias = .99f;
 	//p->attenuation = glm::vec3(.0001f, .00001f, .00001f);
 	//p->attenuation = glm::vec3(0.0f, 0.0f, 1.f);
-	pointLights.push_back(p);
+	lights.push_back(p);
 
 	/*
 	if (!Util::checkMemory(p = new PointLight()))
@@ -97,7 +91,7 @@ bool LightManager::create()
 		//s->attenuation = glm::vec3(.0001f, .00001f, .00001f);
 		s->setPitch(-90.f);
 		s->cutoffAngle = 25.f;
-		spotLights.push_back(s);
+		lights.push_back(s);
 
 		if (!Util::checkMemory(s = new SpotLight()))
 			return false;
@@ -110,7 +104,7 @@ bool LightManager::create()
 		//s->attenuation = glm::vec3(.0001f, .00001f, .00001f);
 		s->setPitch(-90.f);
 		s->cutoffAngle = 25.f;
-		spotLights.push_back(s);
+		lights.push_back(s);
 	}
 
 	/*
@@ -141,22 +135,22 @@ void LightManager::update(float delta)
 	*/
 
 	if (inputManager->lightForwardKeyPressed && !inputManager->lightBackKeyPressed)
-		pointLights[0]->position += pointLights[0]->getForward() * delta;
+		lights[1]->position += lights[1]->getForward() * delta;
 	else if (inputManager->lightBackKeyPressed && !inputManager->lightForwardKeyPressed)
-		pointLights[0]->position -= pointLights[0]->getForward() * delta;
+		lights[1]->position -= lights[1]->getForward() * delta;
 
 	if (inputManager->lightLeftKeyPressed && !inputManager->lightRightKeyPressed)
-		pointLights[0]->position += pointLights[0]->getRight() * delta;
+		lights[1]->position += lights[1]->getRight() * delta;
 	else if (inputManager->lightRightKeyPressed && !inputManager->lightLeftKeyPressed)
-		pointLights[0]->position -= pointLights[0]->getRight() * delta;
+		lights[1]->position -= lights[1]->getRight() * delta;
 
 	if (inputManager->lightUpKeyPressed && !inputManager->lightDownKeyPressed)
-		pointLights[0]->position += pointLights[0]->getUp() * delta;
+		lights[1]->position += lights[1]->getUp() * delta;
 	else if (inputManager->lightDownKeyPressed && !inputManager->lightUpKeyPressed)
-		pointLights[0]->position -= pointLights[0]->getUp() * delta;
+		lights[1]->position -= lights[1]->getUp() * delta;
 }
 
-void LightManager::selectPointLight(glm::vec2 mousePosition)
+void LightManager::selectLight(glm::vec2 mousePosition)
 {
 	/*
 	glm::vec3 pos = glm::vec3(mousePosition, 0.f);
@@ -168,12 +162,12 @@ void LightManager::selectPointLight(glm::vec2 mousePosition)
 	Error::report("Debug", s.str());
 	*/
 
-	float nearestDistance = glm::length(glm::vec3(spotLights[0]->position - camera->position));
+	float nearestDistance = glm::length(glm::vec3(lights[0]->position - camera->position));
 	int nearestIndex = 0;
 
-	for (unsigned int i = 1; i < spotLights.size(); ++i)
+	for (unsigned int i = 1; i < lights.size(); ++i)
 	{
-		SpotLight *s = spotLights[i];
+		DirectionalLight *s = lights[i];
 		float distance = glm::length(glm::vec3(s->position - camera->position));
 
 		if (distance < nearestDistance)
@@ -183,5 +177,5 @@ void LightManager::selectPointLight(glm::vec2 mousePosition)
 		}
 	}
 
-	selectedPointLight = nearestIndex;
+	selectedLightIndex = nearestIndex;
 }

@@ -191,11 +191,24 @@ void render()
 
 	std::stringstream s;
 	unsigned int ms = (thisTickTime - lastTickTime);
-	s << "FPS: " << int(1000.f / ms) << "        Frame Time: " << ms;
+	s << "FPS: " << int(1000.f / ms) << "        Frame Time: " << ms << "        Light Count: " << lightManager->lights.size();
 	SDL_Color color = { 255, 255, 255 };
 	uiRenderer->drawText(s.str(), glm::vec2(5.f, window->height - 25.f), color);
 
-	uiRenderer->drawText("SPACE to switch camera modes", glm::vec2(5.f, 5.f), color);
+	if (camera->getFirstPerson())
+		uiRenderer->drawText("[SPACE] to UNLOCK mouse cursor", glm::vec2(5.f, 5.f), color);
+	else
+		uiRenderer->drawText("[SPACE] to LOCK mouse cursor", glm::vec2(5.f, 5.f), color);
+
+	if (gBufferInspector->visible)
+		uiRenderer->drawText("[G] to HIDE \"G-Buffer Inspector\" window", glm::vec2(5.f, 20.f), color);
+	else
+		uiRenderer->drawText("[G] to SHOW \"G-Buffer Inspector\" window", glm::vec2(5.f, 20.f), color);
+
+	if (lightEditor->visible)
+		uiRenderer->drawText("[L] to HIDE \"Light Editor\" window", glm::vec2(5.f, 35.f), color);
+	else
+		uiRenderer->drawText("[L] to SHOW \"Light Editor\" window", glm::vec2(5.f, 35.f), color);
 
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);

@@ -20,6 +20,24 @@ Slider::Slider(const glm::vec2 &position, const glm::vec2 &size, int min, int ma
 	hover = false;
 }
 
+Slider::~Slider()
+{
+	if (barTexture)
+		TextureManager::unrefTexture(barTexture);
+
+	if (barLeftEndTexture)
+		TextureManager::unrefTexture(barLeftEndTexture);
+
+	if (barRightEndTexture)
+		TextureManager::unrefTexture(barRightEndTexture);
+
+	if (handleTexture)
+		TextureManager::unrefTexture(handleTexture);
+
+	if (handleTextureHover)
+		TextureManager::unrefTexture(handleTextureHover);
+}
+
 bool Slider::load()
 {
 	barTexture = TextureManager::refTexture("Textures\\SliderBar.png");
@@ -48,24 +66,6 @@ bool Slider::load()
 		return false;
 
 	return true;
-}
-
-void Slider::destroy()
-{
-	if (barTexture)
-		TextureManager::unrefTexture(barTexture);
-
-	if (barLeftEndTexture)
-		TextureManager::unrefTexture(barLeftEndTexture);
-
-	if (barRightEndTexture)
-		TextureManager::unrefTexture(barRightEndTexture);
-
-	if (handleTexture)
-		TextureManager::unrefTexture(handleTexture);
-
-	if (handleTextureHover)
-		TextureManager::unrefTexture(handleTextureHover);
 }
 
 void Slider::render(const glm::vec2 &parentPosition)

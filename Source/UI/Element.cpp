@@ -1,9 +1,15 @@
 #include "Element.hpp"
+#include "..\Util\Error.hpp"
 
 Element::Element(const glm::vec2 &position, const glm::vec2 &size)
 {
 	this->position = position;
 	this->size = size;
+}
+
+Element::~Element()
+{
+	
 }
 
 bool Element::isPointOnArea(const glm::vec2 &point, const glm::vec2 &position, const glm::vec2 &size)

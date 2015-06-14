@@ -3,6 +3,7 @@
 #include "GBufferInspector.hpp"
 #include "..\Renderer\DeferredRenderer.hpp"
 #include "..\Renderer\IRenderer.hpp"
+#include "..\Util\Error.hpp"
 #include "..\Util\Util.hpp"
 
 extern IRenderer *sceneRenderer;
@@ -14,31 +15,7 @@ GBufferInspector::GBufferInspector(glm::vec2 position) : Frame(position, glm::ve
 
 GBufferInspector::~GBufferInspector()
 {
-	/*
-	if (testButton)
-	{
-		testButton->destroy();
-		delete testButton;
-	}
-
-	if (panelDiffMap)
-	{
-		panelDiffMap->destroy();
-		delete panelDiffMap;
-	}
-
-	if (sliderTextureSelect)
-	{
-		sliderTextureSelect->destroy();
-		delete sliderTextureSelect;
-	}
-
-	if (labelTextureSelect)
-	{
-		labelTextureSelect->destroy();
-		delete labelTextureSelect;
-	}
-	*/
+	delete pushButtonGroup;
 }
 
 bool GBufferInspector::create()
@@ -51,18 +28,66 @@ bool GBufferInspector::create()
 
 	addChildElement(panelDiffMap);
 
-	if (!Util::checkMemory(sliderTextureSelect = new Slider(glm::vec2(30.f, 240.f), glm::vec2(350.f), 0, 1)))
+
+
+	if (!Util::checkMemory(labelLayout = new Label(glm::vec2(50.f + 5.f, 240.f + 10.f), "Layout:")))
 		return false;
 
-	if (!sliderTextureSelect->load())
+	addChildElement(labelLayout);
+
+
+	if (!Util::checkMemory(panelRGB = new Panel(glm::vec2(155.f, 240.f), glm::vec2(100.f, 40.f), false)))
 		return false;
 
-	addChildElement(sliderTextureSelect);
+	panelRGB->color = glm::vec4(0.f, 0.f, 0.f, .5f);
 
-	if (!Util::checkMemory(labelTextureSelect = new Label(glm::vec2(30.f, 260.f))))
+	addChildElement(panelRGB);
+
+	if (!Util::checkMemory(labelRGB = new Label(glm::vec2(155.f + 5.f, 240.f + 10.f), "RGB")))
 		return false;
 
-	addChildElement(labelTextureSelect);
+	addChildElement(labelRGB);
+
+	if (!Util::checkMemory(panelA = new Panel(glm::vec2(260.f, 240.f), glm::vec2(100.f, 40.f), false)))
+		return false;
+
+	panelA->color = glm::vec4(0.f, 0.f, 0.f, .5f);
+
+	addChildElement(panelA);
+
+	if (!Util::checkMemory(labelA = new Label(glm::vec2(260.f + 5.f, 240.f + 10.f), "A")))
+		return false;
+
+	addChildElement(labelA);
+
+
+	if (!Util::checkMemory(panelMRT0 = new Panel(glm::vec2(50.f, 285.f), glm::vec2(100.f, 40.f), false)))
+		return false;
+
+	panelMRT0->color = glm::vec4(0.f, 0.f, 0.f, .5f);
+
+	addChildElement(panelMRT0);
+
+	if (!Util::checkMemory(labelMRT0 = new Label(glm::vec2(50.f + 5.f, 285.f + 10.f), "MRT 0")))
+		return false;
+
+	addChildElement(labelMRT0);
+
+	if (!Util::checkMemory(panelMRT1 = new Panel(glm::vec2(50.f, 330.f), glm::vec2(100.f, 40.f), false)))
+		return false;
+
+	panelMRT1->color = glm::vec4(0.f, 0.f, 0.f, .5f);
+
+	addChildElement(panelMRT1);
+
+	if (!Util::checkMemory(labelMRT1 = new Label(glm::vec2(50.f + 5.f, 330.f + 10.f), "MRT 1")))
+		return false;
+
+	addChildElement(labelMRT1);
+
+
+	if (!Util::checkMemory(pushButtonGroup = new PushButtonGroup()))
+		return false;
 
 	for (int y = 0; y < 2; ++y)
 	{
@@ -77,38 +102,37 @@ bool GBufferInspector::create()
 			else if (y == 1 && x == 1)
 				text = "Specular";
 
-			if (!Util::checkMemory(button[x][y] = new Button(glm::vec2(160.f + x * 110.f, 290.f + y * 50.f), text)))
+			bool pushed = false;
+
+			if (x == 0 && y == 0)
+				pushed = true;
+
+			if (!Util::checkMemory(pushButton[x][y] = new PushButton(pushed, glm::vec2(155.f + x * 105.f, 285.f + y * 45.f), text)))
 				return false;
 
-			button[x][y]->create();
+			pushButton[x][y]->create();
+			pushButtonGroup->addPushButton(pushButton[x][y]);
 
-			addChildElement(button[x][y]);
+			addChildElement(pushButton[x][y]);
 		}
 	}
 
-	if (!Util::checkMemory(labelMRT0 = new Label(glm::vec2(30.f, 290.f), "MRT 0 (RGB/A):")))
-		return false;
+	pushButtonGroup->selectedButton = pushButton[0][0];
 
-	addChildElement(labelMRT0);
-
-	if (!Util::checkMemory(labelMRT0 = new Label(glm::vec2(30.f, 340.f), "MRT 1 (RGB/A):")))
-		return false;
-
-	addChildElement(labelMRT0);
 
 	return true;
 }
 
 void GBufferInspector::update()
 {
-	std::stringstream s;
-	s << "MRT Index: " << sliderTextureSelect->value;
-
-	if (sliderTextureSelect->value == 0)
-		s << " (RGB: Albedo A: Depth)";
-	else
-		s << " (RGB: Normal A: Specular Intensity)";
-
-	labelTextureSelect->setText(s.str());
-	panelDiffMap->texture = ((DeferredRenderer*)sceneRenderer)->gBuffer->textures[sliderTextureSelect->value];
+	if (pushButton[0][0]->getPushed())
+		panelDiffMap->texture = ((DeferredRenderer*)sceneRenderer)->gBuffer->textures[0];
+	else if (pushButton[1][0]->getPushed())
+		panelDiffMap->texture = ((DeferredRenderer*)sceneRenderer)->gBuffer->textures[1];
+	/*else if (pushButton[0][1]->getPushed())
+		panelDiffMap->texture = ((DeferredRenderer*)sceneRenderer)->gBuffer->textures[2];
+	else if (pushButton[1][1]->getPushed())
+		panelDiffMap->texture = ((DeferredRenderer*)sceneRenderer)->gBuffer->textures[3];*/
+	
+	pushButtonGroup->update();
 }

@@ -15,6 +15,11 @@ Panel::Panel(const glm::vec2 &position, const glm::vec2 &size, bool isTextured) 
 	this->isTextured = isTextured;
 }
 
+Panel::~Panel()
+{
+
+}
+
 void *Panel::operator new(size_t size)
 {
 	return _aligned_malloc(size, 16);
@@ -23,11 +28,6 @@ void *Panel::operator new(size_t size)
 void Panel::operator delete(void *p)
 {
 	_aligned_free(p);
-}
-
-void Panel::destroy()
-{
-	
 }
 
 void Panel::render(const glm::vec2 &parentPosition)
@@ -53,6 +53,9 @@ void Panel::render(const glm::vec2 &parentPosition)
 		uiRenderer->getUIDrawShader()->setColorUniform(color);
 
 	UnitQuad::render();
+
+	if (isTextured)
+		glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Panel::onMouseButtonDown(const glm::vec2 &mousePosition, int mouseButton)

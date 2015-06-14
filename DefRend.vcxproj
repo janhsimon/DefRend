@@ -137,6 +137,8 @@
     <ClInclude Include="Source\UI\Label.hpp" />
     <ClInclude Include="Source\UI\LightEditor.hpp" />
     <ClInclude Include="Source\UI\Panel.hpp" />
+    <ClInclude Include="Source\UI\PushButton.hpp" />
+    <ClInclude Include="Source\UI\PushButtonGroup.hpp" />
     <ClInclude Include="Source\UI\Slider.hpp" />
     <ClInclude Include="Source\Util\Error.hpp" />
     <ClInclude Include="Source\Util\Util.hpp" />
@@ -181,6 +183,8 @@
     <ClCompile Include="Source\UI\Label.cpp" />
     <ClCompile Include="Source\UI\LightEditor.cpp" />
     <ClCompile Include="Source\UI\Panel.cpp" />
+    <ClCompile Include="Source\UI\PushButton.cpp" />
+    <ClCompile Include="Source\UI\PushButtonGroup.cpp" />
     <ClCompile Include="Source\UI\Slider.cpp" />
     <ClCompile Include="Source\Util\Error.cpp" />
     <ClCompile Include="Source\Util\Util.cpp" />

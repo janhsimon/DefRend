@@ -2,7 +2,8 @@
 
 #include <glm.hpp>
 
-#include "Button.hpp"
+#include "PushButton.hpp"
+#include "PushButtonGroup.hpp"
 #include "Frame.hpp"
 #include "Label.hpp"
 #include "Panel.hpp"
@@ -11,10 +12,10 @@
 class GBufferInspector : public Frame
 {
 private:
-	Button *button[2][2];
-	Panel *panelDiffMap;
-	Slider *sliderTextureSelect;
-	Label *labelTextureSelect, *labelMRT0, *labelMRT1;
+	PushButton *pushButton[2][2];
+	PushButtonGroup *pushButtonGroup;
+	Panel *panelDiffMap, *panelRGB, *panelA, *panelMRT0, *panelMRT1;
+	Label *labelLayout, *labelRGB, *labelA, *labelMRT0, *labelMRT1;
 
 public:
 	GBufferInspector(glm::vec2 position);

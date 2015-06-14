@@ -2,6 +2,7 @@
 
 #include "LightEditor.hpp"
 #include "..\Light\LightManager.hpp"
+#include "..\Util\Error.hpp"
 #include "..\Util\Util.hpp"
 
 extern LightManager *lightManager;
@@ -13,43 +14,7 @@ LightEditor::LightEditor(glm::vec2 position) : Frame(position, glm::vec2(256.f, 
 
 LightEditor::~LightEditor()
 {
-	/*
-	if (panelDiffColorPreview)
-	{
-		panelDiffColorPreview->destroy();
-		delete panelDiffColorPreview;
-	}
-
-	if (sliderR)
-	{
-		sliderR->destroy();
-		delete sliderR;
-	}
-
-	if (sliderG)
-	{
-		sliderG->destroy();
-		delete sliderG;
-	}
-
-	if (sliderB)
-	{
-		sliderB->destroy();
-		delete sliderB;
-	}
-
-	if (labelRGB)
-
-	Label *labelRGB;
-	Slider *sliderCutoffAngle;
-	Label *labelCutoffAngle;
-	Slider *sliderDiffuseIntensity;
-	Label *labelDiffuseIntensity;
-	Slider *sliderSpecularIntensity;
-	Label *labelSpecularIntensity;
-	Slider *sliderSpecularPower;
-	Label *labelSpecularPower;
-	*/
+	
 }
 
 bool LightEditor::create()
@@ -167,36 +132,51 @@ bool LightEditor::create()
 
 void LightEditor::update()
 {
+	DirectionalLight *selectedDirectionalLight = lightManager->lights[lightManager->getSelectedLightIndex()];
+
+
 	std::stringstream s;
 	s << "Diffuse Color: " << sliderR->value << "/" << sliderG->value << "/" << sliderB->value;
 	labelRGB->setText(s.str());
 	glm::vec3 color(sliderR->value / 255.f, sliderG->value / 255.f, sliderB->value / 255.f);
 	panelDiffColorPreview->color = glm::vec4(color, 1.f);
-	lightManager->spotLights[lightManager->getSelectedPointLight()]->diffuseColor = color;
+	selectedDirectionalLight->diffuseColor = color;
 
 	s = std::stringstream();
 	s << "Diffuse Intensity: " << sliderDiffuseIntensity->value;
 	labelDiffuseIntensity->setText(s.str());
-	lightManager->spotLights[lightManager->getSelectedPointLight()]->diffuseIntensity = (float)sliderDiffuseIntensity->value;
+	selectedDirectionalLight->diffuseIntensity = (float)sliderDiffuseIntensity->value;
+
+	if (selectedDirectionalLight->type == LightType::DIRECTIONAL_LIGHT)
+		return;
+
+	PointLight *selectedPointLight = (PointLight*)selectedDirectionalLight;
 
 	s = std::stringstream();
 	s << "Specular Intensity: " << sliderSpecularIntensity->value;
 	labelSpecularIntensity->setText(s.str());
-	lightManager->spotLights[lightManager->getSelectedPointLight()]->specularIntensity = (float)sliderSpecularIntensity->value;
+	selectedPointLight->specularIntensity = (float)sliderSpecularIntensity->value;
 
 	s = std::stringstream();
 	s << "Specular Power: " << sliderSpecularPower->value;
 	labelSpecularPower->setText(s.str());
-	lightManager->spotLights[lightManager->getSelectedPointLight()]->specularPower = (float)sliderSpecularPower->value;
+	selectedPointLight->specularPower = (float)sliderSpecularPower->value;
 
-	s = std::stringstream();
-	s << "Cutoff Angle: " << sliderCutoffAngle->value;
-	labelCutoffAngle->setText(s.str());
-	lightManager->spotLights[lightManager->getSelectedPointLight()]->cutoffAngle = (float)sliderCutoffAngle->value;
+	if (selectedDirectionalLight->type == LightType::SPOT_LIGHT)
+	{
+		SpotLight *selectedSpotLight = (SpotLight*)selectedPointLight;
 
-	s = std::stringstream();
-	float normalizedShadowBias = sliderShadowBias->value / 1000.f;
-	s << "Shadow Bias: " << normalizedShadowBias;
-	labelShadowBias->setText(s.str());
-	lightManager->pointLights[0]->shadowBias = normalizedShadowBias;
+		s = std::stringstream();
+		s << "Cutoff Angle: " << sliderCutoffAngle->value;
+		labelCutoffAngle->setText(s.str());
+		selectedSpotLight->cutoffAngle = (float)sliderCutoffAngle->value;
+	}
+	else
+	{
+		s = std::stringstream();
+		float normalizedShadowBias = sliderShadowBias->value / 1000.f;
+		s << "Shadow Bias: " << normalizedShadowBias;
+		labelShadowBias->setText(s.str());
+		selectedPointLight->shadowBias = normalizedShadowBias;
+	}
 }

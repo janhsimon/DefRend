@@ -11,13 +11,26 @@
 extern UIRenderer *uiRenderer;
 extern Window *window;
 
-Button::Button(const glm::vec2 & position, std::string text) : Element(position, glm::vec2(100.f, 40.f))
+Button::Button(const glm::vec2& position, const std::string &text) : Element(position, glm::vec2(100.f, 40.f))
 {
 	this->text = text;
 
 	color = glm::vec3(1.f, 1.f, 1.f);
 	state = ButtonState::NORMAL;
 	mouseDownOnButton = false;
+}
+
+
+Button::~Button()
+{
+	if (label)
+		delete label;
+
+	for (int i = 0; i < 3; ++i)
+	{
+		if (texture[i])
+			TextureManager::unrefTexture(texture[i]);
+	}
 }
 
 bool Button::create()
@@ -43,24 +56,12 @@ bool Button::create()
 	return true;
 }
 
-void Button::destroy()
-{
-	if (label)
-		label->destroy();
-
-	for (int i = 0; i < 3; ++i)
-	{
-		if (texture[i])
-			TextureManager::unrefTexture(texture[i]);
-	}
-}
-
 void Button::render(const glm::vec2 & parentPosition)
 {
 	glUseProgram(uiRenderer->getUIDrawShader()->program);
 
 	glm::mat4 worldMatrix;
-	worldMatrix = glm::translate(worldMatrix, glm::vec3(((position.x + parentPosition.x + size.x / 2.f) / window->width) * 2.f - 1.f, -((position.y + parentPosition.y + 8.f) / window->height) * 2.f + 1.f, 0.f));
+	worldMatrix = glm::translate(worldMatrix, glm::vec3(((position.x + parentPosition.x + size.x / 2.f) / window->width) * 2.f - 1.f, -((position.y + parentPosition.y + size.y / 2.f) / window->height) * 2.f + 1.f, 0.f));
 	worldMatrix = glm::scale(worldMatrix, glm::vec3(size.x / window->width, size.y / window->height, 1.f));
 	uiRenderer->getUIDrawShader()->setWorldMatrixUniform(worldMatrix);
 
@@ -76,7 +77,7 @@ void Button::render(const glm::vec2 & parentPosition)
 	assert(label);
 
 	label->color = color;
-	label->render(parentPosition + glm::vec2((size.x - label->size.x) / 2.f, (size.y - label->size.y) / 2.f - 12.f));
+	label->render(parentPosition + glm::vec2((size.x - label->size.x) / 2.f, (size.y - label->size.y) / 2.f));
 
 	buttonPositionWorld.x = position.x + parentPosition.x;
 	buttonPositionWorld.y = position.y + parentPosition.y;

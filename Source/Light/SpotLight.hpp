@@ -6,4 +6,6 @@ class SpotLight : public PointLight
 {
 public:
 	float cutoffAngle;
+
+	SpotLight();
 };

@@ -9,19 +9,16 @@
 class LightManager
 {
 private:
-	//SpotLight *flashLight;
-	unsigned int selectedPointLight;
+	unsigned int selectedLightIndex;
 
 public:
-	std::vector<DirectionalLight*> directionalLights;
-	std::vector<PointLight*> pointLights;
-	std::vector<SpotLight*> spotLights;
+	std::vector<DirectionalLight*> lights;
 
 	~LightManager();
 
 	bool create();
 	void update(float delta);
 
-	inline int getSelectedPointLight() const { return selectedPointLight; }
-	void selectPointLight(glm::vec2 mousePosition);
+	inline int getSelectedLightIndex() const { return selectedLightIndex; }
+	void selectLight(glm::vec2 mousePosition);
 };

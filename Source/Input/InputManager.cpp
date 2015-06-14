@@ -39,7 +39,7 @@ void InputManager::sendMouseButtonEvent(const SDL_Event &event)
 			gBufferInspector->onMouseButtonUp(glm::vec2(x, y), event.button.button);
 
 			if (event.button.button == 1)
-				lightManager->selectPointLight(glm::vec2(x, y));
+				lightManager->selectLight(glm::vec2(x, y));
 		}
 	}
 }
@@ -73,6 +73,10 @@ void InputManager::sendKeyboardEvent(const SDL_Event &event)
 		flashLight = !flashLight;
 	else if (event.key.keysym.sym == SDLK_SPACE && event.type == SDL_KEYUP)
 		camera->setFirstPerson(!camera->getFirstPerson());
+	else if (event.key.keysym.sym == SDLK_g && event.type == SDL_KEYUP)
+		gBufferInspector->visible = !gBufferInspector->visible;
+	else if (event.key.keysym.sym == SDLK_l && event.type == SDL_KEYUP)
+		lightEditor->visible = !lightEditor->visible;
 
 	else if (event.key.keysym.sym == SDLK_w)
 		forwardKeyPressed = event.type == SDL_KEYDOWN;
@@ -85,16 +89,16 @@ void InputManager::sendKeyboardEvent(const SDL_Event &event)
 	else if (event.key.keysym.sym == SDLK_LSHIFT)
 		crouchKeyPressed = event.type == SDL_KEYDOWN;
 
-	else if (event.key.keysym.sym == SDLK_i)
-		lightForwardKeyPressed = event.type == SDL_KEYDOWN;
-	else if (event.key.keysym.sym == SDLK_k)
-		lightBackKeyPressed = event.type == SDL_KEYDOWN;
-	else if (event.key.keysym.sym == SDLK_j)
-		lightLeftKeyPressed = event.type == SDL_KEYDOWN;
-	else if (event.key.keysym.sym == SDLK_l)
-		lightRightKeyPressed = event.type == SDL_KEYDOWN;
 	else if (event.key.keysym.sym == SDLK_u)
+		lightForwardKeyPressed = event.type == SDL_KEYDOWN;
+	else if (event.key.keysym.sym == SDLK_j)
+		lightBackKeyPressed = event.type == SDL_KEYDOWN;
+	else if (event.key.keysym.sym == SDLK_h)
+		lightLeftKeyPressed = event.type == SDL_KEYDOWN;
+	else if (event.key.keysym.sym == SDLK_k)
+		lightRightKeyPressed = event.type == SDL_KEYDOWN;
+	else if (event.key.keysym.sym == SDLK_y)
 		lightDownKeyPressed = event.type == SDL_KEYDOWN;
-	else if (event.key.keysym.sym == SDLK_o)
+	else if (event.key.keysym.sym == SDLK_i)
 		lightUpKeyPressed = event.type == SDL_KEYDOWN;
 }

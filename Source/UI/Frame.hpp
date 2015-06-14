@@ -17,10 +17,12 @@ private:
 	glm::vec2 lastMousePosition;
 
 public:
+	bool visible;
+
 	Frame(const glm::vec2 &position, const glm::vec2 &size);
+	virtual ~Frame();
 
 	bool load(const std::string &title = "");
-	void destroy();
 
 	void addChildElement(Element *element);
 	void render(const glm::vec2 &parentPosition = glm::vec2(0.f, 0.f));

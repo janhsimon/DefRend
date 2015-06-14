@@ -11,7 +11,9 @@ public:
 	glm::vec3 color;
 
 	Label(const glm::vec2 &position, const std::string &text = "");
-	void destroy();
+	~Label();
+
+	//void destroy();
 
 	void render(const glm::vec2 &parentPosition);
 

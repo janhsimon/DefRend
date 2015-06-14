@@ -16,6 +16,8 @@ class Button : public Element
 private:
 	Label *label;
 	Texture *texture[3]; // normal, hover, down
+
+protected:
 	ButtonState state;
 	glm::vec2 buttonPositionWorld;
 	bool mouseDownOnButton;
@@ -24,9 +26,10 @@ public:
 	std::string text;
 	glm::vec3 color;
 
-	Button(const glm::vec2 & position, std::string text = "");
+	Button(const glm::vec2 &position, const std::string &text = "");
+	~Button();
+
 	bool create();
-	void destroy();
 
 	void render(const glm::vec2 &parentPosition);
 

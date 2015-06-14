@@ -15,8 +15,9 @@ public:
 	int min, max, value;
 
 	Slider(const glm::vec2 &position, const glm::vec2 &size, int min, int max);
+	~Slider();
+
 	bool load();
-	void destroy();
 
 	void render(const glm::vec2 &parentPosition);
 

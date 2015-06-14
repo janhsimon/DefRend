@@ -14,6 +14,22 @@ extern Window *window;
 Frame::Frame(const glm::vec2 &position, const glm::vec2 &size) : Element(position, size)
 {
 	mouseDragging = false;
+	visible = false;
+}
+
+Frame::~Frame()
+{
+	if (headerTexture)
+		TextureManager::unrefTexture(headerTexture);
+
+	if (mainTexture)
+		TextureManager::unrefTexture(mainTexture);
+
+	if (titleLabel)
+		delete titleLabel;
+
+	for (Element *element : childElements)
+		delete element;
 }
 
 bool Frame::load(const std::string &title)
@@ -34,27 +50,6 @@ bool Frame::load(const std::string &title)
 	return true;
 }
 
-void Frame::destroy()
-{
-	// TODO: this is NOT called
-	Error::report("Debug", "Frame dtor called for" + titleLabel->getText());
-
-	if (headerTexture)
-		TextureManager::unrefTexture(headerTexture);
-
-	if (mainTexture)
-		TextureManager::unrefTexture(mainTexture);
-
-	if (titleLabel)
-		titleLabel->destroy();
-
-	for (Element *element : childElements)
-	{
-		element->destroy();
-		delete element;
-	}
-}
-
 void Frame::addChildElement(Element *element)
 {
 	assert(element);
@@ -63,6 +58,9 @@ void Frame::addChildElement(Element *element)
 
 void Frame::render(const glm::vec2 &parentPosition)
 {
+	if (!visible)
+		return;
+
 	glUseProgram(uiRenderer->getUIDrawShader()->program);
 
 
@@ -104,6 +102,9 @@ void Frame::render(const glm::vec2 &parentPosition)
 
 void Frame::onMouseButtonDown(const glm::vec2 &mousePosition, int mouseButton)
 {
+	if (!visible)
+		return;
+
 	if (isPointOnArea(mousePosition, glm::vec2(position.x, position.y - 36.f), glm::vec2(size.x, 32.f)))
 	{
 		if (mouseButton == 1)
@@ -122,6 +123,9 @@ void Frame::onMouseButtonDown(const glm::vec2 &mousePosition, int mouseButton)
 
 void Frame::onMouseButtonUp(const glm::vec2 &mousePosition, int mouseButton)
 {
+	if (!visible)
+		return;
+
 	for (Element *element : childElements)
 		element->onMouseButtonUp(mousePosition, mouseButton);
 
@@ -130,6 +134,9 @@ void Frame::onMouseButtonUp(const glm::vec2 &mousePosition, int mouseButton)
 
 void Frame::onMouseMove(const glm::vec2 &mousePosition)
 {
+	if (!visible)
+		return;
+
 	for (Element *element : childElements)
 		element->onMouseMove(mousePosition);
 

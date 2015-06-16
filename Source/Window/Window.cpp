@@ -65,8 +65,8 @@ bool Window::create(unsigned int width, unsigned int height)
 	// enable depth test
 	glEnable(GL_DEPTH_TEST);
 
-	// set up blend func for opacity maps
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// enable culling
+	glEnable(GL_CULL_FACE);
 
 	alive = true;
 	this->width = width;

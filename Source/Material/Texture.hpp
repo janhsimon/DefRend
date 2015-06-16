@@ -18,6 +18,6 @@ public:
 	bool operator==(const Texture &other);
 
 	bool load(const std::string &filename);
-	void bind(GLenum textureUnit);
-	void unbind(GLenum textureUnit);
+	void bind(GLenum textureUnit = GL_TEXTURE0);
+	void unbind(GLenum textureUnit = GL_TEXTURE0);
 };

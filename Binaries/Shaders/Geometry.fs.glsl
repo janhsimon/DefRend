@@ -30,11 +30,9 @@ vec3 calcTangentSpaceNormal()
 
 void main()
 {
-	//outWorldPosition = vs_fs_worldPosition;
-	//outDiffuse = texture(diffuseMap, vs_fs_uv).rgb + texture(opacityMap, vs_fs_uv).rgb * 0.0001;
-	//outSpecular = texture(specularMap, vs_fs_uv).rgb;
-	//outNormal = calcTangentSpaceNormal();//texture(normalMap, vs_fs_uv).rgb;
+	if (texture(opacityMap, vs_fs_uv).r < 0.5)
+		discard;
 
-	outGBufferMRT0 = vec4(texture(diffuseMap, vs_fs_uv).rgb + texture(opacityMap, vs_fs_uv).rgb * 0.0001, length(vs_fs_posVS.xyz));//-vs_fs_depth / cameraFarClip);
+	outGBufferMRT0 = vec4(texture(diffuseMap, vs_fs_uv).rgb, length(vs_fs_posVS.xyz));
 	outGBufferMRT1 = vec4(calcTangentSpaceNormal(), texture(specularMap, vs_fs_uv).r);
 }

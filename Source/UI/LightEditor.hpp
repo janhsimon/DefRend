@@ -2,6 +2,7 @@
 
 #include <glm.hpp>
 
+#include "Button.hpp"
 #include "Frame.hpp"
 #include "Label.hpp"
 #include "Panel.hpp"
@@ -24,6 +25,8 @@ private:
 	Label *labelSpecularPower;
 	Slider *sliderShadowBias;
 	Label *labelShadowBias;
+
+	Button *buttonNewDirectionalLight, *buttonNewPointLight, *buttonNewSpotLight, *buttonDeleteLight;
 
 public:
 	LightEditor(glm::vec2 position);

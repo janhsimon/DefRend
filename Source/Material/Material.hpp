@@ -5,6 +5,14 @@
 #include "Texture.hpp"
 #include "TextureManager.hpp"
 
+enum BindFlag
+{
+	DIFFUSE_MAP = 1,
+	SPECULAR_MAP = 2,
+	NORMAL_MAP = 4,
+	OPACITY_MAP = 8
+};
+
 class Material
 {
 private:
@@ -18,6 +26,6 @@ public:
 	~Material();
 
 	bool load(aiMaterial *material, const std::string &modelFilename);
-	void bind();
-	void unbind();
+	void bind(char bindFlags);
+	void unbind(char bindFlags);
 };

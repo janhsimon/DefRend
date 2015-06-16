@@ -5,6 +5,8 @@
 #include "..\Light\LightManager.hpp"
 #include "..\Window\Window.hpp"
 
+extern bool showBillboards;
+
 extern Camera *camera;
 extern GBufferInspector *gBufferInspector;
 extern LightManager *lightManager;
@@ -82,6 +84,8 @@ void InputManager::sendKeyboardEvent(const SDL_Event &event)
 		flashLight = !flashLight;
 	else if (event.key.keysym.sym == SDLK_SPACE && event.type == SDL_KEYUP)
 		camera->setFirstPerson(!camera->getFirstPerson());
+	else if (event.key.keysym.sym == SDLK_x && event.type == SDL_KEYUP)
+		showBillboards = !showBillboards;
 	else if (event.key.keysym.sym == SDLK_g && event.type == SDL_KEYUP)
 		gBufferInspector->visible = !gBufferInspector->visible;
 	else if (event.key.keysym.sym == SDLK_l && event.type == SDL_KEYUP)

@@ -19,6 +19,11 @@ public:
 	bool create();
 	void update(float delta);
 
+	void addDirectionalLight();
+	void addPointLight();
+	void addSpotLight();
+	void deleteSelectedLight();
+
 	inline int getSelectedLightIndex() const { return selectedLightIndex; }
 	void selectLight(glm::vec2 mousePosition);
 };

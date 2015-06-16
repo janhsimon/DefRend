@@ -154,32 +154,42 @@ bool Material::load(aiMaterial *material, const std::string &modelFilename)
 	return true;
 }
 
-void Material::bind()
+void Material::bind(char bindFlags)
 {
-	if (diffuseMap)
-		diffuseMap->bind(GL_TEXTURE0);
-	
-	if (specularMap)
-		specularMap->bind(GL_TEXTURE1);
+	if (bindFlags == 0)
+		return;
 
-	if (normalMap)
-		normalMap->bind(GL_TEXTURE2);
+	int i = 0;
 
-	if (opacityMap)
-		opacityMap->bind(GL_TEXTURE3);
+	if ((bindFlags & DIFFUSE_MAP) == DIFFUSE_MAP && diffuseMap)
+		diffuseMap->bind(GL_TEXTURE0 + (i++));
+
+	if ((bindFlags & SPECULAR_MAP) == SPECULAR_MAP && specularMap)
+		specularMap->bind(GL_TEXTURE0 + (i++));
+
+	if ((bindFlags & NORMAL_MAP) == NORMAL_MAP && normalMap)
+		normalMap->bind(GL_TEXTURE0 + (i++));
+
+	if ((bindFlags & OPACITY_MAP) == OPACITY_MAP && opacityMap)
+		opacityMap->bind(GL_TEXTURE0 + (i++));
 }
 
-void Material::unbind()
+void Material::unbind(char bindFlags)
 {
-	if (diffuseMap)
-		diffuseMap->unbind(GL_TEXTURE0);
+	if (bindFlags == 0)
+		return;
 
-	if (specularMap)
-		specularMap->unbind(GL_TEXTURE1);
+	int i = 0;
 
-	if (normalMap)
-		normalMap->unbind(GL_TEXTURE2);
+	if ((bindFlags & DIFFUSE_MAP) == DIFFUSE_MAP && diffuseMap)
+		diffuseMap->unbind(GL_TEXTURE0 + (i++));
 
-	if (opacityMap)
-		opacityMap->unbind(GL_TEXTURE3);
+	if ((bindFlags & SPECULAR_MAP) == SPECULAR_MAP && specularMap)
+		specularMap->unbind(GL_TEXTURE0 + (i++));
+
+	if ((bindFlags & NORMAL_MAP) == NORMAL_MAP && normalMap)
+		normalMap->unbind(GL_TEXTURE0 + (i++));
+
+	if ((bindFlags & OPACITY_MAP) == OPACITY_MAP && opacityMap)
+		opacityMap->unbind(GL_TEXTURE0 + (i++));
 }

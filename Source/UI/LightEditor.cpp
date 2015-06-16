@@ -7,6 +7,26 @@
 
 extern LightManager *lightManager;
 
+void addDirectionalLight()
+{
+	lightManager->addDirectionalLight();
+}
+
+void addPointLight()
+{
+	lightManager->addPointLight();
+}
+
+void addSpotLight()
+{
+	lightManager->addSpotLight();
+}
+
+void deleteLight()
+{
+	lightManager->deleteSelectedLight();
+}
+
 LightEditor::LightEditor(glm::vec2 position) : Frame(position, glm::vec2(256.f, 512.f))
 {
 
@@ -126,6 +146,46 @@ bool LightEditor::create()
 
 	addChildElement(labelShadowBias);
 
+
+	if (!Util::checkMemory(buttonNewDirectionalLight = new Button(glm::vec2(30.f, 400.f), "Sunlight")))
+		return false;
+
+	if (!buttonNewDirectionalLight->create())
+		return false;
+
+	buttonNewDirectionalLight->onClick = &addDirectionalLight;
+
+	addChildElement(buttonNewDirectionalLight);
+
+	if (!Util::checkMemory(buttonNewPointLight = new Button(glm::vec2(135.f, 400.f), "Pointlight")))
+		return false;
+
+	if (!buttonNewPointLight->create())
+		return false;
+
+	buttonNewPointLight->onClick = &addPointLight;
+
+	addChildElement(buttonNewPointLight);
+
+	if (!Util::checkMemory(buttonNewSpotLight = new Button(glm::vec2(30.f, 450.f), "Spotlight")))
+		return false;
+
+	if (!buttonNewSpotLight->create())
+		return false;
+
+	buttonNewSpotLight->onClick = &addSpotLight;
+
+	addChildElement(buttonNewSpotLight);
+
+	if (!Util::checkMemory(buttonDeleteLight = new Button(glm::vec2(135.f, 450.f), "Delete")))
+		return false;
+
+	if (!buttonDeleteLight->create())
+		return false;
+
+	buttonDeleteLight->onClick = &deleteLight;
+
+	addChildElement(buttonDeleteLight);
 
 	return true;
 }

@@ -6,6 +6,7 @@
 const std::string ShadowPassShader::WORLD_MATRIX_UNIFORM_NAME = "worldMatrix";
 const std::string ShadowPassShader::VIEW_MATRIX_UNIFORM_NAME = "viewMatrix";
 const std::string ShadowPassShader::PROJECTION_MATRIX_UNIFORM_NAME = "projectionMatrix";
+const std::string ShadowPassShader::OPACITY_MAP_UNIFORM_NAME = "opacityMap";
 const std::string ShadowPassShader::POINT_LIGHT_POSITION_UNIFORM_NAME = "pointLightPosition";
 const std::string ShadowPassShader::CAMERA_FAR_CLIP_UNIFORM_NAME = "cameraFarClip";
 
@@ -27,6 +28,13 @@ bool ShadowPassShader::create()
 
 	if (!getUniformLocation(PROJECTION_MATRIX_UNIFORM_NAME, projectionMatrixUniformLocation))
 		return false;
+
+	GLint opacityMapUniformLocation;
+
+	if (!getUniformLocation(OPACITY_MAP_UNIFORM_NAME, opacityMapUniformLocation))
+			return false;
+
+	glUniform1i(opacityMapUniformLocation, 0);
 
 	if (!getUniformLocation(POINT_LIGHT_POSITION_UNIFORM_NAME, pointLightPositionUniformLocation))
 		return false;

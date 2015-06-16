@@ -25,6 +25,7 @@ protected:
 public:
 	std::string text;
 	glm::vec3 color;
+	void (*onClick)();
 
 	Button(const glm::vec2 &position, const std::string &text = "");
 	~Button();

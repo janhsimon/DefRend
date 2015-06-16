@@ -10,6 +10,7 @@ private:
 	static const std::string WORLD_MATRIX_UNIFORM_NAME;
 	static const std::string VIEW_MATRIX_UNIFORM_NAME;
 	static const std::string PROJECTION_MATRIX_UNIFORM_NAME;
+	static const std::string OPACITY_MAP_UNIFORM_NAME;
 	static const std::string POINT_LIGHT_POSITION_UNIFORM_NAME;
 	static const std::string CAMERA_FAR_CLIP_UNIFORM_NAME;
 

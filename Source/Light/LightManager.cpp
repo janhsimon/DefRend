@@ -55,8 +55,6 @@ bool LightManager::create()
 	p->specularIntensity = 2000.f;
 	p->specularPower = 4.f;
 	p->shadowBias = .99f;
-	//p->attenuation = glm::vec3(.0001f, .00001f, .00001f);
-	//p->attenuation = glm::vec3(0.0f, 0.0f, 1.f);
 	lights.push_back(p);
 
 	/*
@@ -137,19 +135,95 @@ void LightManager::update(float delta)
 	*/
 
 	if (inputManager->lightForwardKeyPressed && !inputManager->lightBackKeyPressed)
-		lights[1]->position += lights[1]->getForward() * delta;
+		lights[selectedLightIndex]->position += camera->getForward() * delta;
 	else if (inputManager->lightBackKeyPressed && !inputManager->lightForwardKeyPressed)
-		lights[1]->position -= lights[1]->getForward() * delta;
+		lights[selectedLightIndex]->position -= camera->getForward() * delta;
 
 	if (inputManager->lightLeftKeyPressed && !inputManager->lightRightKeyPressed)
-		lights[1]->position += lights[1]->getRight() * delta;
+		lights[selectedLightIndex]->position += camera->getRight() * delta;
 	else if (inputManager->lightRightKeyPressed && !inputManager->lightLeftKeyPressed)
-		lights[1]->position -= lights[1]->getRight() * delta;
+		lights[selectedLightIndex]->position -= camera->getRight() * delta;
 
 	if (inputManager->lightUpKeyPressed && !inputManager->lightDownKeyPressed)
-		lights[1]->position += lights[1]->getUp() * delta;
+		lights[selectedLightIndex]->position += camera->getUp() * delta;
 	else if (inputManager->lightDownKeyPressed && !inputManager->lightUpKeyPressed)
-		lights[1]->position -= lights[1]->getUp() * delta;
+		lights[selectedLightIndex]->position -= camera->getUp() * delta;
+}
+
+void LightManager::addDirectionalLight()
+{
+	DirectionalLight *d;
+
+	if (!Util::checkMemory(d = new DirectionalLight()))
+	{
+		Error::report("Error", "Failed to allocate memory for new directional light.");
+		return;
+	}
+
+	d->position = camera->position;
+	d->setYaw(camera->getYaw());
+	d->setPitch(camera->getPitch());
+	d->setRoll(camera->getRoll());
+	d->diffuseColor = glm::vec3(1.f);
+	d->diffuseIntensity = 1.f;
+	lights.push_back(d);
+}
+
+void LightManager::addPointLight()
+{
+	PointLight *p;
+
+	if (!Util::checkMemory(p = new PointLight()))
+	{
+		Error::report("Error", "Failed to allocate memory for new point light.");
+		return;
+	}
+
+	if (!p->create())
+	{
+		Error::report("Error", "Failed to allocate memory for the cubemap for new point light.");
+		return;
+	}
+
+	p->create();
+
+	p->position = camera->position;
+	p->diffuseColor = glm::vec3(1.f);
+	p->diffuseIntensity = 1000.f;
+	p->specularIntensity = 1000.f;
+	p->specularPower = 4.f;
+	p->shadowBias = .99f;
+	lights.push_back(p);
+}
+
+void LightManager::addSpotLight()
+{
+	SpotLight *s;
+
+	if (!Util::checkMemory(s = new SpotLight()))
+	{
+		Error::report("Error", "Failed to allocate memory for new spot light.");
+		return;
+	}
+
+	s = new SpotLight();
+
+	s->position = camera->position;
+	s->diffuseColor = glm::vec3(1.f);
+	s->diffuseIntensity = 1000.f;
+	s->specularIntensity = 1000.f;
+	s->specularPower = 32.f;
+	s->setYaw(camera->getYaw());
+	s->setPitch(camera->getPitch());
+	s->setRoll(camera->getRoll());
+	s->cutoffAngle = 25.f;
+	lights.push_back(s);
+}
+
+void LightManager::deleteSelectedLight()
+{
+	lights.erase(lights.begin() + selectedLightIndex);
+	selectedLightIndex = 0;
 }
 
 void LightManager::selectLight(glm::vec2 mousePosition)

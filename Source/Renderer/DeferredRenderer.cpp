@@ -134,9 +134,7 @@ void DeferredRenderer::doShadowPass(PointLight *pointLight)
 		for (Model *model : sceneManager->models)
 		{
 			shadowPassShader->setWorldViewProjectionUniforms(model->getWorldMatrix(), pointLightViewMatrix, pointLightProjectionMatrix);
-
-			// render without material binds
-			model->render(false);
+			model->render(BindFlag::OPACITY_MAP);
 		}
 	}
 }
@@ -172,6 +170,10 @@ void DeferredRenderer::doPointLightPass(Camera *camera)
 
 		PointLight *p = (PointLight*)l;
 
+		// bind this light's shadow map
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, p->shadowMap->handle);
+
 		glm::mat4 worldMatrix;
 		worldMatrix = glm::translate(worldMatrix, glm::vec3(p->position[0], p->position[1], p->position[2]));
 		float s = std::max(p->diffuseIntensity, p->specularIntensity);
@@ -183,7 +185,11 @@ void DeferredRenderer::doPointLightPass(Camera *camera)
 		pointLightingShader->setEyePositionUniform(glm::vec3(camera->position.x, camera->position.y, camera->position.z));
 		pointLightingShader->setShadowBiasUniform(p->shadowBias);
 		
-		unitSphereModel->render(false);
+		unitSphereModel->render(0);
+
+		// unbind shadow map
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	}
 }
 
@@ -210,7 +216,7 @@ void DeferredRenderer::doSpotLightPass(Camera *camera)
 		spotLightingShader->setLightParameters(s);
 		spotLightingShader->setEyePositionUniform(glm::vec3(camera->position.x, camera->position.y, camera->position.z));
 
-		unitSphereModel->render(false);
+		unitSphereModel->render(0);
 	}
 
 	/*
@@ -247,6 +253,10 @@ void DeferredRenderer::doSpotLightPass(Camera *camera)
 
 void DeferredRenderer::render(Camera *camera)
 {
+	// we want to cull backfaces
+	glCullFace(GL_BACK);
+	
+
 	// SHADOW PASS: draw depth to the shadow maps
 
 	glViewport(0, 0, 1024, 1024);
@@ -259,7 +269,6 @@ void DeferredRenderer::render(Camera *camera)
 		PointLight *p = (PointLight*)l;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, p->shadowMap->FBO);
-		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUseProgram(shadowPassShader->program);
 
 		doShadowPass(p);
@@ -277,7 +286,7 @@ void DeferredRenderer::render(Camera *camera)
 	for (Model *model : sceneManager->models)
 	{
 		geometryShader->setWorldViewProjectionUniforms(model->getWorldMatrix(), camera->viewMatrix, camera->projectionMatrix);
-		model->render(true);
+		model->render(BindFlag::DIFFUSE_MAP | BindFlag::SPECULAR_MAP | BindFlag::NORMAL_MAP | BindFlag::OPACITY_MAP);
 	}
 	
 
@@ -285,6 +294,9 @@ void DeferredRenderer::render(Camera *camera)
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	// now we switch over to culling front faces for light geometry
+	glCullFace(GL_FRONT);
 
 	glEnable(GL_BLEND);
 	glBlendEquation(GL_FUNC_ADD);
@@ -299,11 +311,6 @@ void DeferredRenderer::render(Camera *camera)
 		glBindTexture(GL_TEXTURE_2D, gBuffer->textures[i]);
 	}
 
-	PointLight *p = (PointLight*)lightManager->lights[1];
-
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, p->shadowMap->handle);
-
 	doDirectionalLightPass(camera);
 	doPointLightPass(camera);
 	doSpotLightPass(camera);
@@ -317,7 +324,4 @@ void DeferredRenderer::render(Camera *camera)
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
-
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }

@@ -116,7 +116,7 @@ bool Model::load(const std::string &filename)
 	return true;
 }
 
-void Model::render(bool bindMaterials)
+void Model::render(char bindFlags)
 {
 	glBindVertexArray(VAO);
 
@@ -127,14 +127,10 @@ void Model::render(bool bindMaterials)
 		Material *material = materials[m->materialIndex];
 		assert(material);
 
-		if (bindMaterials)
-			material->bind();
-
+		material->bind(bindFlags);
 		m->render(vertex);
+		material->unbind(bindFlags);
 
 		vertex += m->vertexCount;
-
-		if (bindMaterials)
-			material->unbind();
 	}
 }

@@ -70,9 +70,9 @@ void Button::render(const glm::vec2 & parentPosition)
 
 	assert(texture[state]);
 
-	texture[state]->bind(GL_TEXTURE0);
+	texture[state]->bind();
 	UnitQuad::render();
-	texture[state]->unbind(GL_TEXTURE0);
+	texture[state]->unbind();
 
 	assert(label);
 
@@ -99,10 +99,7 @@ void Button::onMouseButtonUp(const glm::vec2 & mousePosition, int mouseButton)
 		state = ButtonState::HOVER;
 		
 		if (mouseDownOnButton)
-		{
-			// trigger
-			Error::report("Debug", "Button triggered!");
-		}
+			onClick();
 	}
 	else
 		state = ButtonState::NORMAL;

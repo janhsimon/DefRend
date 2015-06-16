@@ -27,5 +27,5 @@ public:
 	~Model();
 
 	bool load(const std::string &filename);
-	void render(bool bindMaterials);
+	void render(char bindFlags);
 };

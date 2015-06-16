@@ -30,6 +30,7 @@ Window *window;
 
 unsigned int thisTickTime, lastTickTime = 0;
 glm::mat4 projectionMatrix;
+bool showBillboards = false;
 
 bool load()
 {
@@ -184,7 +185,8 @@ void render()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	billboardRenderer->render(camera);
+	if (showBillboards)
+		billboardRenderer->render(camera);
 
 	lightEditor->render();
 	gBufferInspector->render();
@@ -195,20 +197,29 @@ void render()
 	SDL_Color color = { 255, 255, 255 };
 	uiRenderer->drawText(s.str(), glm::vec2(5.f, window->height - 25.f), color);
 
+	uiRenderer->drawText("[W], [A], [S], [D] to MOVE the camera", glm::vec2(5.f, 5.f), color);
+
+	uiRenderer->drawText("[U], [H], [J], [K] to MOVE the selected light", glm::vec2(5.f, 23.f), color);
+
 	if (camera->getFirstPerson())
-		uiRenderer->drawText("[SPACE] to UNLOCK mouse cursor", glm::vec2(5.f, 5.f), color);
+		uiRenderer->drawText("[SPACE] to UNLOCK mouse cursor", glm::vec2(5.f, 41.f), color);
 	else
-		uiRenderer->drawText("[SPACE] to LOCK mouse cursor", glm::vec2(5.f, 5.f), color);
+		uiRenderer->drawText("[SPACE] to LOCK mouse cursor", glm::vec2(5.f, 41.f), color);
+
+	if (showBillboards)
+		uiRenderer->drawText("[X] to HIDE light icons", glm::vec2(5.f, 59.f), color);
+	else
+		uiRenderer->drawText("[X] to SHOW light icons", glm::vec2(5.f, 59.f), color);
 
 	if (gBufferInspector->visible)
-		uiRenderer->drawText("[G] to HIDE \"G-Buffer Inspector\" window", glm::vec2(5.f, 20.f), color);
+		uiRenderer->drawText("[G] to HIDE \"G-Buffer Inspector\" window", glm::vec2(5.f, 77.f), color);
 	else
-		uiRenderer->drawText("[G] to SHOW \"G-Buffer Inspector\" window", glm::vec2(5.f, 20.f), color);
+		uiRenderer->drawText("[G] to SHOW \"G-Buffer Inspector\" window", glm::vec2(5.f, 77.f), color);
 
 	if (lightEditor->visible)
-		uiRenderer->drawText("[L] to HIDE \"Light Editor\" window", glm::vec2(5.f, 35.f), color);
+		uiRenderer->drawText("[L] to HIDE \"Light Editor\" window", glm::vec2(5.f, 95.f), color);
 	else
-		uiRenderer->drawText("[L] to SHOW \"Light Editor\" window", glm::vec2(5.f, 35.f), color);
+		uiRenderer->drawText("[L] to SHOW \"Light Editor\" window", glm::vec2(5.f, 95.f), color);
 
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);

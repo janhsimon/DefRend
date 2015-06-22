@@ -67,6 +67,8 @@ void Button::render(const glm::vec2 & parentPosition)
 
 	uiRenderer->getUIDrawShader()->setUVScaleUniform(glm::vec2(1.f));
 	uiRenderer->getUIDrawShader()->setColorOverrideUniform(false);
+	uiRenderer->getUIDrawShader()->setMRTRGBOverrideUniform(false);
+	uiRenderer->getUIDrawShader()->setMRTRGBOverrideUniform(false);
 
 	assert(texture[state]);
 

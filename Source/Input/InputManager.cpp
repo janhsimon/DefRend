@@ -3,6 +3,11 @@
 #include "..\UI\GBufferInspector.hpp"
 #include "..\UI\LightEditor.hpp"
 #include "..\Light\LightManager.hpp"
+#include "..\Renderer\DeferredRenderer.hpp"
+#include "..\Renderer\ForwardRenderer.hpp"
+#include "..\Renderer\IRenderer.hpp"
+#include "..\Util\Error.hpp"
+#include "..\Util\Util.hpp"
 #include "..\Window\Window.hpp"
 
 extern bool showBillboards;
@@ -11,11 +16,12 @@ extern Camera *camera;
 extern GBufferInspector *gBufferInspector;
 extern LightManager *lightManager;
 extern LightEditor *lightEditor;
+extern IRenderer *sceneRenderer;
 extern Window *window;
 
 InputManager::InputManager()
 {
-	forwardKeyPressed = backKeyPressed = leftKeyPressed = rightKeyPressed = crouchKeyPressed = false;
+	forwardKeyPressed = backKeyPressed = leftKeyPressed = rightKeyPressed = upKeyPressed = downKeyPressed = crouchKeyPressed = false;
 
 	lightForwardKeyPressed = lightBackKeyPressed = lightLeftKeyPressed = lightRightKeyPressed = lightUpKeyPressed = lightDownKeyPressed = false;
 
@@ -84,10 +90,32 @@ void InputManager::sendKeyboardEvent(const SDL_Event &event)
 		flashLight = !flashLight;
 	else if (event.key.keysym.sym == SDLK_SPACE && event.type == SDL_KEYUP)
 		camera->setFirstPerson(!camera->getFirstPerson());
+	else if (event.key.keysym.sym == SDLK_r && event.type == SDL_KEYUP)
+	{
+		assert(sceneRenderer);
+
+		RendererType type = sceneRenderer->type;
+
+		if (type == RendererType::DEFERRED_RENDERER)
+			gBufferInspector->visible = false;
+
+		delete sceneRenderer;
+
+		if (type == RendererType::FORWARD_RENDERER)
+			sceneRenderer = new DeferredRenderer();
+		else if (type == RendererType::DEFERRED_RENDERER)
+			sceneRenderer = new ForwardRenderer();
+
+		sceneRenderer->init();
+	}
 	else if (event.key.keysym.sym == SDLK_x && event.type == SDL_KEYUP)
 		showBillboards = !showBillboards;
 	else if (event.key.keysym.sym == SDLK_g && event.type == SDL_KEYUP)
-		gBufferInspector->visible = !gBufferInspector->visible;
+	{
+		assert(sceneRenderer);
+		if (sceneRenderer->type == RendererType::DEFERRED_RENDERER)
+			gBufferInspector->visible = !gBufferInspector->visible;
+	}
 	else if (event.key.keysym.sym == SDLK_l && event.type == SDL_KEYUP)
 		lightEditor->visible = !lightEditor->visible;
 
@@ -99,6 +127,10 @@ void InputManager::sendKeyboardEvent(const SDL_Event &event)
 		leftKeyPressed = event.type == SDL_KEYDOWN;
 	else if (event.key.keysym.sym == SDLK_d)
 		rightKeyPressed = event.type == SDL_KEYDOWN;
+	else if (event.key.keysym.sym == SDLK_e)
+		upKeyPressed = event.type == SDL_KEYDOWN;
+	else if (event.key.keysym.sym == SDLK_q)
+		downKeyPressed = event.type == SDL_KEYDOWN;
 	else if (event.key.keysym.sym == SDLK_LSHIFT)
 		crouchKeyPressed = event.type == SDL_KEYDOWN;
 
@@ -110,8 +142,8 @@ void InputManager::sendKeyboardEvent(const SDL_Event &event)
 		lightLeftKeyPressed = event.type == SDL_KEYDOWN;
 	else if (event.key.keysym.sym == SDLK_k)
 		lightRightKeyPressed = event.type == SDL_KEYDOWN;
-	else if (event.key.keysym.sym == SDLK_y)
-		lightDownKeyPressed = event.type == SDL_KEYDOWN;
 	else if (event.key.keysym.sym == SDLK_i)
 		lightUpKeyPressed = event.type == SDL_KEYDOWN;
+	else if (event.key.keysym.sym == SDLK_y)
+		lightDownKeyPressed = event.type == SDL_KEYDOWN;
 }

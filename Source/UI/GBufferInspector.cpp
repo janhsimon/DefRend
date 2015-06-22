@@ -1,11 +1,13 @@
 #include <sstream>
 
 #include "GBufferInspector.hpp"
+#include "..\Camera\Camera.hpp"
 #include "..\Renderer\DeferredRenderer.hpp"
 #include "..\Renderer\IRenderer.hpp"
 #include "..\Util\Error.hpp"
 #include "..\Util\Util.hpp"
 
+extern Camera *camera;
 extern IRenderer *sceneRenderer;
 
 GBufferInspector::GBufferInspector(glm::vec2 position) : Frame(position, glm::vec2(410.f, 290.f + 90.f))
@@ -125,14 +127,37 @@ bool GBufferInspector::create()
 
 void GBufferInspector::update()
 {
+	if (sceneRenderer->type != RendererType::DEFERRED_RENDERER)
+		return;
+
 	if (pushButton[0][0]->getPushed())
+	{
 		panelDiffMap->texture = ((DeferredRenderer*)sceneRenderer)->gBuffer->textures[0];
+		panelDiffMap->isMRTRGB = true;
+		panelDiffMap->isMRTA = false;
+		panelDiffMap->mrtScale = 1.f;
+	}
 	else if (pushButton[1][0]->getPushed())
+	{
+		panelDiffMap->texture = ((DeferredRenderer*)sceneRenderer)->gBuffer->textures[0];
+		panelDiffMap->isMRTRGB = false;
+		panelDiffMap->isMRTA = true;
+		panelDiffMap->mrtScale = 1.f / camera->farClipPlane;
+	}
+	else if (pushButton[0][1]->getPushed())
+	{
 		panelDiffMap->texture = ((DeferredRenderer*)sceneRenderer)->gBuffer->textures[1];
-	/*else if (pushButton[0][1]->getPushed())
-		panelDiffMap->texture = ((DeferredRenderer*)sceneRenderer)->gBuffer->textures[2];
+		panelDiffMap->isMRTRGB = true;
+		panelDiffMap->isMRTA = false;
+		panelDiffMap->mrtScale = 1.f;
+	}
 	else if (pushButton[1][1]->getPushed())
-		panelDiffMap->texture = ((DeferredRenderer*)sceneRenderer)->gBuffer->textures[3];*/
+	{
+		panelDiffMap->texture = ((DeferredRenderer*)sceneRenderer)->gBuffer->textures[1];
+		panelDiffMap->isMRTRGB = false;
+		panelDiffMap->isMRTA = true;
+		panelDiffMap->mrtScale = 1.f;
+	}
 	
 	pushButtonGroup->update();
 }

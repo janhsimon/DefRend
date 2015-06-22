@@ -94,8 +94,8 @@
     <None Include="Binaries\Shaders\PointLighting.fs.glsl" />
     <None Include="Binaries\Shaders\ShadowPass.fs.glsl" />
     <None Include="Binaries\Shaders\ShadowPass.vs.glsl" />
-    <None Include="Binaries\Shaders\SimpleDraw.fs.glsl" />
-    <None Include="Binaries\Shaders\SimpleDraw.vs.glsl" />
+    <None Include="Binaries\Shaders\Forward.fs.glsl" />
+    <None Include="Binaries\Shaders\Forward.vs.glsl" />
     <None Include="Binaries\Shaders\SpotLighting.fs.glsl" />
   </ItemGroup>
   <ItemGroup>
@@ -113,6 +113,7 @@
     <ClInclude Include="Source\Renderer\BillboardRenderer.hpp" />
     <ClInclude Include="Source\Renderer\Cubemap.hpp" />
     <ClInclude Include="Source\Renderer\DeferredRenderer.hpp" />
+    <ClInclude Include="Source\Renderer\ForwardRenderer.hpp" />
     <ClInclude Include="Source\Renderer\UIRenderer.hpp" />
     <ClInclude Include="Source\Renderer\GBuffer.hpp" />
     <ClInclude Include="Source\Renderer\IRenderer.hpp" />
@@ -122,6 +123,7 @@
     <ClInclude Include="Source\Scene\SceneManager.hpp" />
     <ClInclude Include="Source\Shader\BillboardDrawShader.hpp" />
     <ClInclude Include="Source\Shader\DirectionalLightingShader.hpp" />
+    <ClInclude Include="Source\Shader\ForwardShader.hpp" />
     <ClInclude Include="Source\Shader\ShadowPassShader.hpp" />
     <ClInclude Include="Source\Shader\UIDrawShader.hpp" />
     <ClInclude Include="Source\Shader\GeometryShader.hpp" />
@@ -160,6 +162,7 @@
     <ClCompile Include="Source\Renderer\BillboardRenderer.cpp" />
     <ClCompile Include="Source\Renderer\Cubemap.cpp" />
     <ClCompile Include="Source\Renderer\DeferredRenderer.cpp" />
+    <ClCompile Include="Source\Renderer\ForwardRenderer.cpp" />
     <ClCompile Include="Source\Renderer\UIRenderer.cpp" />
     <ClCompile Include="Source\Renderer\GBuffer.cpp" />
     <ClCompile Include="Source\Renderer\UnitArrow.cpp" />
@@ -168,6 +171,7 @@
     <ClCompile Include="Source\Scene\SceneManager.cpp" />
     <ClCompile Include="Source\Shader\BillboardDrawShader.cpp" />
     <ClCompile Include="Source\Shader\DirectionalLightingShader.cpp" />
+    <ClCompile Include="Source\Shader\ForwardShader.cpp" />
     <ClCompile Include="Source\Shader\ShadowPassShader.cpp" />
     <ClCompile Include="Source\Shader\UIDrawShader.cpp" />
     <ClCompile Include="Source\Shader\GeometryShader.cpp" />

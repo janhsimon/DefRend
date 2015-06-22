@@ -70,6 +70,11 @@ void Camera::update(float delta)
 	else if (inputManager->rightKeyPressed && !inputManager->leftKeyPressed)
 		position -= getRight() * MOVEMENT_SPEED * delta * (inputManager->crouchKeyPressed ? CROUCH_SPEED_FACTOR : 1.f);
 
+	if (inputManager->upKeyPressed && !inputManager->downKeyPressed)
+		position += getUp() * MOVEMENT_SPEED * delta * (inputManager->crouchKeyPressed ? CROUCH_SPEED_FACTOR : 1.f);
+	else if (inputManager->downKeyPressed && !inputManager->upKeyPressed)
+		position -= getUp() * MOVEMENT_SPEED * delta * (inputManager->crouchKeyPressed ? CROUCH_SPEED_FACTOR : 1.f);
+
 	updateTransform(delta);
 
 	viewMatrix = glm::lookAt(position, position + getForward(), getUp());

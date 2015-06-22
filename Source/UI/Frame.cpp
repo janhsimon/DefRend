@@ -74,6 +74,8 @@ void Frame::render(const glm::vec2 &parentPosition)
 	uiRenderer->getUIDrawShader()->setUVScaleUniform(glm::vec2(1.f));
 
 	uiRenderer->getUIDrawShader()->setColorOverrideUniform(false);
+	uiRenderer->getUIDrawShader()->setMRTRGBOverrideUniform(false);
+	uiRenderer->getUIDrawShader()->setMRTRGBOverrideUniform(false);
 
 	mainTexture->bind(GL_TEXTURE0);
 	UnitQuad::render();
@@ -89,6 +91,8 @@ void Frame::render(const glm::vec2 &parentPosition)
 	uiRenderer->getUIDrawShader()->setUVScaleUniform(glm::vec2(1.f));
 
 	uiRenderer->getUIDrawShader()->setColorOverrideUniform(false);
+	uiRenderer->getUIDrawShader()->setMRTRGBOverrideUniform(false);
+	uiRenderer->getUIDrawShader()->setMRTRGBOverrideUniform(false);
 
 	headerTexture->bind(GL_TEXTURE0);
 	UnitQuad::render();

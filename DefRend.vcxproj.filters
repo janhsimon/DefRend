@@ -46,12 +46,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Binaries\Shaders\SimpleDraw.vs.glsl">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="Binaries\Shaders\SimpleDraw.fs.glsl">
-      <Filter>Shader Files</Filter>
-    </None>
     <None Include="Binaries\Shaders\ShadowPass.fs.glsl">
       <Filter>Shader Files</Filter>
     </None>
@@ -92,6 +86,12 @@
       <Filter>Shader Files</Filter>
     </None>
     <None Include="Binaries\Shaders\UIDraw.vs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\Forward.vs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\Forward.fs.glsl">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>
@@ -228,6 +228,12 @@
     <ClInclude Include="Source\UI\PushButtonGroup.hpp">
       <Filter>Source Files\UI</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Renderer\ForwardRenderer.hpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Shader\ForwardShader.hpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Camera\Camera.cpp">
@@ -361,6 +367,12 @@
     </ClCompile>
     <ClCompile Include="Source\UI\PushButtonGroup.cpp">
       <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer\ForwardRenderer.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Shader\ForwardShader.cpp">
+      <Filter>Source Files\Shader</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

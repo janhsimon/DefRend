@@ -1,16 +1,20 @@
 #pragma once
 
 #include "..\Camera\Camera.hpp"
-#include "..\Window\Window.hpp"
+
+enum RendererType
+{
+	FORWARD_RENDERER,
+	DEFERRED_RENDERER
+};
 
 class IRenderer
 {
-protected:
-	Window *window;
-
 public:
+	RendererType type;
+
 	virtual ~IRenderer() {};
 
-	virtual bool init(Window *window) = 0;
+	virtual bool init() = 0;
 	virtual void render(Camera *camera) = 0;
 };

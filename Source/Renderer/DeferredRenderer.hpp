@@ -32,6 +32,6 @@ public:
 
 	~DeferredRenderer();
 
-	bool init(Window *window);
+	bool init();
 	virtual void render(Camera *camera);
 };

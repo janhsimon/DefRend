@@ -9,6 +9,8 @@ public:
 	bool backKeyPressed;
 	bool leftKeyPressed;
 	bool rightKeyPressed;
+	bool upKeyPressed;
+	bool downKeyPressed;
 	bool crouchKeyPressed;
 
 	bool lightForwardKeyPressed;

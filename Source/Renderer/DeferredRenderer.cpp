@@ -8,9 +8,11 @@
 #include "..\Scene\SceneManager.hpp"
 #include "..\Util\Error.hpp"
 #include "..\Util\Util.hpp"
+#include "..\Window\Window.hpp"
 
 extern LightManager *lightManager;
 extern SceneManager *sceneManager;
+extern Window *window;
 
 DeferredRenderer::~DeferredRenderer()
 {
@@ -69,9 +71,9 @@ bool DeferredRenderer::loadModels()
 	return true;
 }
 
-bool DeferredRenderer::init(Window *window)
+bool DeferredRenderer::init()
 {
-	assert(window);
+	type = RendererType::DEFERRED_RENDERER;
 
 	if (!Util::checkMemory(gBuffer = new GBuffer()))
 		return false;
@@ -84,8 +86,6 @@ bool DeferredRenderer::init(Window *window)
 
 	if (!loadModels())
 		return false;
-
-	this->window = window;
 
 	return true;
 }
@@ -201,7 +201,7 @@ void DeferredRenderer::doSpotLightPass(Camera *camera)
 
 	for (DirectionalLight *l : lightManager->lights)
 	{
-		if (l->type != LightType::DIRECTIONAL_LIGHT)
+		if (l->type != LightType::SPOT_LIGHT)
 			continue;
 
 		SpotLight *s = (SpotLight*)l;
@@ -302,7 +302,6 @@ void DeferredRenderer::render(Camera *camera)
 	glBlendEquation(GL_FUNC_ADD);
 	glBlendFunc(GL_ONE, GL_ONE);
 
-	glDepthMask(GL_FALSE);
 	glDisable(GL_DEPTH_TEST);
 
 	for (unsigned int i = 0; i < 2; ++i)
@@ -316,7 +315,6 @@ void DeferredRenderer::render(Camera *camera)
 	doSpotLightPass(camera);
 
 	glEnable(GL_DEPTH_TEST);
-	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
 
 	for (unsigned int i = 0; i < 2; ++i)

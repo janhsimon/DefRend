@@ -67,6 +67,11 @@ bool ShaderProgram::compileShader(GLuint shader, const std::string &filename)
 
 bool ShaderProgram::load(const std::string &vertexShaderFilename, const std::string &geometryShaderFilename, const std::string &fragmentShaderFilename)
 {
+	program = 0;
+	vertexShader = 0;
+	geometryShader = 0;
+	fragmentShader = 0;
+
 	program = glCreateProgram();
 
 	if (!program)
@@ -151,8 +156,16 @@ const bool ShaderProgram::getUniformLocation(const std::string &uniformName, GLi
 ShaderProgram::~ShaderProgram()
 {
 	glUseProgram(0);
-	glDeleteShader(vertexShader);
-	glDeleteShader(geometryShader);
-	glDeleteShader(fragmentShader);
-	glDeleteProgram(program);
+
+	if (vertexShader > 0)
+		glDeleteShader(vertexShader);
+
+	if (geometryShader > 0)
+		glDeleteShader(geometryShader);
+
+	if (fragmentShader > 0)
+		glDeleteShader(fragmentShader);
+
+	if (program > 0)
+		glDeleteProgram(program);
 }

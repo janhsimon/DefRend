@@ -14,8 +14,9 @@ uniform vec3 lightDiffuseColor;
 uniform float lightDiffuseIntensity;
 uniform float lightSpecularIntensity;
 uniform float lightSpecularPower;
+uniform bool lightCastShadows;
 
-uniform float shadowBias;
+uniform float lightShadowBias;
 
 uniform vec2 screenSize;
 
@@ -70,15 +71,20 @@ void main()
 	vec3 worldPosition = reconstructFromDepth(texture(inGBufferMRT0, uv).a);
 	vec3 normal = normalize(texture(inGBufferMRT1, uv).rgb);
 
-	vec3  light_to_pixel = worldPosition - lightPosition;
-	float lightRadius = max(lightDiffuseIntensity, lightSpecularIntensity);
-	float fDepth = length(light_to_pixel) / lightRadius;
-	float vShadowSample = texture(inShadowMap, light_to_pixel).r;
+	if (lightCastShadows)
+	{
+		vec3  light_to_pixel = worldPosition - lightPosition;
+		float lightRadius = max(lightDiffuseIntensity, lightSpecularIntensity);
+		float fDepth = length(light_to_pixel) / lightRadius;
+		float vShadowSample = texture(inShadowMap, light_to_pixel).r;
 
-	float shadow_factor = 0.0;
+		float shadow_factor = 0.0;
 
-	if (vShadowSample > fDepth * shadowBias)
-		shadow_factor = 1.0;
+		if (vShadowSample > fDepth * lightShadowBias)
+			shadow_factor = 1.0;
 
-	color = vec4(diffuse, 1.0) * calcPointLight(worldPosition, normal, uv) * shadow_factor;
+		color = vec4(diffuse, 1.0) * calcPointLight(worldPosition, normal, uv) * shadow_factor;
+	}
+	else
+		color = vec4(diffuse, 1.0) * calcPointLight(worldPosition, normal, uv);
 }

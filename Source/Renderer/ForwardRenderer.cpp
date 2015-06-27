@@ -50,6 +50,18 @@ void ForwardRenderer::render(Camera *camera)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(forwardShader->program);
 
+	int lightsPassed = 0;
+	for (DirectionalLight *light : lightManager->lights)
+	{
+		forwardShader->setLightParameterUniforms(lightsPassed, *light);
+
+		if (++lightsPassed > 7)
+			break;
+	}
+
+	forwardShader->setLightsPassedUniform(lightsPassed);
+	forwardShader->setEyePositionUniform(camera->position);
+
 	for (Model *model : sceneManager->models)
 	{
 		forwardShader->setWorldViewProjectionUniforms(model->getWorldMatrix(), camera->viewMatrix, camera->projectionMatrix);

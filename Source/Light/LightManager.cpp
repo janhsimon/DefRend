@@ -21,9 +21,9 @@ LightManager::~LightManager()
 
 bool LightManager::create()
 {
-	selectedLightIndex = 1;
+	selectedLightIndex = -1;
 
-
+	/*
 	// add a directional light
 
 	DirectionalLight *d;
@@ -57,7 +57,6 @@ bool LightManager::create()
 	p->shadowBias = .99f;
 	lights.push_back(p);
 
-	/*
 	if (!Util::checkMemory(p = new PointLight()))
 		return false;
 
@@ -71,7 +70,6 @@ bool LightManager::create()
 	p->specularPower = 32.f;
 	//p->attenuation = glm::vec3(.0001f, .00001f, .00001f);
 	pointLights.push_back(p);
-	*/
 
 
 	// and some spot lights
@@ -106,6 +104,7 @@ bool LightManager::create()
 		s->cutoffAngle = 25.f;
 		lights.push_back(s);
 	}
+	*/
 
 	/*
 	// also create a flashlight

@@ -9,6 +9,8 @@ public:
 	GLuint FBO;
 	GLuint depthTexture;
 
-	Cubemap();
+	unsigned int size;
+
+	Cubemap(unsigned int size);
 	~Cubemap();
 };

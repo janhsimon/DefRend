@@ -24,7 +24,7 @@ vec3 calcTangentSpaceNormal()
 	mat3 tbn = mat3(t, b, n);
 
 	vec3 normal = texture(normalMap, vs_fs_uv).rgb;
-	normal = 2.0 * normal - vec3(1.0, 1.0, 1.0);
+	normal = 2.0 * normal - vec3(1.0);
 	return normalize(tbn * normal);
 }
 

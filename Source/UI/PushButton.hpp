@@ -11,12 +11,15 @@ private:
 	bool isPushed;
 
 public:
+	void(*onPushDown)();
+	void(*onPushUp)();
+
 	PushButtonGroup *group;
 
 	PushButton(bool isPushed, const glm::vec2 &position, const std::string &text);
 	~PushButton();
 
-	inline bool getPushed() { return isPushed; }
+	inline bool getPushed() const { return isPushed; }
 	void setPushed(bool isPushed);
 
 	void onMouseButtonDown(const glm::vec2 & mousePosition, int mouseButton);

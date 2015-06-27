@@ -5,6 +5,9 @@
 
 class PointLight : public DirectionalLight
 {
+private:
+	bool castShadows;
+
 public:
 	float specularIntensity;
 	float specularPower;
@@ -18,4 +21,7 @@ public:
 
 	bool create();
 	void update(float delta);
+
+	inline bool getCastShadows() const { return castShadows; }
+	void setCastShadows(bool castShadows);
 };

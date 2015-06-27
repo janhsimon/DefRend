@@ -20,7 +20,6 @@ Button::Button(const glm::vec2& position, const std::string &text) : Element(pos
 	mouseDownOnButton = false;
 }
 
-
 Button::~Button()
 {
 	if (label)

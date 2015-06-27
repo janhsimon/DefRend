@@ -27,6 +27,30 @@ void deleteLight()
 	lightManager->deleteSelectedLight();
 }
 
+void doCastShadows()
+{
+	DirectionalLight *l = lightManager->lights[lightManager->getSelectedLightIndex()];
+
+	if (l->type != LightType::POINT_LIGHT)
+		return;
+
+	PointLight *p = (PointLight*)l;
+
+	p->setCastShadows(true);
+}
+
+void doNotCastShadows()
+{
+	DirectionalLight *l = lightManager->lights[lightManager->getSelectedLightIndex()];
+
+	if (l->type != LightType::POINT_LIGHT)
+		return;
+
+	PointLight *p = (PointLight*)l;
+
+	p->setCastShadows(false);
+}
+
 LightEditor::LightEditor(glm::vec2 position) : Frame(position, glm::vec2(256.f, 512.f))
 {
 
@@ -147,6 +171,18 @@ bool LightEditor::create()
 	addChildElement(labelShadowBias);
 
 
+	if (!Util::checkMemory(pushButtonCastShadows = new PushButton(false, glm::vec2(30.f, 340.f), "Cast shadows")))
+		return false;
+
+	if (!pushButtonCastShadows->create())
+		return false;
+
+	pushButtonCastShadows->onPushDown = &doCastShadows;
+	pushButtonCastShadows->onPushUp = &doNotCastShadows;
+
+	addChildElement(pushButtonCastShadows);
+
+
 	if (!Util::checkMemory(buttonNewDirectionalLight = new Button(glm::vec2(30.f, 400.f), "Sunlight")))
 		return false;
 
@@ -192,6 +228,9 @@ bool LightEditor::create()
 
 void LightEditor::update()
 {
+	if (lightManager->getSelectedLightIndex() < 0)
+		return;
+
 	DirectionalLight *selectedDirectionalLight = lightManager->lights[lightManager->getSelectedLightIndex()];
 
 	std::stringstream s;
@@ -255,6 +294,8 @@ void LightEditor::loadSliderValuesFromLight(DirectionalLight *l)
 
 	sliderSpecularIntensity->value = (int)(p->specularIntensity);
 	sliderSpecularPower->value = (int)(p->specularPower);
+
+	pushButtonCastShadows->setPushed(p->getCastShadows());
 
 	if (l->type == LightType::SPOT_LIGHT)
 	{

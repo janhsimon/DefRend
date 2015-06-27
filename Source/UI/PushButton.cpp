@@ -3,6 +3,10 @@
 PushButton::PushButton(bool isPushed, const glm::vec2 &position, const std::string &text) : Button(position, text)
 {
 	setPushed(isPushed);
+
+	group = nullptr;
+	onPushDown = nullptr;
+	onPushUp = nullptr;
 }
 
 PushButton::~PushButton()
@@ -15,9 +19,19 @@ void PushButton::setPushed(bool isPushed)
 	this->isPushed = isPushed;
 
 	if (isPushed)
+	{
 		state = ButtonState::DOWN;
+
+		if (onPushDown)
+			onPushDown();
+	}
 	else
+	{
 		state = ButtonState::NORMAL;
+
+		if (onPushUp)
+			onPushUp();
+	}
 }
 
 void PushButton::onMouseButtonDown(const glm::vec2 &mousePosition, int mouseButton)
@@ -41,7 +55,9 @@ void PushButton::onMouseButtonUp(const glm::vec2 & mousePosition, int mouseButto
 		if (mouseDownOnButton)
 		{
 			setPushed(!isPushed);
-			group->selectedButton = this;
+
+			if (group)
+				group->selectedButton = this;
 		}
 	}
 	else

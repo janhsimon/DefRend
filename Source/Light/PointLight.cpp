@@ -5,8 +5,8 @@ bool PointLight::create()
 {
 	type = LightType::POINT_LIGHT;
 
-	if (!Util::checkMemory(shadowMap = new Cubemap()))
-		return false;
+	shadowMap = nullptr;
+	setCastShadows(false);
 
 	return true;
 }
@@ -14,4 +14,23 @@ bool PointLight::create()
 PointLight::~PointLight()
 {
 	delete shadowMap;
+}
+
+void PointLight::setCastShadows(bool castShadows)
+{
+	this->castShadows = castShadows;
+
+	if (shadowMap)
+	{
+		delete shadowMap;
+		shadowMap = nullptr;
+	}
+
+	if (castShadows)
+	{
+		//if (!Util::checkMemory(shadowMap = new Cubemap()))
+			//return false;
+
+		shadowMap = new Cubemap(512);
+	}
 }

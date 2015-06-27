@@ -6,6 +6,7 @@
 #include "Frame.hpp"
 #include "Label.hpp"
 #include "Panel.hpp"
+#include "PushButton.hpp"
 #include "Slider.hpp"
 #include "..\Light\DirectionalLight.hpp"
 
@@ -23,6 +24,7 @@ private:
 	Label *labelSpecularIntensity;
 	Slider *sliderSpecularPower;
 	Label *labelSpecularPower;
+	PushButton *pushButtonCastShadows;
 	Slider *sliderShadowBias;
 	Label *labelShadowBias;
 

@@ -170,9 +170,12 @@ void DeferredRenderer::doPointLightPass(Camera *camera)
 
 		PointLight *p = (PointLight*)l;
 
-		// bind this light's shadow map
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, p->shadowMap->handle);
+		if (p->getCastShadows())
+		{
+			// bind this light's shadow map
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, p->shadowMap->handle);
+		}
 
 		glm::mat4 worldMatrix;
 		worldMatrix = glm::translate(worldMatrix, glm::vec3(p->position[0], p->position[1], p->position[2]));
@@ -181,9 +184,8 @@ void DeferredRenderer::doPointLightPass(Camera *camera)
 		
 		pointLightingShader->setWorldViewProjectionUniforms(worldMatrix, camera->viewMatrix, camera->projectionMatrix);
 		pointLightingShader->setScreenSizeUniform(window->width, window->height);
-		pointLightingShader->setLightParameters(p);
+		pointLightingShader->setLightParameterUniforms(*p);
 		pointLightingShader->setEyePositionUniform(glm::vec3(camera->position.x, camera->position.y, camera->position.z));
-		pointLightingShader->setShadowBiasUniform(p->shadowBias);
 		
 		unitSphereModel->render(0);
 
@@ -257,9 +259,7 @@ void DeferredRenderer::render(Camera *camera)
 	glCullFace(GL_BACK);
 	
 
-	// SHADOW PASS: draw depth to the shadow maps
-
-	glViewport(0, 0, 1024, 1024);
+	// SHADOW PASS: draw depth to the shadow maps of those lights that cast shadows
 
 	for (DirectionalLight *l : lightManager->lights)
 	{
@@ -267,6 +267,12 @@ void DeferredRenderer::render(Camera *camera)
 			continue;
 
 		PointLight *p = (PointLight*)l;
+
+		if (!p->getCastShadows())
+			continue;
+
+		unsigned int shadowMapSize = p->shadowMap->size;
+		glViewport(0, 0, shadowMapSize, shadowMapSize);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, p->shadowMap->FBO);
 		glUseProgram(shadowPassShader->program);

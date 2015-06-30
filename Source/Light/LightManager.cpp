@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <sstream>
 
 #include "LightManager.hpp"
@@ -6,12 +7,14 @@
 #include "..\UI\LightEditor.hpp"
 #include "..\Util\Error.hpp"
 #include "..\Util\Util.hpp"
+#include "..\Window\Window.hpp"
 
 #include "gtc\matrix_transform.hpp"
 
 extern Camera *camera;
 extern InputManager *inputManager;
 extern LightEditor *lightEditor;
+extern Window *window;
 
 LightManager::~LightManager()
 {
@@ -227,32 +230,63 @@ void LightManager::deleteSelectedLight()
 
 void LightManager::selectLight(glm::vec2 mousePosition)
 {
-	/*
-	glm::vec3 pos = glm::vec3(mousePosition, 0.f);
-    glm::vec4 viewport = glm::vec4(0.f, 0.f, window->width, window->height);
-	glm::vec3 un = glm::unProject(pos, camera->viewMatrix, camera->projectionMatrix, viewport);
+	assert(window);
+	assert(camera);
 
-	std::stringstream s;
-	s << "Unprojecting point at " << mousePosition.x << "/" << mousePosition.y << " = " << un.x << "/" << un.y << "/" << un.z;
-	Error::report("Debug", s.str());
-	*/
 
-	float nearestDistance = glm::length(glm::vec3(lights[0]->position - camera->position));
-	int nearestIndex = 0;
+	// bring mouse position into OpenGL screen space range (-1,1 top left)
 
-	for (unsigned int i = 1; i < lights.size(); ++i)
+	// [0,0] - [1,1]
+	mousePosition.x /= window->width;
+	mousePosition.y /= window->height;
+
+	// [-1,-1] - [1,1]
+	mousePosition = mousePosition * 2.f - 1.f;
+
+	// flip y
+	mousePosition.y = -mousePosition.y;
+
+
+	if (lights.size() <= 0)
+		return;
+
+	glm::vec2 lightPos(lights[0]->position);
+
+	for (unsigned int i = 0; i < lights.size(); ++i)
 	{
 		DirectionalLight *s = lights[i];
-		float distance = glm::length(glm::vec3(s->position - camera->position));
 
-		if (distance < nearestDistance)
+		glm::vec3 camToLight(s->position - camera->position);
+		camToLight = glm::normalize(camToLight);
+
+		if (glm::dot(camToLight, camera->getForward()) <= 0.f)
+		// if the light is behind the camera
+			// we can't select it
+			continue;
+
+		// bring the light position into screen space
+		glm::vec4 p4 = camera->projectionMatrix * camera->viewMatrix * glm::vec4(s->position, 1.f);
+		p4.x /= p4.w;
+		p4.y /= p4.w;
+
+		glm::vec2 p(p4);
+
+		/*
+		std::stringstream ss;
+		ss << "mousePos: " << mousePosition.x << " / " << mousePosition.y << "   lightPos: " << p.x << " / " << p.y;
+		Error::report("Debug", ss.str());
+		*/
+
+		// get the screen space distance between the light position and the mouse cursor
+		float distance = glm::length(glm::vec2(p - mousePosition));
+
+		if (distance < .04f)
+		// if the mouse was clicked close to the light
 		{
-			nearestIndex = i;
-			nearestDistance = distance;
+			// select it and we're done
+			selectedLightIndex = i;
+			lightEditor->loadSliderValuesFromLight(lights[selectedLightIndex]);
+			return;
 		}
 	}
-
-	selectedLightIndex = nearestIndex;
-
-	lightEditor->loadSliderValuesFromLight(lights[selectedLightIndex]);
 }

@@ -261,6 +261,9 @@ int main(int argc, char **argv)
 	{
 		thisTickTime = SDL_GetTicks();
 		float delta = (thisTickTime - lastTickTime) * .1f;
+		
+		// TODO: move down just over render call
+		update(delta);
 
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
@@ -276,8 +279,7 @@ int main(int argc, char **argv)
 			else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
 				inputManager->sendKeyboardEvent(event);
 		}
-
-		update(delta);
+		
 		render();
 
 		lastTickTime = thisTickTime;

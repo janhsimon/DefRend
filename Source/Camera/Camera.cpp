@@ -83,10 +83,7 @@ void Camera::update(float delta)
 void Camera::setFOV(float fov, unsigned int screenWidth, unsigned int screenHeight)
 {
 	this->fov = fov;
-	
-	//float verticalFOV = Util::convertHorizontalToVerticalFOV(fov, (float)screenWidth, (float)screenHeight);
-	//float aspectRatio = (float)screenWidth / (float)screenHeight;
-	//projectionMatrix = glm::perspective(glm::radians(verticalFOV / 2.f), aspectRatio, nearClipPlane, farClipPlane);
+
 	projectionMatrix = glm::perspectiveFov(glm::radians(fov), (float)screenWidth, (float)screenHeight, nearClipPlane, farClipPlane);
 }
 

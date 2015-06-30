@@ -20,7 +20,7 @@ vec3 calcTangentSpaceNormal()
 {
 	vec3 n = normalize(vs_fs_normal);
 	vec3 t = normalize(vs_fs_tangent);
-	vec3 b = normalize(cross(t, n)); // normalize() shouldn't be necessary but let's be safe
+	vec3 b = cross(t, n);
 	mat3 tbn = mat3(t, b, n);
 
 	vec3 normal = texture(normalMap, vs_fs_uv).rgb;

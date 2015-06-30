@@ -3,7 +3,9 @@
 #include <glm.hpp>
 
 #include "ShaderProgram.hpp"
+#include "..\Light\DirectionalLight.hpp"
 #include "..\Light\PointLight.hpp"
+#include "..\Light\SpotLight.hpp"
 
 class ForwardShader : public ShaderProgram
 {
@@ -20,11 +22,13 @@ private:
 	GLint eyePositionUniformLocation;
 	GLint lightTypeUniformLocation[8];
 	GLint lightPositionUniformLocation[8];
+	GLint lightDirectionUniformLocation[8];
 	GLint lightDiffuseColorUniformLocation[8];
 	GLint lightDiffuseIntensityUniformLocation[8];
 	GLint lightSpecularIntensityUniformLocation[8];
 	GLint lightSpecularPowerUniformLocation[8];
 	GLint lightShadowBiasUniformLocation[8];
+	GLint lightCutoffCosineUniformLocation[8];
 
 public:
 	bool create();

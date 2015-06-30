@@ -47,6 +47,9 @@ bool ForwardShader::create()
 		if (!getUniformLocation(std::string(uniformBaseName.str() + ".position").c_str(), lightPositionUniformLocation[i]))
 			return false;
 
+		if (!getUniformLocation(std::string(uniformBaseName.str() + ".direction").c_str(), lightDirectionUniformLocation[i]))
+			return false;
+
 		if (!getUniformLocation(std::string(uniformBaseName.str() + ".diffuseColor").c_str(), lightDiffuseColorUniformLocation[i]))
 			return false;
 
@@ -59,7 +62,11 @@ bool ForwardShader::create()
 		if (!getUniformLocation(std::string(uniformBaseName.str() + ".specularPower").c_str(), lightSpecularPowerUniformLocation[i]))
 			return false;
 
-		//getUniformLocation(std::string(uniformBaseName.str() + ".shadowBias").c_str(), lightShadowBiasUniformLocation[i]);
+		//if (!getUniformLocation(std::string(uniformBaseName.str() + ".shadowBias").c_str(), lightShadowBiasUniformLocation[i]))
+			//return false;
+
+		if (!getUniformLocation(std::string(uniformBaseName.str() + ".cutoffCosine").c_str(), lightCutoffCosineUniformLocation[i]))
+			return false;
 	}
 
 	GLint textureMapUniformLocation;
@@ -107,6 +114,7 @@ void ForwardShader::setLightParameterUniforms(int index, const DirectionalLight 
 
 	glUniform1i(lightTypeUniformLocation[index], light.type);
 	glUniform3f(lightPositionUniformLocation[index], light.position.x, light.position.y, light.position.z);
+	glUniform3f(lightDirectionUniformLocation[index], light.getForward().x, light.getForward().y, light.getForward().z);
 	glUniform3f(lightDiffuseColorUniformLocation[index], light.diffuseColor.r, light.diffuseColor.g, light.diffuseColor.b);
 	glUniform1f(lightDiffuseIntensityUniformLocation[index], light.diffuseIntensity);
 
@@ -116,7 +124,13 @@ void ForwardShader::setLightParameterUniforms(int index, const DirectionalLight 
 
 		glUniform1f(lightSpecularIntensityUniformLocation[index], p->specularIntensity);
 		glUniform1f(lightSpecularPowerUniformLocation[index], p->specularPower);
-
 		//glUniform1f(lightShadowBiasUniformLocation[index], light.shadowBias);
+
+		if (light.type == LightType::SPOT_LIGHT)
+		{
+			SpotLight *s = (SpotLight*)p;
+
+			glUniform1f(lightCutoffCosineUniformLocation[index], glm::cos(glm::radians(s->cutoffAngle)));
+		}
 	}
 }

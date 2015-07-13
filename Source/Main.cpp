@@ -64,9 +64,9 @@ bool load()
 	}
 
 	//if (!GLEW_VERSION_4_4)
-	if (!GLEW_VERSION_3_0)
+	if (!GLEW_VERSION_3_3)
 	{
-		Error::report("Error", "OpenGL v3.0 is required but your system does not support it.");
+		Error::report("Error", "OpenGL v3.3 is required but your system does not support it.");
 		return false;
 	}
 

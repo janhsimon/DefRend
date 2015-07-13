@@ -30,9 +30,9 @@ bool Window::create(unsigned int width, unsigned int height)
 		return false;
 	}
 
-	// use opengl version 3.0 (from 4.4)
+	// use opengl version 3.3 (from 4.4)
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
 	// require hardware acceleration
 	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);

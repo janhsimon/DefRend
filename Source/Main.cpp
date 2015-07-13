@@ -39,7 +39,7 @@ bool load()
 	if (!Util::checkMemory(window = new Window()))
 		return false;
 
-	if (!window->create(1600, 900))
+	if (!window->create(1280, 720))
 		return false;
 
 

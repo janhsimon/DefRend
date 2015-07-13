@@ -46,7 +46,7 @@ bool Window::create(unsigned int width, unsigned int height)
 	// create an opengl context for the window
 	glContext = SDL_GL_CreateContext(sdlWindow);
 
-	if (!glContext)
+	if (glContext == NULL)
 	{
 		Error::report("Error", "SDL_GL_CreateContext Error: " + std::string(SDL_GetError()));
 		return false;

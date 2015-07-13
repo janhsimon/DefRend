@@ -40,8 +40,8 @@ bool Window::create(unsigned int width, unsigned int height)
 	// enable double buffering
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-	// request a 24-bit depth buffer
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+	// request a 32-bit depth buffer
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
 
 	// create an opengl context for the window
 	glContext = SDL_GL_CreateContext(sdlWindow);

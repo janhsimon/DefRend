@@ -16,32 +16,30 @@ Window::~Window()
 
 bool Window::create(unsigned int width, unsigned int height)
 {
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+	// use opengl version 3.3 (from 4.4)
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
 		Error::report("Error", "SDL_Init Error: " + std::string(SDL_GetError()));
 		return false;
 	}
 
-	sdlWindow = SDL_CreateWindow("DefRend -- written by Jan Simon", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+	sdlWindow = SDL_CreateWindow("DefRend -- written by Jan Simon", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL);
 
 	if (!sdlWindow)
 	{
 		Error::report("Error", "SDL_CreateWindow Error" + std::string(SDL_GetError()));
 		return false;
 	}
-
-	// use opengl version 3.3 (from 4.4)
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-
-	// require hardware acceleration
-	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-
-	// enable double buffering
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-
-	// request a 32-bit depth buffer
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
 
 	// create an opengl context for the window
 	glContext = SDL_GL_CreateContext(sdlWindow);
@@ -93,7 +91,7 @@ bool Window::changeResolution(unsigned int width, unsigned int height, bool full
 		SDL_SetWindowSize(sdlWindow, dm.w, dm.h);
 	*/
 
-	if (SDL_SetWindowFullscreen(sdlWindow, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0) < 0)
+	if (SDL_SetWindowFullscreen(sdlWindow, fullscreen ? /*SDL_WINDOW_FULLSCREEN_DESKTOP*/SDL_WINDOW_FULLSCREEN : 0) < 0)
 	{
 		Error::report("Error", "SDL_SetWindowFullscreen Error: " + std::string(SDL_GetError()));
 		return false;

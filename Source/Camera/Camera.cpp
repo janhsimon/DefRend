@@ -16,7 +16,7 @@ extern Window *window;
 Camera::Camera(glm::vec3 position) : Transform(position)
 {
 	nearClipPlane = 1.f;
-	farClipPlane = 3000.f;
+	farClipPlane = 5000.f;
 
 	setFOV(90.f, window->width, window->height);
 	setFirstPerson(true);

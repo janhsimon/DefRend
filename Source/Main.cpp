@@ -29,8 +29,28 @@ SceneManager *sceneManager;
 Window *window;
 
 unsigned int thisTickTime, lastTickTime = 0;
+unsigned int ms = 0;
+float frameSampleSpacer = 0.f;
 glm::mat4 projectionMatrix;
 bool showBillboards = false;
+
+void renderLoadingScreen()
+{
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glm::vec2 textSize = uiRenderer->getTextDimensions("Loading...");
+
+	SDL_Color color = { 255, 255, 255 };
+	uiRenderer->drawText("Loading...", glm::vec2(window->width - textSize.x - 5.f, window->height - textSize.y - 5.f), color);
+
+	glDisable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
+
+	assert(window);
+	window->finalizeFrame();
+}
 
 bool load()
 {
@@ -39,8 +59,11 @@ bool load()
 	if (!Util::checkMemory(window = new Window()))
 		return false;
 
-	if (!window->create(1280, 720))
+	if (!window->create(1600, 900))
 		return false;
+
+	//if (!window->changeResolution(window->width, window->height, true))
+		//return false;
 
 
 	// check there was no error initializing OpenGL
@@ -78,8 +101,20 @@ bool load()
 		return false;
 	}
 
+	// create UI renderer
 
-	// create billboard, scene and UI renderers
+	if (!Util::checkMemory(uiRenderer = new UIRenderer()))
+		return false;
+
+	if (!uiRenderer->create())
+		return false;
+
+
+	// render the loading screen
+	//renderLoadingScreen();
+
+
+	// create billboard and scene renderers
 
 	if (!Util::checkMemory(billboardRenderer = new BillboardRenderer()))
 		return false;
@@ -91,12 +126,6 @@ bool load()
 		return false;
 
 	if (!sceneRenderer->init())
-		return false;
-
-	if (!Util::checkMemory(uiRenderer = new UIRenderer()))
-		return false;
-
-	if (!uiRenderer->create())
 		return false;
 
 
@@ -150,7 +179,7 @@ bool load()
 	if (!lightEditor->create())
 		return false;
 
-	if (!Util::checkMemory(gBufferInspector = new GBufferInspector(glm::vec2(window->width - 420.f, 48.f))))
+	if (!Util::checkMemory(gBufferInspector = new GBufferInspector(glm::vec2(window->width - /*420.f*/830.f, 48.f))))
 		return false;
 
 	if (!gBufferInspector->create())
@@ -192,9 +221,13 @@ void render()
 	lightEditor->render();
 	gBufferInspector->render();
 
+	int fps = 0;
+	
+	if (ms > 0.f)
+		fps = int(1000.f / ms);
+
 	std::stringstream s;
-	unsigned int ms = (thisTickTime - lastTickTime);
-	s << "FPS: " << int(1000.f / ms) << "        Frame Time: " << ms << " ms        Light Count: " << lightManager->lights.size();
+	s << "Frame Time: " << ms << " ms        FPS: " << fps << "        Light Count: " << lightManager->lights.size();
 	SDL_Color color = { 255, 255, 255 };
 	uiRenderer->drawText(s.str(), glm::vec2(5.f, window->height - 25.f), color);
 
@@ -232,6 +265,7 @@ void render()
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 
+	assert(window);
 	window->finalizeFrame();
 }
 
@@ -262,6 +296,14 @@ int main(int argc, char **argv)
 	{
 		thisTickTime = SDL_GetTicks();
 		float delta = (thisTickTime - lastTickTime) * .1f;
+
+		frameSampleSpacer -= delta;
+
+		if (frameSampleSpacer <= 0.f)
+		{
+			ms = (thisTickTime - lastTickTime);
+			frameSampleSpacer = 100.f;
+		}
 		
 		// TODO: move down just over render call
 		update(delta);
@@ -271,6 +313,16 @@ int main(int argc, char **argv)
 		{
 			if (event.type == SDL_QUIT)
 				window->alive = false;
+			/*
+			else if (event.type == SDL_WINDOWEVENT)
+			{
+				if (event.window.event == SDL_WINDOWEVENT_RESIZED)
+				{
+					glViewport(0, 0, event.window.data1, event.window.data2);
+					//Error::report("Debug", "Window resize event fired");
+				}
+			}
+			*/
 			else if (event.type == SDL_MOUSEMOTION)
 				inputManager->sendMouseMoveEvent(event);
 			else if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP)

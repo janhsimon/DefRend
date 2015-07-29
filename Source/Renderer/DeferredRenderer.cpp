@@ -4,6 +4,9 @@
 
 #include "DeferredRenderer.hpp"
 #include "UnitQuad.hpp"
+#include "..\GBuffer\GBufferFat.hpp"
+#include "..\GBuffer\GBufferSlim.hpp"
+#include "..\GBuffer\GBufferSuperSlim.hpp"
 #include "..\Light\LightManager.hpp"
 #include "..\Scene\SceneManager.hpp"
 #include "..\Util\Error.hpp"
@@ -18,43 +21,75 @@ DeferredRenderer::~DeferredRenderer()
 {
 	delete gBuffer;
 	delete unitSphereModel;
-	delete geometryShader;
-	delete directionalLightingShader;
-	delete pointLightingShader;
-	delete spotLightingShader;
-	delete shadowPassShader;
+
+	if (geometryFatShader)
+		delete geometryFatShader;
+
+	if (deferredFatShader)
+		delete deferredFatShader;
+
+	if (geometrySlimShader)
+		delete geometrySlimShader;
+
+	if (deferredSlimShader)
+		delete deferredSlimShader;
+
+	if (geometrySuperSlimShader)
+		delete geometrySuperSlimShader;
+
+	if (deferredSuperSlimShader)
+		delete deferredSuperSlimShader;
+
+	if (shadowPassShader)
+		delete shadowPassShader;
 }
 
-bool DeferredRenderer::loadShaders()
+bool DeferredRenderer::loadFatShaders()
 {
-	if (!Util::checkMemory(geometryShader = new GeometryShader()))
+	if (!Util::checkMemory(geometryFatShader = new GeometryFatShader()))
 		return false;
 
-	if (!geometryShader->create())
+	if (!geometryFatShader->create())
 		return false;
 
-	if (!Util::checkMemory(directionalLightingShader = new DirectionalLightingShader()))
+	if (!Util::checkMemory(deferredFatShader = new DeferredFatShader()))
 		return false;
 
-	if (!directionalLightingShader->create())
+	if (!deferredFatShader->create())
 		return false;
 
-	if (!Util::checkMemory(pointLightingShader = new PointLightingShader()))
+	return true;
+}
+
+bool DeferredRenderer::loadSlimShaders()
+{
+	if (!Util::checkMemory(geometrySlimShader = new GeometrySlimShader()))
 		return false;
 
-	if (!pointLightingShader->create())
+	if (!geometrySlimShader->create())
 		return false;
 
-	if (!Util::checkMemory(spotLightingShader = new SpotLightingShader()))
+	if (!Util::checkMemory(deferredSlimShader = new DeferredSlimShader()))
 		return false;
 
-	if (!spotLightingShader->create())
+	if (!deferredSlimShader->create())
 		return false;
 
-	if (!Util::checkMemory(shadowPassShader = new ShadowPassShader()))
+	return true;
+}
+
+bool DeferredRenderer::loadSuperSlimShaders()
+{
+	if (!Util::checkMemory(geometrySuperSlimShader = new GeometrySuperSlimShader()))
 		return false;
 
-	if (!shadowPassShader->create())
+	if (!geometrySuperSlimShader->create())
+		return false;
+
+	if (!Util::checkMemory(deferredSuperSlimShader = new DeferredSuperSlimShader()))
+		return false;
+
+	if (!deferredSuperSlimShader->create())
 		return false;
 
 	return true;
@@ -75,13 +110,25 @@ bool DeferredRenderer::init()
 {
 	type = RendererType::DEFERRED_RENDERER;
 
-	if (!Util::checkMemory(gBuffer = new GBuffer()))
+	if (!Util::checkMemory(gBuffer = new GBufferSlim()))
 		return false;
 
 	if (!gBuffer->load(window->width, window->height))
 		return false;
 
-	if (!loadShaders())
+	if (!loadSlimShaders())
+		return false;
+
+	geometryFatShader = nullptr;
+	deferredFatShader = nullptr;
+
+	geometrySuperSlimShader = nullptr;
+	deferredSuperSlimShader = nullptr;
+
+	if (!Util::checkMemory(shadowPassShader = new ShadowPassShader()))
+		return false;
+
+	if (!shadowPassShader->create())
 		return false;
 
 	if (!loadModels())
@@ -139,120 +186,6 @@ void DeferredRenderer::doShadowPass(PointLight *pointLight)
 	}
 }
 
-void DeferredRenderer::doDirectionalLightPass(Camera *camera)
-{
-	assert(camera);
-
-	glUseProgram(directionalLightingShader->program);
-
-	for (DirectionalLight *l : lightManager->lights)
-	{
-		if (l->type != LightType::DIRECTIONAL_LIGHT)
-				continue;
-
-		directionalLightingShader->setWorldViewProjectionUniforms(glm::mat4(1.f), glm::mat4(1.f), glm::mat4(1.f));
-		directionalLightingShader->setLightParameters(l);
-		directionalLightingShader->setScreenSizeUniforms(window->width, window->height);
-		UnitQuad::render();
-	}
-}
-
-void DeferredRenderer::doPointLightPass(Camera *camera)
-{
-	assert(camera);
-
-	glUseProgram(pointLightingShader->program);
-
-	for (DirectionalLight *l : lightManager->lights)
-	{
-		if (l->type != LightType::POINT_LIGHT)
-			continue;
-
-		PointLight *p = (PointLight*)l;
-
-		if (p->getCastShadows())
-		{
-			// bind this light's shadow map
-			glActiveTexture(GL_TEXTURE2);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, p->shadowMap->handle);
-		}
-
-		glm::mat4 worldMatrix;
-		worldMatrix = glm::translate(worldMatrix, glm::vec3(p->position[0], p->position[1], p->position[2]));
-		float s = std::max(p->diffuseIntensity, p->specularIntensity);
-		worldMatrix = glm::scale(worldMatrix, glm::vec3(s, s, s));
-		
-		pointLightingShader->setWorldViewProjectionUniforms(worldMatrix, camera->viewMatrix, camera->projectionMatrix);
-		pointLightingShader->setScreenSizeUniform(window->width, window->height);
-		pointLightingShader->setLightParameterUniforms(*p);
-		pointLightingShader->setEyePositionUniform(glm::vec3(camera->position.x, camera->position.y, camera->position.z));
-		
-		unitSphereModel->render(0);
-
-		// unbind shadow map
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-	}
-}
-
-void DeferredRenderer::doSpotLightPass(Camera *camera)
-{
-	assert(camera);
-
-	glUseProgram(spotLightingShader->program);
-
-	for (DirectionalLight *l : lightManager->lights)
-	{
-		if (l->type != LightType::SPOT_LIGHT)
-			continue;
-
-		SpotLight *s = (SpotLight*)l;
-
-		glm::mat4 worldMatrix;
-		worldMatrix = glm::translate(worldMatrix, glm::vec3(s->position[0], s->position[1], s->position[2]));
-		float scale = std::max(s->diffuseIntensity, s->specularIntensity);
-		worldMatrix = glm::scale(worldMatrix, glm::vec3(scale));
-
-		spotLightingShader->setWorldViewProjectionUniforms(worldMatrix, camera->viewMatrix, camera->projectionMatrix);
-		spotLightingShader->setScreenSizeUniform(window->width, window->height);
-		spotLightingShader->setLightParameters(s);
-		spotLightingShader->setEyePositionUniform(glm::vec3(camera->position.x, camera->position.y, camera->position.z));
-
-		unitSphereModel->render(0);
-	}
-
-	/*
-	if (input.isFlashLightOn())
-	{
-		flashLight->position[0] = camera->getPosition().x;
-		flashLight->position[1] = camera->getPosition().y;
-		flashLight->position[2] = camera->getPosition().z;
-
-		flashLight->direction[0] = camera->getForward().x;
-		flashLight->direction[1] = camera->getForward().y;
-		flashLight->direction[2] = camera->getForward().z;
-
-		// set the world matrix
-		glm::mat4 worldMatrix;
-		worldMatrix = glm::translate(worldMatrix, glm::vec3(flashLight->position[0], flashLight->position[1], flashLight->position[2]));
-		float s = std::max(pointLight->diffuseIntensity, pointLight->specularIntensity);
-		worldMatrix = glm::scale(worldMatrix, glm::vec3(s, s, s));
-		
-		spotLightingShader->setWorldViewProjectionUniforms(worldMatrix, camera->getViewMatrix(), camera->getProjectionMatrix());
-		spotLightingShader->setScreenSizeUniform(window->getWidth(), window->getHeight());
-		spotLightingShader->setLightPositionUniform(flashLight->position[0], flashLight->position[1], flashLight->position[2]);
-		spotLightingShader->setLightDiffuseUniforms(flashLight->diffuseColor[0], flashLight->diffuseColor[1], flashLight->diffuseColor[2], flashLight->diffuseIntensity);
-		spotLightingShader->setLightSpecularUniforms(flashLight->specularIntensity, flashLight->specularPower);
-		spotLightingShader->setLightDirectionUniform(flashLight->direction[0], flashLight->direction[1], flashLight->direction[2]);
-		spotLightingShader->setLightCutoffAngleUniform(flashLight->cutoffAngle);
-		spotLightingShader->setLightAttenuationUniform(flashLight->attenuation[0], flashLight->attenuation[1], flashLight->attenuation[2]);
-		spotLightingShader->setEyePositionUniform(camera->getPosition().x, camera->getPosition().y, camera->getPosition().z);
-
-		unitSphereModel.render(false);
-	}
-	*/
-}
-
 void DeferredRenderer::render(Camera *camera)
 {
 	// we want to cull backfaces
@@ -285,16 +218,31 @@ void DeferredRenderer::render(Camera *camera)
 
 	glViewport(0, 0, window->width, window->height);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, gBuffer->FBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, gBuffer->getFBO());
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glUseProgram(geometryShader->program);
-	
+
+	if (gBuffer->type == GBufferType::FAT)
+		glUseProgram(geometryFatShader->program);
+	else if (gBuffer->type == GBufferType::SLIM)
+		glUseProgram(geometrySlimShader->program);
+	else if (gBuffer->type == GBufferType::SUPER_SLIM)
+	{
+		glUseProgram(geometrySuperSlimShader->program);
+		geometrySuperSlimShader->setCameraFarClip(camera->farClipPlane);
+	}
+
 	for (Model *model : sceneManager->models)
 	{
-		geometryShader->setWorldViewProjectionUniforms(model->getWorldMatrix(), camera->viewMatrix, camera->projectionMatrix);
+		if (gBuffer->type == GBufferType::FAT)
+			geometryFatShader->setWorldViewProjectionUniforms(model->getWorldMatrix(), camera->viewMatrix, camera->projectionMatrix);
+		else if (gBuffer->type == GBufferType::SLIM)
+			geometrySlimShader->setWorldViewProjectionUniforms(model->getWorldMatrix(), camera->viewMatrix, camera->projectionMatrix);
+		else if (gBuffer->type == GBufferType::SUPER_SLIM)
+			geometrySuperSlimShader->setWorldViewProjectionUniforms(model->getWorldMatrix(), camera->viewMatrix, camera->projectionMatrix);
+
 		model->render(BindFlag::DIFFUSE_MAP | BindFlag::SPECULAR_MAP | BindFlag::NORMAL_MAP | BindFlag::OPACITY_MAP);
 	}
-	
+
 
 	// LIGHTING PASS: draw light primitives to the screen
 
@@ -310,22 +258,168 @@ void DeferredRenderer::render(Camera *camera)
 
 	glDisable(GL_DEPTH_TEST);
 
-	for (unsigned int i = 0; i < 2; ++i)
+	unsigned int numTextures = 2;
+	
+	if (gBuffer->type == GBufferType::FAT)
+		numTextures = 4;
+
+	for (unsigned int i = 0; i < numTextures; ++i)
 	{
 		glActiveTexture(GL_TEXTURE0 + i);
-		glBindTexture(GL_TEXTURE_2D, gBuffer->textures[i]);
+		glBindTexture(GL_TEXTURE_2D, gBuffer->getTexture(i));
 	}
 
-	doDirectionalLightPass(camera);
-	doPointLightPass(camera);
-	doSpotLightPass(camera);
+	if (gBuffer->type == GBufferType::FAT)
+		glUseProgram(deferredFatShader->program);
+	else if (gBuffer->type == GBufferType::SLIM)
+		glUseProgram(deferredSlimShader->program);
+	else if (gBuffer->type == GBufferType::SUPER_SLIM)
+	{
+		glUseProgram(deferredSuperSlimShader->program);
+		deferredSuperSlimShader->setCameraFarClip(camera->farClipPlane);
+	}
+
+	for (DirectionalLight *l : lightManager->lights)
+	{
+		if (l->type == LightType::DIRECTIONAL_LIGHT)
+		{
+			if (gBuffer->type == GBufferType::FAT)
+				deferredFatShader->setWorldViewProjectionUniforms(glm::mat4(1.f), glm::mat4(1.f), glm::mat4(1.f));
+			else if (gBuffer->type == GBufferType::SLIM)
+				deferredSlimShader->setWorldViewProjectionUniforms(glm::mat4(1.f), glm::mat4(1.f), glm::mat4(1.f));
+			else if (gBuffer->type == GBufferType::SUPER_SLIM)
+				deferredSuperSlimShader->setWorldViewProjectionUniforms(glm::mat4(1.f), glm::mat4(1.f), glm::mat4(1.f));
+		}
+		else if (l->type == LightType::POINT_LIGHT)
+		{
+			PointLight *p = (PointLight*)l;
+
+			if (p->getCastShadows())
+			{
+				unsigned int shadowMap = GL_TEXTURE2;
+
+				if (gBuffer->type == GBufferType::FAT)
+					shadowMap = GL_TEXTURE4;
+
+				// bind this light's shadow map
+				glActiveTexture(shadowMap);
+				glBindTexture(GL_TEXTURE_CUBE_MAP, p->shadowMap->handle);
+			}
+
+			glm::mat4 worldMatrix;
+			worldMatrix = glm::translate(worldMatrix, glm::vec3(p->position[0], p->position[1], p->position[2]));
+			float scale = std::max(p->diffuseIntensity, p->specularIntensity);
+			worldMatrix = glm::scale(worldMatrix, glm::vec3(scale));
+
+			if (gBuffer->type == GBufferType::FAT)
+				deferredFatShader->setWorldViewProjectionUniforms(worldMatrix, camera->viewMatrix, camera->projectionMatrix);
+			else if (gBuffer->type == GBufferType::SLIM)
+				deferredSlimShader->setWorldViewProjectionUniforms(worldMatrix, camera->viewMatrix, camera->projectionMatrix);
+			else if (gBuffer->type == GBufferType::SUPER_SLIM)
+				deferredSuperSlimShader->setWorldViewProjectionUniforms(worldMatrix, camera->viewMatrix, camera->projectionMatrix);
+		}
+		
+		if (gBuffer->type == GBufferType::FAT)
+		{
+			deferredFatShader->setScreenSizeUniform(window->width, window->height);
+			deferredFatShader->setLightParameterUniforms(*l);
+			deferredFatShader->setEyePositionUniform(glm::vec3(camera->position.x, camera->position.y, camera->position.z));
+		}
+		else if (gBuffer->type == GBufferType::SLIM)
+		{
+			deferredSlimShader->setScreenSizeUniform(window->width, window->height);
+			deferredSlimShader->setLightParameterUniforms(*l);
+			deferredSlimShader->setEyePositionUniform(glm::vec3(camera->position.x, camera->position.y, camera->position.z));
+		}
+		else if (gBuffer->type == GBufferType::SUPER_SLIM)
+		{
+			deferredSuperSlimShader->setScreenSizeUniform(window->width, window->height);
+			deferredSuperSlimShader->setLightParameterUniforms(*l);
+			deferredSuperSlimShader->setEyePositionUniform(glm::vec3(camera->position.x, camera->position.y, camera->position.z));
+		}
+
+		if (l->type == LightType::DIRECTIONAL_LIGHT)
+			UnitQuad::render();
+		else
+			unitSphereModel->render(0);
+
+		if (l->type == LightType::POINT_LIGHT)
+		{
+			PointLight *p = (PointLight*)l;
+
+			if (p->getCastShadows())
+			{
+				unsigned int shadowMap = GL_TEXTURE2;
+
+				if (gBuffer->type == GBufferType::FAT)
+					shadowMap = GL_TEXTURE4;
+
+				// unbind shadow map
+				glActiveTexture(shadowMap);
+				glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+			}
+		}
+	}
 
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 
-	for (unsigned int i = 0; i < 2; ++i)
+	for (unsigned int i = 0; i < numTextures; ++i)
 	{
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
+}
+
+void DeferredRenderer::changeGBufferLayout(GBufferType type)
+{
+	assert(window);
+
+	if (gBuffer->type == type)
+		return;
+
+	delete gBuffer;
+
+	if (gBuffer->type == GBufferType::FAT)
+	{
+		delete geometryFatShader;
+		delete deferredFatShader;
+
+		geometryFatShader = nullptr;
+		deferredFatShader = nullptr;
+	}
+	else if (gBuffer->type == GBufferType::SLIM)
+	{
+		delete geometrySlimShader;
+		delete deferredSlimShader;
+
+		geometrySlimShader = nullptr;
+		deferredSlimShader = nullptr;
+	}
+	else if (gBuffer->type == GBufferType::SUPER_SLIM)
+	{
+		delete geometrySuperSlimShader;
+		delete deferredSuperSlimShader;
+
+		geometrySuperSlimShader = nullptr;
+		deferredSuperSlimShader = nullptr;
+	}
+
+	if (type == GBufferType::FAT)
+	{
+		gBuffer = new GBufferFat();
+		loadFatShaders();
+	}
+	else if (type == GBufferType::SLIM)
+	{
+		gBuffer = new GBufferSlim();
+		loadSlimShaders();
+	}
+	else if (type == GBufferType::SUPER_SLIM)
+	{
+		gBuffer = new GBufferSuperSlim();
+		loadSuperSlimShaders();
+	}
+
+	gBuffer->load(window->width, window->height);
 }

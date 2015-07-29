@@ -20,6 +20,7 @@ in vec2 vs_fs_uv;
 in vec3 vs_fs_normal;
 in vec3 vs_fs_worldPosition;
 in vec3 vs_fs_tangent;
+in vec3 vs_fs_bitangent;
 //in vec4 vs_fs_posVS;
 
 layout (location = 0) out vec4 color;
@@ -35,30 +36,34 @@ vec3 calcTangentSpaceNormal()
 {
 	vec3 n = normalize(vs_fs_normal);
 	vec3 t = normalize(vs_fs_tangent);
-	vec3 b = cross(t, n);
+	//vec3 b = cross(t, n);
+	vec3 b = normalize(vs_fs_bitangent);
 	mat3 tbn = mat3(t, b, n);
 
 	vec3 normal = texture(normalMap, vs_fs_uv).rgb;
+
+	// from [0, 1] to [-1, 1]
 	normal = 2.0 * normal - vec3(1.0);
+
 	return normalize(tbn * normal);
 }
 
 void main()
 {
-	if (texture2D(opacityMap, vs_fs_uv).r < 0.5)
+	if (texture(opacityMap, vs_fs_uv).r < 0.5)
 		discard;
 
-	vec3 diffuseTexture = texture2D(diffuseMap, vs_fs_uv).rgb + texture2D(specularMap, vs_fs_uv).rgb * 0.000001 + texture2D(normalMap, vs_fs_uv).rgb * 0.000001;
+	vec3 diffuseTexture = texture(diffuseMap, vs_fs_uv).rgb;
 	
-	vec3 c = vec3(0.0, 0.0, 0.0) + eyePosition * 0.000001;
+	vec3 c = vec3(0.0, 0.0, 0.0);
 
 	for (int i = 0; i < lightsPassed; ++i)
 	{
 		if (light[i].type == 0)
-		// directional lighting
+		// directional light
 			c += dot(-light[i].direction, calcTangentSpaceNormal()) * light[i].diffuseColor * light[i].diffuseIntensity;
 		else
-		// point lighting and spot lighting
+		// point or spot light
 		{
 			vec3 v = light[i].position - vs_fs_worldPosition;
 			float distance = length(v);

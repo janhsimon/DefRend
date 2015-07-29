@@ -93,10 +93,11 @@ void UIRenderer::drawText(std::string text, glm::vec2 position, SDL_Color color)
 	uiDrawShader->setWorldMatrixUniform(worldMatrix);
 
 	uiDrawShader->setUVScaleUniform(glm::vec2(1.f));
-	uiDrawShader->setColorOverrideUniform(false);
-	uiDrawShader->setMRTRGBOverrideUniform(false);
-	uiDrawShader->setMRTAOverrideUniform(false);
-	uiDrawShader->setMRTScaleUniform(1.f);
+	//uiDrawShader->setColorOverrideUniform(false);
+	//uiDrawShader->setMRTRGBOverrideUniform(false);
+	//uiDrawShader->setMRTAOverrideUniform(false);
+	//uiDrawShader->setMRTScaleUniform(1.f);
+	uiDrawShader->setModeUniform(0);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, fontTextureID);

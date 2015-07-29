@@ -44,6 +44,9 @@
     <Filter Include="Source Files\UI">
       <UniqueIdentifier>{95462385-f3f3-47c1-98f6-09d9c0666c60}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\GBuffer">
+      <UniqueIdentifier>{b5354025-96d7-40c9-bb73-758d842d4bf1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Binaries\Shaders\ShadowPass.fs.glsl">
@@ -52,22 +55,7 @@
     <None Include="Binaries\Shaders\ShadowPass.vs.glsl">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="Binaries\Shaders\Lighting.vs.glsl">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="Binaries\Shaders\PointLighting.fs.glsl">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="Binaries\Shaders\SpotLighting.fs.glsl">
-      <Filter>Shader Files</Filter>
-    </None>
     <None Include="Binaries\Shaders\Geometry.vs.glsl">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="Binaries\Shaders\Geometry.fs.glsl">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="Binaries\Shaders\DirectionalLighting.fs.glsl">
       <Filter>Shader Files</Filter>
     </None>
     <None Include="Binaries\Shaders\BillboardDraw.fs.glsl">
@@ -92,6 +80,27 @@
       <Filter>Shader Files</Filter>
     </None>
     <None Include="Binaries\Shaders\Forward.fs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\DeferredSlim.fs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\GeometrySlim.fs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\Deferred.vs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\DeferredSuperSlim.fs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\GeometrySuperSlim.fs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\DeferredFat.fs.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Binaries\Shaders\GeometryFat.fs.glsl">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>
@@ -126,28 +135,13 @@
     <ClInclude Include="Source\Renderer\DeferredRenderer.hpp">
       <Filter>Source Files\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Renderer\GBuffer.hpp">
-      <Filter>Source Files\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Renderer\IRenderer.hpp">
       <Filter>Source Files\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Source\Scene\SceneManager.hpp">
       <Filter>Source Files\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Shader\DirectionalLightingShader.hpp">
-      <Filter>Source Files\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Shader\GeometryShader.hpp">
-      <Filter>Source Files\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Shader\PointLightingShader.hpp">
-      <Filter>Source Files\Shader</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Shader\ShaderProgram.hpp">
-      <Filter>Source Files\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Shader\SpotLightingShader.hpp">
       <Filter>Source Files\Shader</Filter>
     </ClInclude>
     <ClInclude Include="Source\Transform\Transform.hpp">
@@ -234,6 +228,36 @@
     <ClInclude Include="Source\Shader\ForwardShader.hpp">
       <Filter>Source Files\Shader</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GBuffer\GBufferSlim.hpp">
+      <Filter>Source Files\GBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Shader\DeferredSlimShader.hpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GBuffer\GBufferSuperSlim.hpp">
+      <Filter>Source Files\GBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Shader\DeferredSuperSlimShader.hpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Shader\GeometrySlimShader.hpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Shader\GeometrySuperSlimShader.hpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GBuffer\GBufferFat.hpp">
+      <Filter>Source Files\GBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Shader\DeferredFatShader.hpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Shader\GeometryFatShader.hpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GBuffer\IGBuffer.hpp">
+      <Filter>Source Files\GBuffer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Camera\Camera.cpp">
@@ -266,25 +290,10 @@
     <ClCompile Include="Source\Renderer\DeferredRenderer.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Renderer\GBuffer.cpp">
-      <Filter>Source Files\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Scene\SceneManager.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Shader\DirectionalLightingShader.cpp">
-      <Filter>Source Files\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Shader\GeometryShader.cpp">
-      <Filter>Source Files\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Shader\PointLightingShader.cpp">
-      <Filter>Source Files\Shader</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Shader\ShaderProgram.cpp">
-      <Filter>Source Files\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Shader\SpotLightingShader.cpp">
       <Filter>Source Files\Shader</Filter>
     </ClCompile>
     <ClCompile Include="Source\Transform\Transform.cpp">
@@ -372,6 +381,33 @@
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Shader\ForwardShader.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GBuffer\GBufferSlim.cpp">
+      <Filter>Source Files\GBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Shader\DeferredSlimShader.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GBuffer\GBufferSuperSlim.cpp">
+      <Filter>Source Files\GBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Shader\DeferredSuperSlimShader.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Shader\GeometrySlimShader.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Shader\GeometrySuperSlimShader.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GBuffer\GBufferFat.cpp">
+      <Filter>Source Files\GBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Shader\DeferredFatShader.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Shader\GeometryFatShader.cpp">
       <Filter>Source Files\Shader</Filter>
     </ClCompile>
   </ItemGroup>

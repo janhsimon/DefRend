@@ -9,6 +9,7 @@ struct Vertex
 	float u, v;
 	float normalX, normalY, normalZ;
 	float tangentX, tangentY, tangentZ;
+	float bitangentX, bitangentY, bitangentZ;
 };
 
 class Mesh

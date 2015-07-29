@@ -10,6 +10,6 @@ uniform vec3 tintColor;
 
 void main()
 {
-	vec4 tex = texture2D(diffuseMap, vs_fs_uv);
+	vec4 tex = texture(diffuseMap, vs_fs_uv);
 	color = vec4(tex.rgb * tintColor, tex.a);
 }

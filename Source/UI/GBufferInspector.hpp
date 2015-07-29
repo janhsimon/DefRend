@@ -14,7 +14,9 @@ class GBufferInspector : public Frame
 private:
 	PushButton *pushButton[2][2];
 	PushButtonGroup *pushButtonGroup;
-	Panel *panelDiffMap, *panelRGB, *panelA, *panelMRT0, *panelMRT1;
+	PushButton *buttonGBufferFat, *buttonGBufferSlim, *buttonGBufferSuperSlim;
+	PushButtonGroup *buttonGroupGBufferLayout;
+	Panel *panelViewer, *panelRGB, *panelA, *panelMRT0, *panelMRT1;
 	Label *labelLayout, *labelRGB, *labelA, *labelMRT0, *labelMRT1;
 
 public:

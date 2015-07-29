@@ -31,6 +31,6 @@ void PointLight::setCastShadows(bool castShadows)
 		//if (!Util::checkMemory(shadowMap = new Cubemap()))
 			//return false;
 
-		shadowMap = new Cubemap(512);
+		shadowMap = new Cubemap(1024);
 	}
 }

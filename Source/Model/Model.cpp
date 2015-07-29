@@ -94,6 +94,7 @@ bool Model::load(const std::string &filename)
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
 	glEnableVertexAttribArray(3);
+	glEnableVertexAttribArray(4);
 
 	// generate and bind a VBO
 	glGenBuffers(1, &VBO);
@@ -105,6 +106,7 @@ bool Model::load(const std::string &filename)
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)(sizeof(float) * 3));	// tex coord uvs
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)(sizeof(float) * 5));	// normal
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)(sizeof(float) * 8));	// tangent
+	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)(sizeof(float) * 11));	// bitangent
 
 	GLenum error = glGetError();
 	if (error != GL_NO_ERROR)

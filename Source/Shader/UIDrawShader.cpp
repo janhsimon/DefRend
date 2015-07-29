@@ -6,10 +6,11 @@
 const std::string UIDrawShader::WORLD_MATRIX_UNIFORM_NAME = "worldMatrix";
 const std::string UIDrawShader::UV_SCALE_UNIFORM_NAME = "uvScale";
 const std::string UIDrawShader::COLOR_UNIFORM_NAME = "color";
-const std::string UIDrawShader::COLOR_OVERRIDE_UNIFORM_NAME = "colorOverride";
-const std::string UIDrawShader::MRT_RGB_OVERRIDE_UNIFORM_NAME = "mrtRGBReinterpretOverride";
-const std::string UIDrawShader::MRT_A_OVERRIDE_UNIFORM_NAME = "mrtAReinterpretOverride";
-const std::string UIDrawShader::MRT_SCALE_UNIFORM_NAME = "mrtScale";
+//const std::string UIDrawShader::COLOR_OVERRIDE_UNIFORM_NAME = "colorOverride";
+//const std::string UIDrawShader::MRT_RGB_OVERRIDE_UNIFORM_NAME = "mrtRGBReinterpretOverride";
+//const std::string UIDrawShader::MRT_A_OVERRIDE_UNIFORM_NAME = "mrtAReinterpretOverride";
+//const std::string UIDrawShader::MRT_SCALE_UNIFORM_NAME = "mrtScale";
+const std::string UIDrawShader::MODE_UNIFORM_NAME = "mode";
 const std::string UIDrawShader::DIFFUSE_MAP_UNIFORM_NAME = "diffuseMap";
 
 bool UIDrawShader::create()
@@ -31,6 +32,7 @@ bool UIDrawShader::create()
 	if (!getUniformLocation(COLOR_UNIFORM_NAME, colorUniformLocation))
 		return false;
 
+	/*
 	if (!getUniformLocation(COLOR_OVERRIDE_UNIFORM_NAME, colorOverrideUniformLocation))
 		return false;
 
@@ -41,6 +43,10 @@ bool UIDrawShader::create()
 		return false;
 
 	if (!getUniformLocation(MRT_SCALE_UNIFORM_NAME, mrtScaleUniformLocation))
+		return false;
+	*/
+
+	if (!getUniformLocation(MODE_UNIFORM_NAME, modeUniformLocation))
 		return false;
 
 	GLint diffuseMapUniformLocation;
@@ -75,6 +81,7 @@ void UIDrawShader::setColorUniform(const glm::vec4 &color)
 	glUniform4f(colorUniformLocation, color.r, color.g, color.b, color.a);
 }
 
+/*
 void UIDrawShader::setColorOverrideUniform(bool colorOverride)
 {
 	glUniform1i(colorOverrideUniformLocation, colorOverride);
@@ -93,4 +100,10 @@ void UIDrawShader::setMRTAOverrideUniform(bool mrtAOverride)
 void UIDrawShader::setMRTScaleUniform(float mrtScale)
 {
 	glUniform1f(mrtScaleUniformLocation, mrtScale);
+}
+*/
+
+void UIDrawShader::setModeUniform(int mode)
+{
+	glUniform1i(modeUniformLocation, mode);
 }

@@ -6,6 +6,16 @@
 #include "..\Renderer\UIRenderer.hpp"
 #include "..\Material\Texture.hpp"
 
+enum PanelMode
+{
+	CUSTOM_TEXTURE,
+	SINGLE_COLOR,
+	GBUFFER_DIFFUSE,
+	GBUFFER_SPECULAR,
+	GBUFFER_NORMAL,
+	GBUFFER_DEPTH
+};
+
 class Panel : public Element
 {
 private:
@@ -14,8 +24,9 @@ private:
 public:
 	GLuint texture;
 	glm::vec4 color;
-	bool isMRTRGB, isMRTA;
-	float mrtScale;
+	//bool isMRTRGB, isMRTA;
+	//float mrtScale;
+	PanelMode mode;
 
 	Panel(const glm::vec2 &position, const glm::vec2 &size, bool isTextured);
 	~Panel();

@@ -82,10 +82,11 @@ void Slider::render(const glm::vec2 &parentPosition)
 
 	uiRenderer->getUIDrawShader()->setUVScaleUniform(glm::vec2(size.x / 16.f, 1.f));
 
-	uiRenderer->getUIDrawShader()->setColorOverrideUniform(false);
-	uiRenderer->getUIDrawShader()->setMRTRGBOverrideUniform(false);
-	uiRenderer->getUIDrawShader()->setMRTAOverrideUniform(false);
-	uiRenderer->getUIDrawShader()->setMRTScaleUniform(1.f);
+	//uiRenderer->getUIDrawShader()->setColorOverrideUniform(false);
+	//uiRenderer->getUIDrawShader()->setMRTRGBOverrideUniform(false);
+	//uiRenderer->getUIDrawShader()->setMRTAOverrideUniform(false);
+	//uiRenderer->getUIDrawShader()->setMRTScaleUniform(1.f);
+	uiRenderer->getUIDrawShader()->setModeUniform(0);
 
 	barTexture->bind(GL_TEXTURE0);
 	UnitQuad::render();
@@ -103,10 +104,11 @@ void Slider::render(const glm::vec2 &parentPosition)
 
 	uiRenderer->getUIDrawShader()->setUVScaleUniform(glm::vec2(1.f, 1.f));
 
-	uiRenderer->getUIDrawShader()->setColorOverrideUniform(false);
-	uiRenderer->getUIDrawShader()->setMRTRGBOverrideUniform(false);
-	uiRenderer->getUIDrawShader()->setMRTAOverrideUniform(false);
-	uiRenderer->getUIDrawShader()->setMRTScaleUniform(1.f);
+	//uiRenderer->getUIDrawShader()->setColorOverrideUniform(false);
+	//uiRenderer->getUIDrawShader()->setMRTRGBOverrideUniform(false);
+	//uiRenderer->getUIDrawShader()->setMRTAOverrideUniform(false);
+	//uiRenderer->getUIDrawShader()->setMRTScaleUniform(1.f);
+	uiRenderer->getUIDrawShader()->setModeUniform(0);
 
 	barLeftEndTexture->bind(GL_TEXTURE0);
 	UnitQuad::render();
@@ -121,10 +123,11 @@ void Slider::render(const glm::vec2 &parentPosition)
 
 	uiRenderer->getUIDrawShader()->setUVScaleUniform(glm::vec2(1.f, 1.f));
 
-	uiRenderer->getUIDrawShader()->setColorOverrideUniform(false);
-	uiRenderer->getUIDrawShader()->setMRTRGBOverrideUniform(false);
-	uiRenderer->getUIDrawShader()->setMRTAOverrideUniform(false);
-	uiRenderer->getUIDrawShader()->setMRTScaleUniform(1.f);
+	//uiRenderer->getUIDrawShader()->setColorOverrideUniform(false);
+	//uiRenderer->getUIDrawShader()->setMRTRGBOverrideUniform(false);
+	//uiRenderer->getUIDrawShader()->setMRTAOverrideUniform(false);
+	//uiRenderer->getUIDrawShader()->setMRTScaleUniform(1.f);
+	uiRenderer->getUIDrawShader()->setModeUniform(0);
 
 	barRightEndTexture->bind(GL_TEXTURE0);
 	UnitQuad::render();
@@ -146,10 +149,11 @@ void Slider::render(const glm::vec2 &parentPosition)
 
 	uiRenderer->getUIDrawShader()->setUVScaleUniform(glm::vec2(1.f));
 
-	uiRenderer->getUIDrawShader()->setColorOverrideUniform(false);
-	uiRenderer->getUIDrawShader()->setMRTRGBOverrideUniform(false);
-	uiRenderer->getUIDrawShader()->setMRTAOverrideUniform(false);
-	uiRenderer->getUIDrawShader()->setMRTScaleUniform(1.f);
+	//uiRenderer->getUIDrawShader()->setColorOverrideUniform(false);
+	//uiRenderer->getUIDrawShader()->setMRTRGBOverrideUniform(false);
+	//uiRenderer->getUIDrawShader()->setMRTAOverrideUniform(false);
+	//uiRenderer->getUIDrawShader()->setMRTScaleUniform(1.f);
+	uiRenderer->getUIDrawShader()->setModeUniform(0);
 
 	UnitQuad::render();
 

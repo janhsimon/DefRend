@@ -1,37 +1,47 @@
-#include "GBuffer.hpp"
 #include "IRenderer.hpp"
+#include "..\GBuffer\IGBuffer.hpp"
+#include "..\Light\PointLight.hpp"
 #include "..\Model\Model.hpp"
-#include "..\Shader\DirectionalLightingShader.hpp"
-#include "..\Shader\GeometryShader.hpp"
-#include "..\Shader\PointLightingShader.hpp"
+#include "..\Shader\DeferredFatShader.hpp"
+#include "..\Shader\DeferredSlimShader.hpp"
+#include "..\Shader\DeferredSuperSlimShader.hpp"
+#include "..\Shader\GeometryFatShader.hpp"
+#include "..\Shader\GeometrySlimShader.hpp"
+#include "..\Shader\GeometrySuperSlimShader.hpp"
 #include "..\Shader\ShadowPassShader.hpp"
-#include "..\Shader\SpotLightingShader.hpp"
 
 class DeferredRenderer : public IRenderer
 {
 private:
 	
 	ShadowPassShader *shadowPassShader;
-	GeometryShader *geometryShader;
-	DirectionalLightingShader *directionalLightingShader;
-	PointLightingShader *pointLightingShader;
-	SpotLightingShader *spotLightingShader;
+
+	GeometryFatShader *geometryFatShader;
+	DeferredFatShader *deferredFatShader;
+
+	GeometrySlimShader *geometrySlimShader;
+	DeferredSlimShader *deferredSlimShader;
+
+	GeometrySuperSlimShader *geometrySuperSlimShader;
+	DeferredSuperSlimShader *deferredSuperSlimShader;
 
 	Model *unitSphereModel;
 
-	bool loadShaders();
+	bool loadFatShaders();
+	bool loadSlimShaders();
+	bool loadSuperSlimShaders();
+
 	bool loadModels();
 
 	void doShadowPass(PointLight *pointLight);
-	void doDirectionalLightPass(Camera *camera);
-	void doPointLightPass(Camera *camera);
-	void doSpotLightPass(Camera *camera);
 
 public:
-	GBuffer *gBuffer;
+	IGBuffer *gBuffer;
 
 	~DeferredRenderer();
 
 	bool init();
 	virtual void render(Camera *camera);
+
+	void changeGBufferLayout(GBufferType type);
 };

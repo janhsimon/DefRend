@@ -136,6 +136,9 @@ void LightManager::update(float delta)
 	z += .005f * delta;
 	*/
 
+	if (selectedLightIndex < 0 || selectedLightIndex >= lights.size())
+		return;
+
 	if (inputManager->lightForwardKeyPressed && !inputManager->lightBackKeyPressed)
 		lights[selectedLightIndex]->position += camera->getForward() * delta;
 	else if (inputManager->lightBackKeyPressed && !inputManager->lightForwardKeyPressed)

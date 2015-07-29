@@ -14,9 +14,11 @@ Panel::Panel(const glm::vec2 &position, const glm::vec2 &size, bool isTextured) 
 {
 	this->isTextured = isTextured;
 
-	isMRTRGB = false;
-	isMRTA = false;
-	mrtScale = 1.f;
+	//isMRTRGB = false;
+	//isMRTA = false;
+	//mrtScale = 1.f;
+
+	mode = PanelMode::CUSTOM_TEXTURE;
 }
 
 Panel::~Panel()
@@ -46,11 +48,12 @@ void Panel::render(const glm::vec2 &parentPosition)
 	// flip texture vertically which is needed for some reason
 	uiRenderer->getUIDrawShader()->setUVScaleUniform(glm::vec2(1.f, -1.f));
 
-	uiRenderer->getUIDrawShader()->setColorOverrideUniform(!isTextured);
 	uiRenderer->getUIDrawShader()->setColorUniform(color);
-	uiRenderer->getUIDrawShader()->setMRTRGBOverrideUniform(isMRTRGB);
-	uiRenderer->getUIDrawShader()->setMRTAOverrideUniform(isMRTA);
-	uiRenderer->getUIDrawShader()->setMRTScaleUniform(mrtScale);
+	//uiRenderer->getUIDrawShader()->setColorOverrideUniform(!isTextured);
+	//uiRenderer->getUIDrawShader()->setMRTRGBOverrideUniform(isMRTRGB);
+	//uiRenderer->getUIDrawShader()->setMRTAOverrideUniform(isMRTA);
+	//uiRenderer->getUIDrawShader()->setMRTScaleUniform(mrtScale);
+	uiRenderer->getUIDrawShader()->setModeUniform(!isTextured ? 1 : mode);
 
 	if (isTextured)
 	{

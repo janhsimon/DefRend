@@ -119,6 +119,12 @@ void InputManager::sendKeyboardEvent(const SDL_Event &event)
 	else if (event.key.keysym.sym == SDLK_l && event.type == SDL_KEYUP)
 		lightEditor->visible = !lightEditor->visible;
 
+	else if (event.key.keysym.sym == SDLK_n && event.type == SDL_KEYUP)
+	{
+		if (sceneRenderer->type == RendererType::FORWARD_RENDERER)
+			sceneRenderer->doAA = !sceneRenderer->doAA;
+	}
+
 	else if (event.key.keysym.sym == SDLK_w)
 		forwardKeyPressed = event.type == SDL_KEYDOWN;
 	else if (event.key.keysym.sym == SDLK_s)

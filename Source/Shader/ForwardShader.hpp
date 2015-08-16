@@ -20,15 +20,15 @@ private:
 	GLint worldMatrixUniformLocation, viewMatrixUniformLocation, projectionMatrixUniformLocation;
 	GLint lightsPassedUniformLocation;
 	GLint eyePositionUniformLocation;
-	GLint lightTypeUniformLocation[8];
-	GLint lightPositionUniformLocation[8];
-	GLint lightDirectionUniformLocation[8];
-	GLint lightDiffuseColorUniformLocation[8];
-	GLint lightDiffuseIntensityUniformLocation[8];
-	GLint lightSpecularIntensityUniformLocation[8];
-	GLint lightSpecularPowerUniformLocation[8];
-	GLint lightShadowBiasUniformLocation[8];
-	GLint lightCutoffCosineUniformLocation[8];
+	GLint lightTypeUniformLocation[33];
+	GLint lightPositionUniformLocation[33];
+	GLint lightDirectionUniformLocation[33];
+	GLint lightDiffuseColorUniformLocation[33];
+	GLint lightDiffuseIntensityUniformLocation[33];
+	GLint lightSpecularIntensityUniformLocation[33];
+	GLint lightSpecularPowerUniformLocation[33];
+	GLint lightShadowBiasUniformLocation[33];
+	GLint lightCutoffCosineUniformLocation[33];
 
 public:
 	bool create();

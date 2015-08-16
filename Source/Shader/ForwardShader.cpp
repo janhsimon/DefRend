@@ -36,7 +36,7 @@ bool ForwardShader::create()
 	if (!getUniformLocation(EYE_POSITION_UNIFORM_NAME, eyePositionUniformLocation))
 		return false;
 
-	for (int i = 0; i < 8; ++i)
+	for (int i = 0; i < 33; ++i)
 	{
 		std::stringstream uniformBaseName;
 		uniformBaseName << "light[" << i << "]";
@@ -98,7 +98,7 @@ void ForwardShader::setWorldViewProjectionUniforms(const glm::mat4 &worldMatrix,
 
 void ForwardShader::setLightsPassedUniform(int lightsPassed)
 {
-	assert(lightsPassed >= 0 || lightsPassed < 8);
+	assert(lightsPassed >= 0 && lightsPassed <= 33);
 
 	glUniform1i(lightsPassedUniformLocation, lightsPassed);
 }
@@ -110,7 +110,7 @@ void ForwardShader::setEyePositionUniform(const glm::vec3 &eyePosition)
 
 void ForwardShader::setLightParameterUniforms(int index, const DirectionalLight &light)
 {
-	assert(index >= 0 || index < 8);
+	assert(index >= 0 && index < 33);
 
 	glUniform1i(lightTypeUniformLocation[index], light.type);
 	glUniform3f(lightPositionUniformLocation[index], light.position.x, light.position.y, light.position.z);

@@ -275,7 +275,7 @@ void LightManager::selectLight(glm::vec2 mousePosition)
 		glm::vec2 p(p4);
 
 		/*
-		std::stringstream ss;
+		std::stringstream ss;1
 		ss << "mousePos: " << mousePosition.x << " / " << mousePosition.y << "   lightPos: " << p.x << " / " << p.y;
 		Error::report("Debug", ss.str());
 		*/
@@ -283,7 +283,7 @@ void LightManager::selectLight(glm::vec2 mousePosition)
 		// get the screen space distance between the light position and the mouse cursor
 		float distance = glm::length(glm::vec2(p - mousePosition));
 
-		if (distance < .04f)
+		if (distance < /*.04f*/ .1f)
 		// if the mouse was clicked close to the light
 		{
 			// select it and we're done

@@ -36,6 +36,8 @@ bool ForwardRenderer::init()
 	if (!loadShaders())
 		return false;
 
+	doAA = false;
+
 	return true;
 }
 
@@ -50,12 +52,15 @@ void ForwardRenderer::render(Camera *camera)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(forwardShader->program);
 
+	if (doAA)
+		glEnable(GL_MULTISAMPLE);
+
 	int lightsPassed = 0;
 	for (DirectionalLight *light : lightManager->lights)
 	{
 		forwardShader->setLightParameterUniforms(lightsPassed, *light);
 
-		if (++lightsPassed > 7)
+		if (++lightsPassed > 33)
 			break;
 	}
 
@@ -70,4 +75,7 @@ void ForwardRenderer::render(Camera *camera)
 
 	// switch cull direction for later renderers
 	glCullFace(GL_FRONT);
+
+	if (doAA)
+		glDisable(GL_MULTISAMPLE);
 }

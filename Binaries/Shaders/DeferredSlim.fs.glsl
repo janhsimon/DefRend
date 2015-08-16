@@ -51,7 +51,10 @@ void main()
 
 	if (light.type == 0)
 	// directional light
-		color = vec4(diffuseTextureColor * light.diffuseColor, 1.0) * (dot(-lightDirection, normal) * light.diffuseIntensity);
+	{
+		float diffuseTerm = dot(-lightDirection, normal);
+		color = vec4(diffuseTerm * light.diffuseColor * diffuseTextureColor, 1.0);
+	}
 	else
 	// point or spot light
 	{
@@ -81,8 +84,15 @@ void main()
 				SpecularColor = light.diffuseColor * SpecularFactor * materialSpecularReflectivity;
 		}
 
-		float diffuseAttenuationFactor = 1.0 - sqrt(distance / light.diffuseIntensity);
-		float specularAttenuationFactor = 1.0 - sqrt(distance / light.specularIntensity);
+		float diffuseAttenuationFactor = 0.0;
+
+		if (light.diffuseIntensity > 0.0)
+			diffuseAttenuationFactor = 1.0 - sqrt(distance / light.diffuseIntensity);
+
+		float specularAttenuationFactor = 0.0;
+
+		if (light.specularIntensity > 0.0)
+			specularAttenuationFactor = 1.0 - sqrt(distance / light.specularIntensity);
 
 		color = vec4(diffuseTextureColor * (DiffuseColor * clamp(diffuseAttenuationFactor, 0.0, 1.0) + SpecularColor * clamp(specularAttenuationFactor, 0.0, 1.0)), 1.0);
 

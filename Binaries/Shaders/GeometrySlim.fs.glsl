@@ -17,9 +17,9 @@ uniform sampler2D opacityMap;
 
 vec3 calcTangentSpaceNormal()
 {
-	vec3 n = normalize(vs_fs_normal);
 	vec3 t = normalize(vs_fs_tangent);
 	vec3 b = normalize(vs_fs_bitangent);
+	vec3 n = normalize(vs_fs_normal);
 	mat3 tbn = mat3(t, b, n);
 
 	vec3 normal = texture(normalMap, vs_fs_uv).rgb;

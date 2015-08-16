@@ -13,7 +13,7 @@ struct LightInfo
 	float cutoffCosine;
 };
 
-uniform LightInfo light[8];
+uniform LightInfo light[33];
 uniform int lightsPassed;
 
 in vec2 vs_fs_uv;
@@ -34,10 +34,9 @@ uniform vec3 eyePosition;
 
 vec3 calcTangentSpaceNormal()
 {
-	vec3 n = normalize(vs_fs_normal);
 	vec3 t = normalize(vs_fs_tangent);
-	//vec3 b = cross(t, n);
 	vec3 b = normalize(vs_fs_bitangent);
+	vec3 n = normalize(vs_fs_normal);
 	mat3 tbn = mat3(t, b, n);
 
 	vec3 normal = texture(normalMap, vs_fs_uv).rgb;
@@ -53,15 +52,19 @@ void main()
 	if (texture(opacityMap, vs_fs_uv).r < 0.5)
 		discard;
 
-	vec3 diffuseTexture = texture(diffuseMap, vs_fs_uv).rgb;
-	
-	vec3 c = vec3(0.0, 0.0, 0.0);
+	vec3 c = vec3(0.0);
 
 	for (int i = 0; i < lightsPassed; ++i)
 	{
 		if (light[i].type == 0)
 		// directional light
-			c += dot(-light[i].direction, calcTangentSpaceNormal()) * light[i].diffuseColor * light[i].diffuseIntensity;
+		{
+			vec3 v = -light[i].direction;
+			v = normalize(v);
+			vec3 n = calcTangentSpaceNormal();
+			float diffuseTerm = clamp(dot(v, n), 0.0, 1.0);
+			c += diffuseTerm * light[i].diffuseColor;
+		}
 		else
 		// point or spot light
 		{
@@ -69,25 +72,33 @@ void main()
 			float distance = length(v);
 			v = normalize(v);
 			vec3 n = calcTangentSpaceNormal();
-			float diffuseFactor = dot(v, n);
+			float diffuseFactor = clamp(dot(v, n), 0.0, 1.0);
 
-			float SpecularFactor = 0.0;
-
-			vec3 SpecularColor = vec3(0.0, 0.0, 0.0);
-
+			float specularFactor = 0.0;
+			
 			if (diffuseFactor > 0.0)
 			{
 				vec3 VertexToEye = normalize(eyePosition - vs_fs_worldPosition);
 				vec3 LightReflect = normalize(reflect(-v, n));
-				SpecularFactor = pow(dot(VertexToEye, LightReflect), light[i].specularPower);
+				float spec = pow(dot(VertexToEye, LightReflect), light[i].specularPower);
 
-				if (SpecularFactor > 0.0)
-					SpecularColor = light[i].diffuseColor * SpecularFactor * texture(specularMap, vs_fs_uv).r;
+				if (spec > 0.0)
+					specularFactor = spec * texture(specularMap, vs_fs_uv).r;
 			}
 
-			float diffuseAttenuationFactor = 1.0 - sqrt(distance / light[i].diffuseIntensity);
-			float specularAttenuationFactor = 1.0 - sqrt(distance / light[i].specularIntensity);
+			float diffuseAttenuationFactor = 0.0;
 
+			if (light[i].diffuseIntensity > 0.0)
+				diffuseAttenuationFactor = 1.0 - sqrt(distance / light[i].diffuseIntensity);
+				
+			float specularAttenuationFactor = 0.0;
+
+			if (light[i].specularIntensity > 0.0)
+				specularAttenuationFactor = 1.0 - sqrt(distance / light[i].specularIntensity);
+				
+			float diffuseTerm = diffuseFactor * clamp(diffuseAttenuationFactor, 0.0, 1.0);
+			float specularTerm = specularFactor * clamp(specularAttenuationFactor, 0.0, 1.0);
+			
 			if (light[i].type == 2)
 			// spot lighting
 			{
@@ -98,14 +109,15 @@ void main()
 
 				if (SpotFactor > light[i].cutoffCosine)
 					spot = (1.0 - (1.0 - SpotFactor) * 1.0 / (1.0 - light[i].cutoffCosine));
-				
-				c += light[i].diffuseColor * spot * diffuseFactor * clamp(diffuseAttenuationFactor, 0.0, 1.0) + SpecularColor * clamp(specularAttenuationFactor, 0.0, 1.0) * spot;
+
+				c += (diffuseTerm + specularTerm) * light[i].diffuseColor * spot;
 			}
-			else
+			else if (light[i].type == 1)
 			// point lighting
-				c += light[i].diffuseColor * diffuseFactor * clamp(diffuseAttenuationFactor, 0.0, 1.0) + SpecularColor * clamp(specularAttenuationFactor, 0.0, 1.0);
+				c += (diffuseTerm + specularTerm) * light[i].diffuseColor;
 		}
 	}
 
+	vec3 diffuseTexture = texture(diffuseMap, vs_fs_uv).rgb;
 	color = vec4(diffuseTexture * c, 1.0);
 }

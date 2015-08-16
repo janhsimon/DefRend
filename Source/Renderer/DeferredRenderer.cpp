@@ -134,6 +134,8 @@ bool DeferredRenderer::init()
 	if (!loadModels())
 		return false;
 
+	doAA = false;
+
 	return true;
 }
 
@@ -290,11 +292,11 @@ void DeferredRenderer::render(Camera *camera)
 			else if (gBuffer->type == GBufferType::SUPER_SLIM)
 				deferredSuperSlimShader->setWorldViewProjectionUniforms(glm::mat4(1.f), glm::mat4(1.f), glm::mat4(1.f));
 		}
-		else if (l->type == LightType::POINT_LIGHT)
+		else if (l->type == LightType::POINT_LIGHT || l->type == LightType::SPOT_LIGHT)
 		{
 			PointLight *p = (PointLight*)l;
 
-			if (p->getCastShadows())
+			if (p->type == LightType::POINT_LIGHT && p->getCastShadows())
 			{
 				unsigned int shadowMap = GL_TEXTURE2;
 

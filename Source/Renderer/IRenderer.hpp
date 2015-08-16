@@ -12,6 +12,7 @@ class IRenderer
 {
 public:
 	RendererType type;
+	bool doAA;
 
 	virtual ~IRenderer() {};
 

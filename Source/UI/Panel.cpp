@@ -19,11 +19,6 @@ extern Window *window;
 Panel::Panel(const glm::vec2 &position, const glm::vec2 &size, bool isTextured) : Element(position, size)
 {
 	this->isTextured = isTextured;
-
-	//isMRTRGB = false;
-	//isMRTA = false;
-	//mrtScale = 1.f;
-
 	mode = PanelMode::CUSTOM_TEXTURE;
 }
 

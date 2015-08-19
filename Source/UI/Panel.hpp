@@ -24,8 +24,6 @@ private:
 public:
 	GLuint texture;
 	glm::vec4 color;
-	//bool isMRTRGB, isMRTA;
-	//float mrtScale;
 	PanelMode mode;
 
 	Panel(const glm::vec2 &position, const glm::vec2 &size, bool isTextured);

@@ -9,6 +9,7 @@ class Element
 public:
 	glm::vec2 position;
 	glm::vec2 size;
+	bool visible;
 
 	Element(const glm::vec2 & position, const glm::vec2 & size);
 	virtual ~Element();

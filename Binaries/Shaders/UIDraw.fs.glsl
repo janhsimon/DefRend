@@ -25,7 +25,6 @@ vec3 unpackNormal(vec2 uv)
 	uint ny = (nr & 7u) << 3;
 	ny = ny | (ng >> 5);
 
-	// [0, 1]
 	normal.x = float(nx) / 31.0; // 5-bit
 	normal.y = float(ny) / 63.0; // 6-bit
 	normal.z = float(nz) / 31.0; // 5-bit
@@ -96,7 +95,10 @@ void main()
 			outColor = vec4(unpackNormal(vs_fs_uv), 1.0);
 		else if (gBufferLayout == 1 || gBufferLayout == 2)
 		// slim or fat
-			outColor = vec4(texture(textureMap, vs_fs_uv).rgb, 1.0);
+		{
+			vec3 normal = texture(textureMap, vs_fs_uv).rgb;
+			outColor = vec4(normalize(normal), 1.0);
+		}
 	}
 	else if (mode == 5)
 	// gbuffer depth

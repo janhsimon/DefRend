@@ -17,8 +17,6 @@ private:
 	glm::vec2 lastMousePosition;
 
 public:
-	bool visible;
-
 	Frame(const glm::vec2 &position, const glm::vec2 &size);
 	virtual ~Frame();
 

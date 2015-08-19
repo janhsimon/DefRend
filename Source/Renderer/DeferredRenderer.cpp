@@ -146,8 +146,13 @@ void DeferredRenderer::doShadowPass(PointLight *pointLight)
 	shadowPassShader->setPointLightPositionUniform(pointLight->position);
 	shadowPassShader->setCameraFarClipUniform(std::max(pointLight->diffuseIntensity, pointLight->specularIntensity));
 	
+	float zFar = std::max(pointLight->diffuseIntensity, pointLight->specularIntensity);
+	
+	if (zFar <= 1.f)
+		return;
+
 	// fov needs to be negative 90 to make sure the shadow map sides aren't all flipped upside-down
-	glm::mat4 pointLightProjectionMatrix = glm::perspective(glm::radians(-90.f), 1.f, 1.f, std::max(pointLight->diffuseIntensity, pointLight->specularIntensity));
+	glm::mat4 pointLightProjectionMatrix = glm::perspective(glm::radians(-90.f), 1.f, 1.f, zFar);
 	
 	for (int i = 0; i < 6; ++i)
 	{

@@ -33,7 +33,7 @@ bool GBufferInspector::create()
 
 
 
-	if (!Util::checkMemory(labelLayout = new Label(glm::vec2(50.f + 5.f, 475.f + 10.f), "Layout:"))) // 240 -> 475
+	if (!Util::checkMemory(labelLayout = new Label(glm::vec2(50.f + 5.f, 475.f + 10.f), "Layout:")))
 		return false;
 
 	addChildElement(labelLayout);
@@ -64,7 +64,7 @@ bool GBufferInspector::create()
 	addChildElement(labelA);
 
 
-	if (!Util::checkMemory(panelMRT0 = new Panel(glm::vec2(50.f, 520.f), glm::vec2(100.f, 40.f), false))) // 285 -> 520
+	if (!Util::checkMemory(panelMRT0 = new Panel(glm::vec2(50.f, 520.f), glm::vec2(100.f, 40.f), false)))
 		return false;
 
 	panelMRT0->color = glm::vec4(0.f, 0.f, 0.f, .5f);
@@ -76,7 +76,7 @@ bool GBufferInspector::create()
 
 	addChildElement(labelMRT0);
 
-	if (!Util::checkMemory(panelMRT1 = new Panel(glm::vec2(50.f, 565.f), glm::vec2(100.f, 40.f), false))) // 330 -> 565
+	if (!Util::checkMemory(panelMRT1 = new Panel(glm::vec2(50.f, 565.f), glm::vec2(100.f, 40.f), false)))
 		return false;
 
 	panelMRT1->color = glm::vec4(0.f, 0.f, 0.f, .5f);
@@ -158,6 +158,8 @@ void GBufferInspector::update()
 	if (sceneRenderer->type != RendererType::DEFERRED_RENDERER)
 		return;
 
+	DeferredRenderer *deferredRenderer = (DeferredRenderer*)sceneRenderer;
+
 	if (pushButton[0][0]->getPushed())
 	// albedo button
 	{
@@ -167,7 +169,13 @@ void GBufferInspector::update()
 	else if (pushButton[1][0]->getPushed())
 	// depth button
 	{
-		panelViewer->texture = ((DeferredRenderer*)sceneRenderer)->gBuffer->getTexture(0/*3*/);
+		if (deferredRenderer->gBuffer->type == GBufferType::SUPER_SLIM)
+			panelViewer->texture = ((DeferredRenderer*)sceneRenderer)->gBuffer->getTexture(1);
+		else if (deferredRenderer->gBuffer->type == GBufferType::SLIM)
+			panelViewer->texture = ((DeferredRenderer*)sceneRenderer)->gBuffer->getTexture(0);
+		else if (deferredRenderer->gBuffer->type == GBufferType::FAT)
+			panelViewer->texture = ((DeferredRenderer*)sceneRenderer)->gBuffer->getTexture(3);
+
 		panelViewer->mode = PanelMode::GBUFFER_DEPTH;
 	}
 	else if (pushButton[0][1]->getPushed())
@@ -179,7 +187,13 @@ void GBufferInspector::update()
 	else if (pushButton[1][1]->getPushed())
 	// specular button
 	{
-		panelViewer->texture = ((DeferredRenderer*)sceneRenderer)->gBuffer->getTexture(1/*2*/);
+		if (deferredRenderer->gBuffer->type == GBufferType::SUPER_SLIM)
+			panelViewer->texture = ((DeferredRenderer*)sceneRenderer)->gBuffer->getTexture(0);
+		else if (deferredRenderer->gBuffer->type == GBufferType::SLIM)
+			panelViewer->texture = ((DeferredRenderer*)sceneRenderer)->gBuffer->getTexture(1);
+		else if (deferredRenderer->gBuffer->type == GBufferType::FAT)
+			panelViewer->texture = ((DeferredRenderer*)sceneRenderer)->gBuffer->getTexture(2);
+
 		panelViewer->mode = PanelMode::GBUFFER_SPECULAR;
 	}
 

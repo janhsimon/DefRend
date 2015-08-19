@@ -1,12 +1,18 @@
 #include <gtc\matrix_transform.hpp>
 
 #include "Panel.hpp"
+#include "..\Camera\Camera.hpp"
+#include "..\GBuffer\IGBuffer.hpp"
 #include "..\Material\TextureManager.hpp"
+#include "..\Renderer\DeferredRenderer.hpp"
+#include "..\Renderer\IRenderer.hpp"
 #include "..\Renderer\UnitQuad.hpp"
 #include "..\Renderer\UIRenderer.hpp"
 #include "..\Util\Util.hpp"
 #include "..\Window\Window.hpp"
 
+extern Camera *camera;
+extern IRenderer *sceneRenderer;
 extern UIRenderer *uiRenderer;
 extern Window *window;
 
@@ -49,22 +55,37 @@ void Panel::render(const glm::vec2 &parentPosition)
 	uiRenderer->getUIDrawShader()->setUVScaleUniform(glm::vec2(1.f, -1.f));
 
 	uiRenderer->getUIDrawShader()->setColorUniform(color);
-	//uiRenderer->getUIDrawShader()->setColorOverrideUniform(!isTextured);
-	//uiRenderer->getUIDrawShader()->setMRTRGBOverrideUniform(isMRTRGB);
-	//uiRenderer->getUIDrawShader()->setMRTAOverrideUniform(isMRTA);
-	//uiRenderer->getUIDrawShader()->setMRTScaleUniform(mrtScale);
 	uiRenderer->getUIDrawShader()->setModeUniform(!isTextured ? 1 : mode);
+	uiRenderer->getUIDrawShader()->setCameraFarClip(camera->farClipPlane);
 
 	if (isTextured)
 	{
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
 	}
+
+	if (sceneRenderer->type == DEFERRED_RENDERER)
+	{
+		DeferredRenderer *deferredRenderer = (DeferredRenderer*)sceneRenderer;
+		uiRenderer->getUIDrawShader()->setGBufferLayoutUniform(deferredRenderer->gBuffer->type);
+
+		if (deferredRenderer->gBuffer->type == GBufferType::SUPER_SLIM)
+		{
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, texture);
+		}
+	}
 	
 	UnitQuad::render();
 
 	if (isTextured)
+	{
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, 0);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
 }
 
 void Panel::onMouseButtonDown(const glm::vec2 &mousePosition, int mouseButton)

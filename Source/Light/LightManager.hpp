@@ -23,6 +23,7 @@ public:
 	void addPointLight();
 	void addSpotLight();
 	void deleteSelectedLight();
+	void setShadowsForSelectedLight(bool toggle);
 
 	inline int getSelectedLightIndex() const { return selectedLightIndex; }
 	void selectLight(glm::vec2 mousePosition);

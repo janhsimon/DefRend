@@ -125,6 +125,9 @@ void InputManager::sendKeyboardEvent(const SDL_Event &event)
 			sceneRenderer->doAA = !sceneRenderer->doAA;
 	}
 
+	else if (event.key.keysym.sym == SDLK_DELETE && event.type == SDL_KEYUP)
+		lightManager->deleteSelectedLight();
+
 	else if (event.key.keysym.sym == SDLK_w)
 		forwardKeyPressed = event.type == SDL_KEYDOWN;
 	else if (event.key.keysym.sym == SDLK_s)

@@ -4,9 +4,9 @@
 
 enum GBufferType
 {
-	FAT,
+	SUPER_SLIM,
 	SLIM,
-	SUPER_SLIM
+	FAT
 };
 
 class IGBuffer

@@ -6,12 +6,11 @@
 const std::string UIDrawShader::WORLD_MATRIX_UNIFORM_NAME = "worldMatrix";
 const std::string UIDrawShader::UV_SCALE_UNIFORM_NAME = "uvScale";
 const std::string UIDrawShader::COLOR_UNIFORM_NAME = "color";
-//const std::string UIDrawShader::COLOR_OVERRIDE_UNIFORM_NAME = "colorOverride";
-//const std::string UIDrawShader::MRT_RGB_OVERRIDE_UNIFORM_NAME = "mrtRGBReinterpretOverride";
-//const std::string UIDrawShader::MRT_A_OVERRIDE_UNIFORM_NAME = "mrtAReinterpretOverride";
-//const std::string UIDrawShader::MRT_SCALE_UNIFORM_NAME = "mrtScale";
 const std::string UIDrawShader::MODE_UNIFORM_NAME = "mode";
-const std::string UIDrawShader::DIFFUSE_MAP_UNIFORM_NAME = "diffuseMap";
+const std::string UIDrawShader::GBUFFER_LAYOUT_UNIFORM_NAME = "gBufferLayout";
+const std::string UIDrawShader::TEXTURE_MAP_UNIFORM_NAME = "textureMap";
+const std::string UIDrawShader::UINT_TEXTURE_MAP_UNIFORM_NAME = "uintTextureMap";
+const std::string UIDrawShader::CAMERA_FAR_CLIP_UNIFORM_NAME = "farClip";
 
 bool UIDrawShader::create()
 {
@@ -32,29 +31,26 @@ bool UIDrawShader::create()
 	if (!getUniformLocation(COLOR_UNIFORM_NAME, colorUniformLocation))
 		return false;
 
-	/*
-	if (!getUniformLocation(COLOR_OVERRIDE_UNIFORM_NAME, colorOverrideUniformLocation))
-		return false;
-
-	if (!getUniformLocation(MRT_RGB_OVERRIDE_UNIFORM_NAME, mrtRGBOverrideUniformLocation))
-		return false;
-
-	if (!getUniformLocation(MRT_A_OVERRIDE_UNIFORM_NAME, mrtAOverrideUniformLocation))
-		return false;
-
-	if (!getUniformLocation(MRT_SCALE_UNIFORM_NAME, mrtScaleUniformLocation))
-		return false;
-	*/
-
 	if (!getUniformLocation(MODE_UNIFORM_NAME, modeUniformLocation))
 		return false;
 
-	GLint diffuseMapUniformLocation;
-
-	if (!getUniformLocation(DIFFUSE_MAP_UNIFORM_NAME, diffuseMapUniformLocation))
+	if (!getUniformLocation(GBUFFER_LAYOUT_UNIFORM_NAME, gBufferLayoutUniformName))
 		return false;
 
-	glUniform1i(diffuseMapUniformLocation, 0);
+	if (!getUniformLocation(CAMERA_FAR_CLIP_UNIFORM_NAME, cameraFarClipUniformLocation))
+		return false;
+
+	GLint uintTextureMapUniformLocation, textureMapUniformLocation;
+
+	if (!getUniformLocation(TEXTURE_MAP_UNIFORM_NAME, textureMapUniformLocation))
+		return false;
+
+	glUniform1i(textureMapUniformLocation, 0);
+
+	if (!getUniformLocation(UINT_TEXTURE_MAP_UNIFORM_NAME, uintTextureMapUniformLocation))
+		return false;
+
+	glUniform1i(uintTextureMapUniformLocation, 1);
 
 	GLenum error = glGetError();
 	if (error != GL_NO_ERROR)
@@ -81,29 +77,17 @@ void UIDrawShader::setColorUniform(const glm::vec4 &color)
 	glUniform4f(colorUniformLocation, color.r, color.g, color.b, color.a);
 }
 
-/*
-void UIDrawShader::setColorOverrideUniform(bool colorOverride)
-{
-	glUniform1i(colorOverrideUniformLocation, colorOverride);
-}
-
-void UIDrawShader::setMRTRGBOverrideUniform(bool mrtRGBOverride)
-{
-	glUniform1i(mrtRGBOverrideUniformLocation, mrtRGBOverride);
-}
-
-void UIDrawShader::setMRTAOverrideUniform(bool mrtAOverride)
-{
-	glUniform1i(mrtAOverrideUniformLocation, mrtAOverride);
-}
-
-void UIDrawShader::setMRTScaleUniform(float mrtScale)
-{
-	glUniform1f(mrtScaleUniformLocation, mrtScale);
-}
-*/
-
 void UIDrawShader::setModeUniform(int mode)
 {
 	glUniform1i(modeUniformLocation, mode);
+}
+
+void UIDrawShader::setGBufferLayoutUniform(int layout)
+{
+	glUniform1i(gBufferLayoutUniformName, layout);
+}
+
+void UIDrawShader::setCameraFarClip(float farClip)
+{
+	glUniform1f(cameraFarClipUniformLocation, farClip);
 }

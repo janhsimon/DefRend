@@ -241,44 +241,49 @@ void render()
 	
 	uiRenderer->drawText(s.str(), glm::vec2(5.f, window->height - 25.f), color);
 
-	uiRenderer->drawText("[W], [A], [S], [D], [Q], [E] to MOVE the camera", glm::vec2(5.f, 5.f), color);
-	uiRenderer->drawText("[U], [H], [J], [K], [Y], [I] to MOVE the selected light", glm::vec2(5.f, 23.f), color);
-	uiRenderer->drawText("[SHIFT] to SLOW camera movement", glm::vec2(5.f, 41.f), color);
+	float y = 5.f - 18.f;
+
+	uiRenderer->drawText("[W], [A], [S], [D], [Q], [E] to MOVE the camera", glm::vec2(5.f, y += 18.f), color);
+	uiRenderer->drawText("[U], [H], [J], [K], [Y], [I] to MOVE the selected light", glm::vec2(5.f, y += 18.f), color);
+	uiRenderer->drawText("[DEL] to DELETE selected light", glm::vec2(5.f, y += 18.f), color);
+	uiRenderer->drawText("[SHIFT] to SLOW camera movement", glm::vec2(5.f, y += 18.f), color);
 
 	if (camera->getFirstPerson())
-		uiRenderer->drawText("[SPACE] to UNLOCK mouse cursor", glm::vec2(5.f, 59.f), color);
+		uiRenderer->drawText("[SPACE] to UNLOCK mouse cursor", glm::vec2(5.f, y += 18.f), color);
 	else
-		uiRenderer->drawText("[SPACE] to LOCK mouse cursor", glm::vec2(5.f, 59.f), color);
+		uiRenderer->drawText("[SPACE] to LOCK mouse cursor", glm::vec2(5.f, y += 18.f), color);
 	
 	if (sceneRenderer->type == RendererType::FORWARD_RENDERER)
 	{
-		uiRenderer->drawText("[R] to SWITCH to Deferred Renderer", glm::vec2(5.f, 77.f), color);
+		uiRenderer->drawText("[R] to SWITCH to Deferred Renderer", glm::vec2(5.f, y += 18.f), color);
 		
 		if (sceneRenderer->doAA)
-			uiRenderer->drawText("[N] to DISABLE antialiasing (MSAA x4)", glm::vec2(5.f, 95.f), color);
+			uiRenderer->drawText("[N] to DISABLE antialiasing (MSAA x4)", glm::vec2(5.f, y += 18.f), color);
 		else
-			uiRenderer->drawText("[N] to ENABLE antialiasing (MSAA x4)", glm::vec2(5.f, 95.f), color);
+			uiRenderer->drawText("[N] to ENABLE antialiasing (MSAA x4)", glm::vec2(5.f, y += 18.f), color);
 	}
 	else
 	{
-		uiRenderer->drawText("[R] to SWITCH to Forward Renderer", glm::vec2(5.f, 77.f), color);
-		uiRenderer->drawText("[_] antialiasing disabled while using Deferred Renderer", glm::vec2(5.f, 95.f), color);
+		uiRenderer->drawText("[R] to SWITCH to Forward Renderer", glm::vec2(5.f, y += 18.f), color);
 	}
 
 	if (showBillboards)
-		uiRenderer->drawText("[X] to HIDE light icons", glm::vec2(5.f, 112.f), color);
+		uiRenderer->drawText("[X] to HIDE light icons", glm::vec2(5.f, y += 18.f), color);
 	else
-		uiRenderer->drawText("[X] to SHOW light icons", glm::vec2(5.f, 112.f), color);
+		uiRenderer->drawText("[X] to SHOW light icons", glm::vec2(5.f, y += 18.f), color);
 
-	if (gBufferInspector->visible)
-		uiRenderer->drawText("[G] to HIDE \"G-Buffer Inspector\" window", glm::vec2(5.f, 130.f), color);
-	else
-		uiRenderer->drawText("[G] to SHOW \"G-Buffer Inspector\" window", glm::vec2(5.f, 130.f), color);
+	if (sceneRenderer->type == RendererType::DEFERRED_RENDERER)
+	{
+		if (gBufferInspector->visible)
+			uiRenderer->drawText("[G] to HIDE \"G-Buffer Inspector\" window", glm::vec2(5.f, y += 18.f), color);
+		else
+			uiRenderer->drawText("[G] to SHOW \"G-Buffer Inspector\" window", glm::vec2(5.f, y += 18.f), color);
+	}
 
 	if (lightEditor->visible)
-		uiRenderer->drawText("[L] to HIDE \"Light Editor\" window", glm::vec2(5.f, 148.f), color);
+		uiRenderer->drawText("[L] to HIDE \"Light Editor\" window", glm::vec2(5.f, y += 18.f), color);
 	else
-		uiRenderer->drawText("[L] to SHOW \"Light Editor\" window", glm::vec2(5.f, 148.f), color);
+		uiRenderer->drawText("[L] to SHOW \"Light Editor\" window", glm::vec2(5.f, y += 18.f), color);
 
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);

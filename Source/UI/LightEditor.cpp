@@ -27,28 +27,14 @@ void deleteLight()
 	lightManager->deleteSelectedLight();
 }
 
-void doCastShadows()
+void enableShadows()
 {
-	DirectionalLight *l = lightManager->lights[lightManager->getSelectedLightIndex()];
-
-	if (l->type != LightType::POINT_LIGHT)
-		return;
-
-	PointLight *p = (PointLight*)l;
-
-	p->setCastShadows(true);
+	lightManager->setShadowsForSelectedLight(true);
 }
 
-void doNotCastShadows()
+void disableShadows()
 {
-	DirectionalLight *l = lightManager->lights[lightManager->getSelectedLightIndex()];
-
-	if (l->type != LightType::POINT_LIGHT)
-		return;
-
-	PointLight *p = (PointLight*)l;
-
-	p->setCastShadows(false);
+	lightManager->setShadowsForSelectedLight(false);
 }
 
 LightEditor::LightEditor(glm::vec2 position) : Frame(position, glm::vec2(256.f, 512.f))
@@ -177,8 +163,8 @@ bool LightEditor::create()
 	if (!pushButtonCastShadows->create())
 		return false;
 
-	pushButtonCastShadows->onPushDown = &doCastShadows;
-	pushButtonCastShadows->onPushUp = &doNotCastShadows;
+	pushButtonCastShadows->onPushDown = &enableShadows;
+	pushButtonCastShadows->onPushUp = &disableShadows;
 
 	addChildElement(pushButtonCastShadows);
 

@@ -26,7 +26,7 @@ bool LightManager::create()
 {
 	selectedLightIndex = -1;
 
-	/*
+	
 	// add a directional light
 
 	DirectionalLight *d;
@@ -41,7 +41,7 @@ bool LightManager::create()
 	d->diffuseIntensity = 1.f;
 	lights.push_back(d);
 
-
+	/*
 	// add point lights
 	
 	PointLight *p;
@@ -227,14 +227,35 @@ void LightManager::addSpotLight()
 
 void LightManager::deleteSelectedLight()
 {
+	if (selectedLightIndex < 0 || selectedLightIndex >= lights.size())
+		return;
+	
 	lights.erase(lights.begin() + selectedLightIndex);
-	selectedLightIndex = 0;
+	selectedLightIndex = -1;
+}
+
+void LightManager::setShadowsForSelectedLight(bool toggle)
+{
+	if (selectedLightIndex < 0 || selectedLightIndex >= lights.size())
+		return;
+
+	DirectionalLight *l = lights[selectedLightIndex];
+
+	if (l->type != LightType::POINT_LIGHT)
+		return;
+
+	PointLight *p = (PointLight*)l;
+
+	p->setCastShadows(toggle);
 }
 
 void LightManager::selectLight(glm::vec2 mousePosition)
 {
 	assert(window);
 	assert(camera);
+
+	if (lights.size() <= 0)
+		return;
 
 
 	// bring mouse position into OpenGL screen space range (-1,1 top left)
@@ -248,10 +269,6 @@ void LightManager::selectLight(glm::vec2 mousePosition)
 
 	// flip y
 	mousePosition.y = -mousePosition.y;
-
-
-	if (lights.size() <= 0)
-		return;
 
 	glm::vec2 lightPos(lights[0]->position);
 
